@@ -1,7 +1,6 @@
-
+// authSlice.ts
 import { User } from "@/src/type/auth.types";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-
 
 interface AuthState {
   user: User | null;
@@ -10,13 +9,36 @@ interface AuthState {
   isAuthenticated: boolean;
 }
 
-// Khởi tạo state ban đầu (có thể lấy từ localStorage nếu cần persist ngay lúc load)
-const initialState: AuthState = {
-  user: null,
-  token: null, // Access Token
-  refreshToken: null,
-  isAuthenticated: false,
+// --- HÀM HELPER ĐỂ LẤY DỮ LIỆU TỪ LS ---
+const getInitialStateFromStorage = (): AuthState => {
+  if (typeof window === 'undefined') {
+    return { user: null, token: null, refreshToken: null, isAuthenticated: false };
+  }
+
+  try {
+    const token = localStorage.getItem("accessToken");
+    const refreshToken = localStorage.getItem("refreshToken");
+    // Lưu ý: User object nên được lưu vào LS dưới dạng JSON string khi login
+    const userJson = localStorage.getItem("user"); 
+    const user = userJson ? JSON.parse(userJson) : null;
+
+    if (token && refreshToken && user) {
+      return {
+        user: user,
+        token: token,
+        refreshToken: refreshToken,
+        isAuthenticated: true, // Đã có token thì coi như đã login
+      };
+    }
+  } catch (error) {
+    console.error("Lỗi parse JSON từ localStorage", error);
+  }
+
+  return { user: null, token: null, refreshToken: null, isAuthenticated: false };
 };
+
+// SỬ DỤNG HÀM TRÊN ĐỂ KHỞI TẠO
+const initialState: AuthState = getInitialStateFromStorage();
 
 const authSlice = createSlice({
   name: "auth",
@@ -32,10 +54,11 @@ const authSlice = createSlice({
       state.refreshToken = refreshToken;
       state.isAuthenticated = true;
       
-      // Lưu vào localStorage để persist (Hoặc dùng thư viện redux-persist)
       if (typeof window !== 'undefined') {
         localStorage.setItem("accessToken", accessToken);
         localStorage.setItem("refreshToken", refreshToken);
+        // QUAN TRỌNG: Lưu cả thông tin user để khi F5 còn load lại được
+        localStorage.setItem("user", JSON.stringify(user)); 
       }
     },
     logOut: (state) => {
@@ -47,9 +70,9 @@ const authSlice = createSlice({
       if (typeof window !== 'undefined') {
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
+        localStorage.removeItem("user"); // Xóa user
       }
     },
-    // Action cập nhật token mới sau khi refresh thành công
     tokenReceived: (state, action: PayloadAction<{ accessToken: string, refreshToken: string }>) => {
       state.token = action.payload.accessToken;
       state.refreshToken = action.payload.refreshToken;

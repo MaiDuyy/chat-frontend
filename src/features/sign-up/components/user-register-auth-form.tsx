@@ -90,7 +90,7 @@ export function UserRegisterForm({ className, ...props }: React.HTMLAttributes<H
                 // @ts-ignore
                 await registerUser(requestData).unwrap();
 
-                return "Đăng ký tài khoản thành công!";
+                return { message: "Đăng ký tài khoản thành công!", email: data.email };
             } catch (error: any) {
                 // Xử lý lỗi từ server
                 const msg = error?.data?.message || "Đăng ký thất bại.";
@@ -108,10 +108,11 @@ export function UserRegisterForm({ className, ...props }: React.HTMLAttributes<H
 
         toast.promise(registerPromise(), {
             loading: "Đang tạo tài khoản...",
-            success: (msg) => {
+            success: (result) => {
                 setIsSpinning(false);
-                router.push("/auth/sign-in"); // Chuyển hướng về trang đăng nhập
-                return msg;
+                // Chuyển hướng đến trang xác thực OTP với email
+                router.push(`/auth/verify-email?email=${encodeURIComponent(result.email)}`);
+                return result.message;
             },
             error: (err) => {
                 setIsSpinning(false);

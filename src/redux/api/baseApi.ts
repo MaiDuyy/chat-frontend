@@ -8,9 +8,16 @@ const mutex = new Mutex();
 
 const baseQuery = fetchBaseQuery({
   baseUrl: process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api", // URL Backend
-  prepareHeaders: (headers, { getState }) => {
-    // Lấy token từ Redux Store
-    const token = (getState() as RootState).auth.token || localStorage.getItem("accessToken");
+  credentials: "include",
+prepareHeaders: (headers, { getState }) => {
+    // 1. Thử lấy token từ Redux Store
+    let token = (getState() as RootState).auth.token;
+
+    // 2. Nếu Redux null (ví dụ vừa F5 xong), lấy từ localStorage
+    if (!token && typeof window !== 'undefined') {
+       token = localStorage.getItem("accessToken");
+    }
+
     if (token) {
       headers.set("authorization", `Bearer ${token}`);
     }
@@ -83,6 +90,6 @@ const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQue
 export const apiSlice = createApi({
   reducerPath: "api",
   baseQuery: baseQueryWithReauth,
-  tagTypes: ["User"], // Dùng để invalidate cache nếu cần
+  tagTypes: ["User", "Account"], // Dùng để invalidate cache nếu cần
   endpoints: () => ({}),
 });

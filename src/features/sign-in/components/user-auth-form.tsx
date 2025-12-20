@@ -81,7 +81,7 @@ export function UserAuthForm({
     const loginPromise = async () => {
       try {
         // Bước 1: Giả lập chờ 2 giây
-        await sleep(2000);
+        await sleep(500);
 
         const deviceInfo = getDeviceInfo();
 
@@ -107,7 +107,7 @@ export function UserAuthForm({
       loading: "Đang đăng nhập...",
       success: (message) => {
         setIsSpinning(false); // Tắt spinner
-        router.push("/dashboard");
+        router.push("/");
         return message;
       },
       error: (err) => {
@@ -153,7 +153,7 @@ export function UserAuthForm({
               </FormControl>
               <FormMessage />
               <Link
-                href="/forgot-password"
+                href="/auth/forgot-password"
                 className="text-muted-foreground absolute end-0 -top-0.5 text-sm font-medium hover:opacity-75"
               >
                 Quên mật khẩu?

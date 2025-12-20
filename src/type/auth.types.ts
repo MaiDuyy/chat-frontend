@@ -1,4 +1,4 @@
-export type RoleType = "USER" | "ADMIN" | "MANAGER"; // Tùy chỉnh theo enum của bạn
+export type RoleType = "USER" | "ADMIN" | "MODERATOR";
 
 export interface User {
   id: string;
@@ -6,8 +6,18 @@ export interface User {
   email: string;
   number: string;
   avatar?: string;
+  status?: string;
+  birthDate?: string;
+  location?: string;
+  gender?: string;
   role: RoleType;
   isVerified: boolean;
+  isOnline?: boolean;
+  lastSeen?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  currentAvatars?: string[];
+  pushToken?: string;
 }
 
 export interface AuthResponse {
@@ -47,4 +57,98 @@ export interface RegisterRequest {
 export interface ChangePasswordRequest {
   currentPassword: string;
   newPassword: string;
+}
+
+// ==================== OTP Types ====================
+
+export type OTPType = "VERIFY_EMAIL" | "RESET_PASSWORD" | "CHANGE_EMAIL";
+
+export interface SendOTPRequest {
+  email: string;
+}
+
+export interface VerifyEmailOTPRequest {
+  email: string;
+  code: string;
+}
+
+export interface ResetPasswordRequest {
+  email: string;
+  code: string;
+  newPassword: string;
+}
+
+export interface VerifyOTPRequest {
+  email: string;
+  code: string;
+  type: OTPType;
+}
+
+export interface ResendOTPRequest {
+  email: string;
+  type: OTPType;
+}
+
+export interface OTPResponse {
+  message: string;
+  expiresIn?: number;
+  retryAfter?: number;
+}
+
+export interface VerifyOTPResponse {
+  valid: boolean;
+  message: string;
+}
+
+// ==================== Account Types ====================
+
+export interface AccountDetails extends User {
+  currentAvatars: string[];
+}
+
+export interface UpdateAccountRequest {
+  name?: string;
+  birthDate?: string;
+  location?: string;
+  gender?: string;
+  pushToken?: string;
+}
+
+export interface UpdateStatusRequest {
+  status: string;
+}
+
+export interface UpdateOnlineStatusRequest {
+  isOnline: boolean;
+}
+
+export interface SelectAvatarRequest {
+  avatarUrl: string;
+}
+
+export interface AvatarHistoryResponse {
+  currentAvatar: string | null;
+  avatarHistory: string[];
+}
+
+export interface UploadAvatarResponse {
+  message: string;
+  user: {
+    id: string;
+    name: string;
+    avatar: string;
+    currentAvatars: string[];
+  };
+}
+
+export interface UserActivityStatus {
+  user: {
+    id: string;
+    name: string;
+    avatar: string | null;
+    status: string | null;
+    isOnline: boolean;
+    lastSeen: string | null;
+    lastSeenText: string;
+  };
 }
