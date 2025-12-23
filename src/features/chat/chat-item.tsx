@@ -54,6 +54,7 @@ import {
     useToggleNotifyChatMutation,
     useLeaveChatMutation,
 } from "@/src/redux/feature/chatApi";
+import { Chat } from "@/src/type/chat.types";
 
 // Định nghĩa lại Categories
 const FRIEND_CATEGORIES = [
@@ -64,7 +65,7 @@ const FRIEND_CATEGORIES = [
 ];
 
 interface ChatItemProps {
-    chat: any; // Thay any bằng interface Chat của bạn
+    chat: Chat; // Thay any bằng interface Chat của bạn
     isSelected: boolean;
     isOnline: boolean;
     isTyping: boolean;

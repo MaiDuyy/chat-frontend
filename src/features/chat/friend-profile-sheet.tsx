@@ -67,10 +67,10 @@ interface Friend {
     name: string;
     avatar: string | null;
     email?: string;
-    phone?: string;
-    bio?: string;
-    birthday?: string;
-    address?: string;
+    number?: string;
+    status?: string;
+    birthDate?: string;
+    location?: string;
     category?: string;
     lastSeen?: string;
     isOnline?: boolean;
@@ -101,6 +101,8 @@ export default function FriendProfileSheet({
 
     if (!friend) return null;
 
+    console.log("friend " , friend);
+    
     const initials = friend.name
         .split(" ")
         .map((n) => n[0])
@@ -271,10 +273,10 @@ export default function FriendProfileSheet({
                         </div>
 
                         {/* Bio */}
-                        {friend.bio && (
+                        {friend.status && (
                             <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                                 <p className="text-sm text-gray-600 dark:text-gray-300 italic">
-                                    "{friend.bio}"
+                                    "{friend.status}"
                                 </p>
                             </div>
                         )}
@@ -293,24 +295,24 @@ export default function FriendProfileSheet({
                                         <span className="text-gray-600 dark:text-gray-300">{friend.email}</span>
                                     </div>
                                 )}
-                                {friend.phone && (
+                                {friend.number && (
                                     <div className="flex items-center gap-3 text-sm">
                                         <Phone className="h-4 w-4 text-gray-400" />
-                                        <span className="text-gray-600 dark:text-gray-300">{friend.phone}</span>
+                                        <span className="text-gray-600 dark:text-gray-300">{friend.number}</span>
                                     </div>
                                 )}
-                                {friend.birthday && (
+                                {friend.birthDate && (
                                     <div className="flex items-center gap-3 text-sm">
                                         <Calendar className="h-4 w-4 text-gray-400" />
                                         <span className="text-gray-600 dark:text-gray-300">
-                                            {format(new Date(friend.birthday), "dd 'tháng' MM, yyyy", { locale: vi })}
+                                            {format(new Date(friend.birthDate), "dd 'tháng' MM, yyyy", { locale: vi })}
                                         </span>
                                     </div>
                                 )}
-                                {friend.address && (
+                                {friend.location   && (
                                     <div className="flex items-center gap-3 text-sm">
                                         <MapPin className="h-4 w-4 text-gray-400" />
-                                        <span className="text-gray-600 dark:text-gray-300">{friend.address}</span>
+                                        <span className="text-gray-600 dark:text-gray-300">{friend.location}</span>
                                     </div>
                                 )}
                             </div>

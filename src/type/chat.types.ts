@@ -13,6 +13,7 @@ export interface Friend {
   isOnline: boolean;
   lastSeen?: string | null;
   createdAt: string;
+  birthDate? : string ;
 }
 
 export interface FriendRequest {
@@ -42,6 +43,9 @@ export interface SearchUser {
   isOnline?: boolean;
   relation: "none" | "friend" | "request_sent" | "request_received" | "blocked";
   requestId?: string;
+  email?:string;
+  location?: string; 
+  birthDate? : string;
 }
 
 export interface BlockedUser {

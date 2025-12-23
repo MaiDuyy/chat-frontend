@@ -44,6 +44,14 @@ export interface FriendRemovedEvent {
   userId: string;
   userName: string;
 }
+export interface FriendRequestDeclinedEvent {
+  requestId: string;
+  userId: string; // Người đã từ chối
+}
+export interface FriendRequestCancelledEvent {
+  requestId: string;
+  userId: string; // Người đã hủy
+}
 
 // Socket URL - backend server (không có /api)
 const getSocketUrl = (): string => {
@@ -75,6 +83,8 @@ export interface SocketCallbacks {
   onFriendRequestReceived?: (data: FriendRequestReceivedEvent) => void;
   onFriendRequestAccepted?: (data: FriendRequestAcceptedEvent) => void;
   onFriendRemoved?: (data: FriendRemovedEvent) => void;
+  onFriendRequestDeclined?: (data: FriendRequestDeclinedEvent) => void;
+  onFriendRequestCancelled?: (data: FriendRequestCancelledEvent) => void;
 }
 
 // Kết nối socket
@@ -215,6 +225,17 @@ export const connectSocket = (token: string, callbacks?: SocketCallbacks): Socke
   socket.on("friend:removed", (data) => {
     console.log("[Socket] ❌ Friend removed:", data);
     callbacks?.onFriendRemoved?.(data);
+  });
+
+  socket.on("friend:request:declined", (data) => {
+    console.log("[Socket] 🚫 Friend request declined:", data);
+    callbacks?.onFriendRequestDeclined?.(data);
+  });
+
+  // Khi đối phương hủy lời mời họ đã gửi cho mình (quan trọng để mất cái badge đỏ)
+  socket.on("friend:request:cancelled", (data) => {
+    console.log("[Socket] ↩️ Friend request cancelled:", data);
+    callbacks?.onFriendRequestCancelled?.(data);
   });
 
   return socket;
