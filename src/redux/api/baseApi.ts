@@ -90,6 +90,16 @@ const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQue
 export const apiSlice = createApi({
   reducerPath: "api",
   baseQuery: baseQueryWithReauth,
-  tagTypes: ["User", "Account"], // Dùng để invalidate cache nếu cần
+  tagTypes: [
+    "User",
+    "Account",
+    "Friends",
+    "FriendRequests",
+    "Blocked",
+    "Chats",
+    "Messages",
+    "PinnedMessages",
+    "Notifications",
+  ],
   endpoints: () => ({}),
 });

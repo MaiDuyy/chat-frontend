@@ -107,7 +107,7 @@ export function UserAuthForm({
       loading: "Đang đăng nhập...",
       success: (message) => {
         setIsSpinning(false); // Tắt spinner
-        router.push("/");
+        router.push("/chat");
         return message;
       },
       error: (err) => {
