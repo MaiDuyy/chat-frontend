@@ -1,6 +1,6 @@
 "use client";
-export const dynamic = "force-dynamic";
-import { useState, useEffect } from "react";
+
+import { useState, useEffect, Suspense } from "react"; // 1. Thêm import Suspense
 import { useRouter, useSearchParams } from "next/navigation";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -29,7 +29,8 @@ const otpSchema = z.object({
     code: z.string().length(6, "Mã OTP phải có 6 chữ số"),
 });
 
-export function VerifyEmailPage() {
+// 2. Tách toàn bộ logic cũ vào component con (Content)
+function VerifyEmailContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const email = searchParams.get("email") || "";
@@ -166,14 +167,12 @@ export function VerifyEmailPage() {
                 </CardHeader>
 
                 <CardContent className="space-y-6">
-                    {/* OTP Input */}
                     <OTPInput
                         value={otpValue}
                         onChange={setOtpValue}
                         disabled={isVerifying}
                     />
 
-                    {/* Verify Button */}
                     <Button
                         onClick={onSubmit}
                         disabled={otpValue.length !== 6 || isVerifying}
@@ -190,7 +189,6 @@ export function VerifyEmailPage() {
                         )}
                     </Button>
 
-                    {/* Resend OTP */}
                     <div className="text-center">
                         <p className="text-sm text-muted-foreground mb-2">
                             Không nhận được mã?
@@ -213,7 +211,6 @@ export function VerifyEmailPage() {
                         </Button>
                     </div>
 
-                    {/* Back to Sign Up */}
                     <div className="text-center pt-4 border-t">
                         <Link
                             href="/auth/sign-up"
@@ -226,5 +223,18 @@ export function VerifyEmailPage() {
                 </CardContent>
             </Card>
         </div>
+    );
+}
+
+// 3. Component chính Export ra ngoài (Chứa Suspense Boundary)
+export default function VerifyEmailPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen flex items-center justify-center bg-background">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+        }>
+            <VerifyEmailContent />
+        </Suspense>
     );
 }
