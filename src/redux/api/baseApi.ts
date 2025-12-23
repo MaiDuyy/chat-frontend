@@ -7,7 +7,7 @@ import { logOut, tokenReceived } from "../feature/authSlice";
 const mutex = new Mutex();
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api", // URL Backend
+  baseUrl: process.env.NEXT_PUBLIC_API_URL || "https://chat-backend-pearl-theta.vercel.app/api", // URL Backend
   credentials: "include",
 prepareHeaders: (headers, { getState }) => {
     // 1. Thử lấy token từ Redux Store

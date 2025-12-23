@@ -57,7 +57,8 @@ export interface FriendRequestCancelledEvent {
 const getSocketUrl = (): string => {
   // DEBUG: Hardcode URL để test
   // TODO: Sau khi hoạt động, có thể dùng environment variable
-  const url = "http://localhost:8080";
+  // const url = "http://localhost:8080";
+  const url = "https://chat-backend-pearl-theta.vercel.app/api"
   return url;
 };
 
