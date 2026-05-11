@@ -18,58 +18,58 @@ export const accountApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     // Lấy thông tin tài khoản
     getAccountDetails: builder.query<{ user: AccountDetails }, void>({
-      query: () => "/account",
+      query: () => "/users/account",
       providesTags: ["User"],
     }),
 
     // Cập nhật thông tin tài khoản
     updateAccount: builder.mutation<{ message: string; user: User }, UpdateAccountRequest>({
       query: (data) => ({
-        url: "/account",
+        url: "/users/account",
         method: "PUT",
         body: data,
       }),
-      invalidatesTags: ["User"],
+      invalidatesTags: ["User", "Chats"],
     }),
 
     // Upload avatar (FormData)
     uploadAvatar: builder.mutation<UploadAvatarResponse, FormData>({
       query: (formData) => ({
-        url: "/account/avatar",
+        url: "/upload/avatar",
         method: "POST",
         body: formData,
       }),
-      invalidatesTags: ["User"],
+      invalidatesTags: ["User", "Chats"],
     }),
 
     // Xóa avatar
     deleteAvatar: builder.mutation<{ message: string }, void>({
       query: () => ({
-        url: "/account/avatar",
+        url: "/upload/avatar",
         method: "DELETE",
       }),
-      invalidatesTags: ["User"],
+      invalidatesTags: ["User", "Chats"],
     }),
 
     // Lấy lịch sử avatar
     getAvatarHistory: builder.query<AvatarHistoryResponse, void>({
-      query: () => "/account/avatars",
+      query: () => "/users/profile",
     }),
 
     // Chọn avatar từ lịch sử
     selectAvatar: builder.mutation<{ message: string; avatar: string }, SelectAvatarRequest>({
       query: (data) => ({
-        url: "/account/avatar/select",
+        url: "/users/profile",
         method: "PUT",
         body: data,
       }),
-      invalidatesTags: ["User"],
+      invalidatesTags: ["User", "Chats"],
     }),
 
     // Cập nhật trạng thái (status text)
     updateStatus: builder.mutation<{ message: string; status: string | null }, UpdateStatusRequest>({
       query: (data) => ({
-        url: "/account/status",
+        url: "/users/status",
         method: "PUT",
         body: data,
       }),
@@ -82,7 +82,7 @@ export const accountApi = apiSlice.injectEndpoints({
       UpdateOnlineStatusRequest
     >({
       query: (data) => ({
-        url: "/account/online-status",
+        url: "/users/online-status",
         method: "PUT",
         body: data,
       }),
@@ -91,14 +91,20 @@ export const accountApi = apiSlice.injectEndpoints({
     // Heartbeat
     heartbeat: builder.mutation<{ success: boolean }, void>({
       query: () => ({
-        url: "/account/heartbeat",
+        url: "/users/heartbeat",
         method: "POST",
       }),
     }),
 
     // Lấy trạng thái hoạt động của user khác
     getUserActivityStatus: builder.query<UserActivityStatus, string>({
-      query: (userId) => `/account/${userId}/status`,
+      query: (userId) => `/users/${userId}/status`,
+    }),
+    
+    // Tìm kiếm người dùng trong danh bạ hệ thống
+    searchUsers: builder.query<User[], string>({
+      query: (q) => `/users/directory?q=${encodeURIComponent(q)}`,
+      transformResponse: (response: { success: boolean; users: User[] }) => response.users || [],
     }),
   }),
 });
@@ -114,4 +120,5 @@ export const {
   useUpdateOnlineStatusMutation,
   useHeartbeatMutation,
   useGetUserActivityStatusQuery,
+  useSearchUsersQuery,
 } = accountApi;

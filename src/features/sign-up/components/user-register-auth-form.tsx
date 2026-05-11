@@ -221,9 +221,9 @@ export function UserRegisterForm({ className, ...props }: React.HTMLAttributes<H
                                         </SelectTrigger>
                                     </FormControl>
                                     <SelectContent>
-                                        <SelectItem value="Nam">Nam</SelectItem>
-                                        <SelectItem value="Nữ">Nữ</SelectItem>
-                                        <SelectItem value="Khác">Khác</SelectItem>
+                                        <SelectItem value="male">Nam</SelectItem>
+                                        <SelectItem value="female">Nữ</SelectItem>
+                                        <SelectItem value="other">Khác</SelectItem>
                                     </SelectContent>
                                 </Select>
                                 <FormMessage />

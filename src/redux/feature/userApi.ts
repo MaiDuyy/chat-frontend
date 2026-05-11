@@ -29,6 +29,12 @@ export const userApi = apiSlice.injectEndpoints({
       providesTags: ["User"],
     }),
 
+    // Search Company Directory
+    searchDirectory: builder.query<{ users: User[] }, string>({
+      query: (searchTerm) => `/users/directory?q=${encodeURIComponent(searchTerm)}`,
+    }),
+
+
     // Update profile
     updateProfile: builder.mutation<UpdateProfileResponse, FormData>({
       query: (formData) => ({
@@ -49,13 +55,14 @@ export const userApi = apiSlice.injectEndpoints({
     }),
 
     // Upload file (avatar, chat attachments)
-    uploadFile: builder.mutation<UploadResponse, { file: File; type: "avatar" | "chat" | "group" }>({
-      query: ({ file, type }) => {
+    uploadFile: builder.mutation<any, { file: File; type: "avatar" | "chat" | "group"; chatId?: string }>({
+      query: ({ file, type, chatId }) => {
         const formData = new FormData();
         formData.append("file", file);
         formData.append("type", type);
+        if (chatId) formData.append("chatId", chatId);
         return {
-          url: "/upload",
+          url: `/upload/${type}`,
           method: "POST",
           body: formData,
         };
@@ -80,6 +87,8 @@ export const userApi = apiSlice.injectEndpoints({
 
 export const {
   useGetProfileQuery,
+  useSearchDirectoryQuery,
+  useLazySearchDirectoryQuery,
   useUpdateProfileMutation,
   useChangePasswordMutation,
   useUploadFileMutation,

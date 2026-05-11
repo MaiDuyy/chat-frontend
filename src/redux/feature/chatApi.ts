@@ -6,22 +6,92 @@ import {
   ChatsResponse,
   ChatDetailsResponse,
   Chat,
+  ChatDetails,
+  ChatParticipant,
 } from "@/src/type/chat.types";
 
+// ===== Helper: Resolve displayName & displayAvatar from participants =====
+
+/** Get current userId from localStorage (set by auth) */
+function getCurrentUserId(): string | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = localStorage.getItem("user");
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      return parsed?.id || null;
+    }
+  } catch {}
+  return null;
+}
+
+/** Find the "other" participant in a 1-1 chat */
+function findPartner(participants: ChatParticipant[], currentUserId: string | null): ChatParticipant | null {
+  if (!participants || participants.length === 0) return null;
+  if (!currentUserId) return participants[0] || null;
+  return participants.find((p) => p.accountId !== currentUserId) || participants[0] || null;
+}
+
+/** Enrich a Chat object with displayName & displayAvatar */
+function enrichChat(chat: Chat): Chat {
+  const currentUserId = getCurrentUserId();
+  if (!chat.isGroup) {
+    const partner = findPartner(chat.participants, currentUserId);
+    return {
+      ...chat,
+      // For 1-1 chats: override name/avatar with partner's info
+      name: partner?.name || chat.name || "Unknown User",
+      avatar: partner?.avatar || chat.avatar,
+    };
+  }
+  return chat;
+}
+
+/** Enrich a ChatDetails object with displayName & displayAvatar */
+function enrichChatDetails(chat: ChatDetails): ChatDetails {
+  const currentUserId = getCurrentUserId();
+  if (!chat.isGroup) {
+    const partner = findPartner(chat.participants, currentUserId);
+    return {
+      ...chat,
+      name: partner?.name || chat.name || "Unknown User",
+      avatar: partner?.avatar || chat.avatar,
+    };
+  }
+  return chat;
+}
+
 export const chatApi = apiSlice.injectEndpoints({
+  overrideExisting: true,
   endpoints: (builder) => ({
     // Lấy danh sách chat
-    getChats: builder.query<ChatsResponse, { type?: "all" | "private" | "group" } | void>({
+    getChats: builder.query<ChatsResponse, { type?: "all" | "private" | "group"; workspaceId?: string | null } | void>({
       query: (params) => ({
         url: "/chats",
         params: params || {},
       }),
+      transformResponse: (response: ChatsResponse, _meta, _arg) => {
+        // Pre-compute displayName & displayAvatar, then sort by latest activity
+        const enriched = response.chats?.map((chat) => enrichChat(chat)) || [];
+        const sorted = [...enriched].sort((a, b) => {
+          const aTime = a.lastMessage?.time || a.updatedAt || "";
+          const bTime = b.lastMessage?.time || b.updatedAt || "";
+          return bTime.localeCompare(aTime);
+        });
+        return { ...response, chats: sorted };
+      },
       providesTags: ["Chats"],
     }),
 
     // Lấy chi tiết chat
     getChatById: builder.query<ChatDetailsResponse, string>({
       query: (chatId) => `/chats/${chatId}`,
+      transformResponse: (response: ChatDetailsResponse) => {
+        return {
+          ...response,
+          chat: enrichChatDetails(response.chat),
+        };
+      },
       providesTags: (_result, _error, chatId) => [{ type: "Chats", id: chatId }],
     }),
 
@@ -36,7 +106,7 @@ export const chatApi = apiSlice.injectEndpoints({
     }),
 
     // Tạo nhóm chat
-    createGroupChat: builder.mutation<{ message: string; chat: Chat }, { name: string; avatar?: string; memberIds: string[] }>({
+    createGroupChat: builder.mutation<{ message: string; chat: Chat }, { name: string; avatar?: string; memberIds: string[]; joinPolicy?: string }>({
       query: (body) => ({
         url: "/chats/group",
         method: "POST",
@@ -46,7 +116,7 @@ export const chatApi = apiSlice.injectEndpoints({
     }),
 
     // Cập nhật nhóm
-    updateChat: builder.mutation<{ message: string; chat: Chat }, { chatId: string; name?: string; avatar?: string }>({
+    updateChat: builder.mutation<{ message: string; chat: Chat }, { chatId: string; name?: string; avatar?: string; joinPolicy?: string }>({
       query: ({ chatId, ...body }) => ({
         url: `/chats/${chatId}`,
         method: "PUT",
@@ -75,12 +145,22 @@ export const chatApi = apiSlice.injectEndpoints({
     }),
 
     // Xóa thành viên
-    removeMember: builder.mutation<{ message: string }, { chatId: string; memberId: string }>({
+    removeChatMember: builder.mutation<{ message: string }, { chatId: string; memberId: string }>({
       query: ({ chatId, memberId }) => ({
         url: `/chats/${chatId}/members/${memberId}`,
         method: "DELETE",
       }),
       invalidatesTags: (_result, _error, { chatId }) => [{ type: "Chats", id: chatId }],
+    }),
+    
+    // Cập nhật quyền thành viên
+    updateChatMemberRole: builder.mutation<{ message: string }, { chatId: string; memberId: string; role: string }>({
+        query: ({ chatId, memberId, role }) => ({
+            url: `/chats/${chatId}/members/${memberId}/role`,
+            method: "PUT",
+            body: { role },
+        }),
+        invalidatesTags: (_result, _error, { chatId }) => [{ type: "Chats", id: chatId }],
     }),
 
     // Rời nhóm
@@ -118,8 +198,106 @@ export const chatApi = apiSlice.injectEndpoints({
         url: `/chats/${chatId}/read`,
         method: "PUT",
       }),
+      async onQueryStarted(chatId, { dispatch, queryFulfilled }) {
+        // Optimistic update cho danh sách chat (cả group và private)
+        const patchGroup = dispatch(
+          chatApi.util.updateQueryData("getChats" as any, { type: "group" }, (draft: any) => {
+            const chat = draft.chats?.find((c: any) => c.id === chatId);
+            if (chat) {
+              chat.unreadCount = 0;
+              chat.readed = true;
+            }
+          })
+        );
+        const patchPrivate = dispatch(
+          chatApi.util.updateQueryData("getChats" as any, { type: "private" }, (draft: any) => {
+            const chat = draft.chats?.find((c: any) => c.id === chatId);
+            if (chat) {
+              chat.unreadCount = 0;
+              chat.readed = true;
+            }
+          })
+        );
+
+        try {
+          await queryFulfilled;
+        } catch {
+          patchGroup.undo();
+          patchPrivate.undo();
+        }
+      },
       invalidatesTags: ["Chats"],
     }),
+
+    // Lấy danh sách Read Receipts của chat
+    getChatReadReceipts: builder.query<any[], string>({
+      query: (chatId) => `/chats/${chatId}/receipts`,
+      transformResponse: (response: { success: boolean; receipts: any[] }) => response.receipts || [],
+      providesTags: (result, _error, chatId) => 
+        result 
+          ? [...result.map(({ userId }) => ({ type: "ReadReceipts" as const, id: `${chatId}-${userId}` })), { type: "ReadReceipts", id: chatId }]
+          : [{ type: "ReadReceipts", id: chatId }],
+    }),
+
+    // Get LiveKit Token for calls
+    getLiveKitToken: builder.mutation<{ success: boolean; token: string }, string>({
+      query: (chatId) => `/chats/${chatId}/call/token`,
+    }),
+
+    // Join Group (Public/Approval)
+    joinGroup: builder.mutation<{ status: string }, string>({
+        query: (chatId) => ({
+            url: `/chats/${chatId}/join`,
+            method: "POST",
+        }),
+        invalidatesTags: ["Chats"],
+    }),
+
+    // Approve Join Request
+    approveJoinRequest: builder.mutation<{ success: boolean }, { chatId: string; targetAccountId: string; approve: boolean }>({
+        query: ({ chatId, targetAccountId, approve }) => ({
+            url: `/chats/${chatId}/join-requests/${targetAccountId}/approve`,
+            method: "POST",
+            body: { approve },
+        }),
+        invalidatesTags: (_result, _error, { chatId }) => [{ type: "Chats", id: chatId }],
+    }),
+
+    // Get Tasks
+    getTasks: builder.query<{ success: boolean; tasks: any[] }, string>({
+        query: (chatId) => `/chats/${chatId}/tasks`,
+        providesTags: (_result, _error, chatId) => [{ type: "Tasks" as any, id: chatId }],
+    }),
+
+    // Create Task
+    createTask: builder.mutation<any, { chatId: string; title: string; description?: string; deadlineAt?: string; startAt?: string; assigneeIds?: string[] }>({
+        query: ({ chatId, ...body }) => ({
+            url: `/chats/${chatId}/tasks`,
+            method: "POST",
+            body,
+        }),
+        invalidatesTags: (_result, _error, { chatId }) => [{ type: "Tasks" as any, id: chatId }],
+    }),
+
+    // Update Task Status
+    updateTaskStatus: builder.mutation<any, { taskId: string; status: string; chatId: string }>({
+        query: ({ taskId, status }) => ({
+            url: `/chats/tasks/${taskId}/status`,
+            method: "PATCH",
+            body: { status },
+        }),
+        invalidatesTags: (_result, _error, { chatId }) => [{ type: "Tasks" as any, id: chatId }],
+    // Delete Task
+  
+    }),
+
+      deleteTask: builder.mutation<any, { taskId: string; chatId: string }>({
+        query: ({ taskId, chatId }) => ({
+            url: `/chats/tasks/${taskId}?chatId=${chatId}`,
+            method: "DELETE",
+        }),
+        invalidatesTags: (_result, _error, { chatId }) => [{ type: "Tasks" as any, id: chatId }],
+            }),
   }),
 });
 
@@ -131,9 +309,18 @@ export const {
   useUpdateChatMutation,
   useDeleteChatMutation,
   useAddMembersMutation,
-  useRemoveMemberMutation,
+  useRemoveChatMemberMutation,
+  useUpdateChatMemberRoleMutation,
   useLeaveChatMutation,
   useTogglePinChatMutation,
   useToggleNotifyChatMutation,
   useMarkChatAsReadMutation,
+  useGetChatReadReceiptsQuery,
+  useGetLiveKitTokenMutation,
+  useJoinGroupMutation,
+  useApproveJoinRequestMutation,
+  useGetTasksQuery,
+  useCreateTaskMutation,
+  useUpdateTaskStatusMutation,
+  useDeleteTaskMutation,
 } = chatApi;

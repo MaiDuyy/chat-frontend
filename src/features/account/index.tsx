@@ -168,8 +168,8 @@ export function AccountSettingsPage() {
             if (authUser && result.user) {
                 dispatch(setCredentials({
                     user: { ...authUser, ...result.user },
-                    accessToken: localStorage.getItem("accessToken") || "",
-                    refreshToken: localStorage.getItem("refreshToken") || "",
+                    accessToken: "",
+                    refreshToken: "",
                 }));
             }
         } catch (error: any) {

@@ -15,13 +15,15 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useUploadAvatarMutation } from "@/src/redux/feature/uploadApi";
+import { useDeleteAvatarMutation, useGetAvatarHistoryQuery, useSelectAvatarMutation } from "@/src/redux/feature/accountApi";
 
-import {
-    useUploadAvatarMutation,
-    useDeleteAvatarMutation,
-    useGetAvatarHistoryQuery,
-    useSelectAvatarMutation,
-} from "@/src/redux/feature/accountApi";
+// import {
+//     useUploadAvatarMutation,
+//     useDeleteAvatarMutation,
+//     useGetAvatarHistoryQuery,
+//     useSelectAvatarMutation,
+// } from "@/src/redux/feature/accountApi";
 
 interface AvatarUploadProps {
     currentAvatar?: string | null;
@@ -88,11 +90,12 @@ export function AvatarUpload({
 
         try {
             const formData = new FormData();
-            formData.append("avatar", selectedFile);
+            formData.append("file", selectedFile);
 
             const result = await uploadAvatar(formData).unwrap();
             toast.success(result.message);
-            onAvatarChange?.(result.user.avatar);
+            console.log(result);
+            // onAvatarChange?.(result.avatar);
             refetchHistory();
             handleClose();
         } catch (error: any) {
@@ -131,14 +134,23 @@ export function AvatarUpload({
         }
     };
 
+    let imageUrl = currentAvatar || "";
+    if (imageUrl && !imageUrl.startsWith("http://") && !imageUrl.startsWith("https://")) {
+        imageUrl = `https://${imageUrl}`;
+    }
+
     return (
         <Dialog open={isOpen} onOpenChange={(open: boolean) => open ? setIsOpen(true) : handleClose()}>
             <DialogTrigger asChild>
                 <button className="relative group cursor-pointer">
                     <Avatar className={cn(sizeClasses[size], "ring-4 ring-background shadow-lg")}>
+
+
                         <AvatarImage
-                            src={currentAvatar || undefined}
-                            alt={name}
+                            src={imageUrl}
+                            alt="Image"
+                            className="w-full h-auto cursor-pointer hover:opacity-90 transition-opacity"
+                            onClick={() => window.open(imageUrl, "_blank")} // Mở ảnh gốc khi click
                         />
                         <AvatarFallback className="text-lg font-semibold bg-gradient-to-br from-primary to-primary/60 text-primary-foreground">
                             {getInitials(name)}
@@ -163,8 +175,10 @@ export function AvatarUpload({
                     <div className="flex justify-center">
                         <Avatar className="h-32 w-32 ring-4 ring-primary/20">
                             <AvatarImage
-                                src={previewUrl || currentAvatar || undefined}
+                                src={previewUrl || imageUrl || undefined}
                                 alt={name}
+                                className="w-full h-auto cursor-pointer hover:opacity-90 transition-opacity"
+                            // onClick={() => window.open(imageUrl, "_blank")} // Mở ảnh gốc khi click
                             />
                             <AvatarFallback className="text-2xl font-semibold bg-gradient-to-br from-primary to-primary/60 text-primary-foreground">
                                 {getInitials(name)}
@@ -234,7 +248,7 @@ export function AvatarUpload({
                     />
 
                     {/* Avatar History */}
-                    {avatarHistory && avatarHistory.avatarHistory.length > 0 && !previewUrl && (
+                    {/* {avatarHistory && avatarHistory.avatarHistory.length > 0 && !previewUrl && (
                         <div className="space-y-3">
                             <p className="text-sm font-medium text-muted-foreground">Lịch sử avatar</p>
                             <div className="flex gap-2 flex-wrap">
@@ -258,7 +272,7 @@ export function AvatarUpload({
                                 ))}
                             </div>
                         </div>
-                    )}
+                    )} */}
                 </div>
             </DialogContent>
         </Dialog>
