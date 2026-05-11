@@ -1,4 +1,11 @@
-export type RoleType = "USER" | "ADMIN" | "MODERATOR";
+export type RoleType = "SUPER_ADMIN" | "ADMIN" | "WORKSPACE_OWNER" | "WORKSPACE_ADMIN" | "WORKSPACE_MEMBER" | "WORKSPACE_GUEST";
+
+// Standard backend API response wrapper
+export interface ApiResponse<T = unknown> {
+  success: boolean;
+  message: string;
+  data?: T;
+}
 
 export interface User {
   id: string;
@@ -18,13 +25,21 @@ export interface User {
   updatedAt?: string;
   currentAvatars?: string[];
   pushToken?: string;
+  isSuspended?: boolean;
+  suspendReason?: string;
+  suspendedAt?: string;
+  suspendedBy?: string;
+
 }
 
 export interface AuthResponse {
-  message?: string;
+  success: boolean;
+  message: string;
   user: User;
   accessToken: string;
   refreshToken: string;
+  permissions?: string[];
+  roles?: string[];
 }
 
 export interface LoginRequest {
@@ -52,6 +67,11 @@ export interface RegisterRequest {
   birthDate?: string;
   location?: string;
   role?: RoleType;
+}
+
+export interface RegisterOrgRequest extends RegisterRequest {
+  organizationName: string;
+  workspaceName?: string;
 }
 
 export interface ChangePasswordRequest {

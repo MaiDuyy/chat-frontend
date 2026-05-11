@@ -21,8 +21,10 @@ import Link from "next/link";
 
 // Import từ Redux (RTK Query)
 import { useLoginMutation } from "@/src/redux/feature/authApi";
+// import { useLazyGetMyPermissionsQuery } from "@/src/redux/feature/rbacApi";
 import { useAppDispatch } from "@/src/redux/hooks";
-import { setCredentials } from "@/src/redux/feature/authSlice";
+import { setCredentials, setPermissions } from "@/src/redux/feature/authSlice";
+import { useLazyGetUserPermissionsQuery } from "@/src/redux/feature/rbacApi";
 
 // 1. Schema Validation
 const formSchema = z.object({
@@ -50,6 +52,7 @@ export function UserAuthForm({
   const dispatch = useAppDispatch();
 
   const [login] = useLoginMutation();
+  const [getMyPermissions] = useLazyGetUserPermissionsQuery();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -94,7 +97,33 @@ export function UserAuthForm({
         }).unwrap();
 
         // Bước 3: Lưu vào Redux Store
-        dispatch(setCredentials(userData));
+        dispatch(setCredentials({
+          ...userData,
+          permissions: userData.permissions || [],
+          roles: userData.roles || [],
+        }));
+
+        // Bước 4: Permissions đã kèm theo trong login response
+        if (userData.permissions?.length) {
+          dispatch(setPermissions({
+            permissions: userData.permissions,
+            roles: userData.roles || [],
+          }));
+        } else {
+          // Fallback: Fetch từ RBAC service nếu login response không có
+          try {
+            const userId = userData.user?.id;
+            if (userId) {
+              const permissionsData = await getMyPermissions(userId).unwrap();
+              dispatch(setPermissions({
+                permissions: permissionsData.permissions as string[],
+                roles: permissionsData.roles?.map((r: any) => typeof r === 'string' ? r : r.name) || [],
+              }));
+            }
+          } catch (permError) {
+            console.warn("Không thể lấy permissions từ RBAC:", permError);
+          }
+        }
 
         return "Đăng nhập thành công!";
       } catch (error) {

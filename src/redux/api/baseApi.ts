@@ -1,26 +1,26 @@
 import { createApi, fetchBaseQuery, BaseQueryFn, FetchArgs, FetchBaseQueryError } from "@reduxjs/toolkit/query/react";
 import { Mutex } from "async-mutex";
-import { RootState } from "../store";
 import { logOut, tokenReceived } from "../feature/authSlice";
+import { RootState } from "../store";
+import { toast } from "sonner";
 
 
 const mutex = new Mutex();
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: process.env.NEXT_PUBLIC_API_URL || "https://chat-backend-pearl-theta.vercel.app/api", // URL Backend
-  credentials: "include",
-prepareHeaders: (headers, { getState }) => {
-    // 1. Thử lấy token từ Redux Store
-    let token = (getState() as RootState).auth.token;
-
-    // 2. Nếu Redux null (ví dụ vừa F5 xong), lấy từ localStorage
-    if (!token && typeof window !== 'undefined') {
-       token = localStorage.getItem("accessToken");
-    }
-
+  baseUrl: process.env.NEXT_PUBLIC_API_URL,
+  credentials: "include", // Tự động gửi httpOnly cookie theo mỗi request
+  prepareHeaders: (headers, { getState }) => {
+    const token = (getState() as RootState).auth.token || (typeof window !== 'undefined' ? localStorage.getItem("accessToken") : null);
     if (token) {
-      headers.set("authorization", `Bearer ${token}`);
+      headers.set("Authorization", `Bearer ${token}`);
     }
+
+    const workspaceId = (getState() as RootState).workspace.currentWorkspaceId;
+    if (workspaceId) {
+      headers.set("X-Workspace-Id", workspaceId);
+    }
+
     return headers;
   },
 });
@@ -43,47 +43,40 @@ const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQue
       const release = await mutex.acquire();
       
       try {
-        // Lấy refresh token từ store hoặc local storage
-        const refreshToken = (api.getState() as RootState).auth.refreshToken || localStorage.getItem("refreshToken");
+        // Gọi API refresh token (server đọc refreshToken từ cookie)
+        const refreshResult = await baseQuery(
+          {
+            url: "/auth/refresh-token",
+            method: "POST",
+          },
+          api,
+          extraOptions
+        );
 
-        if (refreshToken) {
-          // Gọi API refresh token
-          const refreshResult = await baseQuery(
-            {
-              url: "/auth/refresh-token",
-              method: "POST",
-              body: { refreshToken },
-            },
-            api,
-            extraOptions
-          );
-
-          if (refreshResult.data) {
-            // Refresh thành công
-            const data = refreshResult.data as { accessToken: string; refreshToken: string };
-            
-            // Dispatch action cập nhật token mới vào store
-            api.dispatch(tokenReceived(data));
-            
-            // Retry (gọi lại) request ban đầu với token mới
-            result = await baseQuery(args, api, extraOptions);
-          } else {
-            // Refresh thất bại -> Force logout
-            api.dispatch(logOut());
-          }
+        if (refreshResult.data) {
+          // Refresh thành công - server đã set cookie mới
+          const data = refreshResult.data as { accessToken: string; refreshToken: string };
+          
+          // Dispatch để cập nhật state (không lưu token, chỉ mark authenticated)
+          api.dispatch(tokenReceived(data));
+          
+          // Retry request ban đầu với cookie mới
+          result = await baseQuery(args, api, extraOptions);
         } else {
-           // Không có refresh token -> Logout
-           api.dispatch(logOut());
+          // Refresh thất bại -> Force logout
+          api.dispatch(logOut());
         }
       } finally {
         release();
       }
-    } else {
-      // Nếu mutex đang bị lock (đang có request khác refresh), đợi và retry
-      await mutex.waitForUnlock();
-      result = await baseQuery(args, api, extraOptions);
     }
   }
+
+  // 3. Nếu lỗi 403 (Forbidden) -> Không có quyền trong Workspace
+  if (result.error && result.error.status === 403) {
+    toast.error("Bạn không có quyền thực hiện hành động này trong Workspace này!");
+  }
+
   return result;
 };
 
@@ -91,15 +84,55 @@ export const apiSlice = createApi({
   reducerPath: "api",
   baseQuery: baseQueryWithReauth,
   tagTypes: [
+    // Core
     "User",
+    "Users",
     "Account",
     "Friends",
     "FriendRequests",
     "Blocked",
+    // Chat
     "Chats",
     "Messages",
     "PinnedMessages",
+    "Channels",
+    "Threads",
+    "Replies",
+    "Workspaces",
+    "Members",
+    "Categories",
+    "AIHistory",
+    "SavedAnswers",
+    // Notifications
     "Notifications",
+    // RBAC
+    "Roles",
+    "Permissions",
+    // Audit
+    "AuditLogs",
+    "DMAccess",
+    "SecurityAlerts",
+    "AuditReports",
+    // Knowledge
+    "Collections",
+    "Documents",
+    "Chunks",
+    // Admin
+    "AdminStats",
+    "Invitations",
+    "OrgSettings",
+    "Departments",
+    "ReadReceipts",
+    "Tasks",
+    "MediaMessages",
+    // Dashboard
+    "Dashboard",
+    "DashboardHealth",
+    "DashboardTasks",
+    // Workspace
+    "WorkspaceInvites",
+    "WorkspaceMembers",
+    "Organizations"
   ],
   endpoints: () => ({}),
 });

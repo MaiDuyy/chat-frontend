@@ -58,3 +58,21 @@ export function getPageNumbers(currentPage: number, totalPages: number) {
 
   return rangeWithDots
 }
+
+/**
+ * Formats a number with commas
+ */
+export function formatNumber(num: number): string {
+  return new Intl.NumberFormat().format(num)
+}
+
+/**
+ * Formats file size in bytes to human readable format
+ */
+export function formatFileSize(bytes: number): string {
+  if (bytes === 0) return '0 B'
+  const k = 1024
+  const sizes = ['B', 'KB', 'MB', 'GB', 'TB']
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+}

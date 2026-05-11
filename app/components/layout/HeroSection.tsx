@@ -17,10 +17,10 @@ const HeroSection: React.FC = () => {
                 <div className="lg:w-1/2 space-y-8">
                     <div>
                         <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 dark:text-white mb-4 leading-tight">
-                            Tải Zalo PC cho máy tính
+                            Tải OTT cho máy tính
                         </h1>
                         <p className="text-lg md:text-xl text-slate-600 dark:text-slate-300 font-medium">
-                            Ứng dụng Zalo PC đã có mặt trên Windows, Mac OS, Web
+                            Ứng dụng OTT đã có mặt trên Windows, Mac OS, Web
                         </p>
                     </div>
 

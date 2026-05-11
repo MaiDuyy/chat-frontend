@@ -6,6 +6,7 @@ import { Message, TypingEvent, MessageReadEvent, UserOnlineEvent, MessageReacted
 
 // Event types cho recalled và pinned
 export interface MessageRecalledEvent {
+  id: string;
   messageId: string;
   chatId: string;
   userId: string;
@@ -13,6 +14,7 @@ export interface MessageRecalledEvent {
 }
 
 export interface MessagePinnedEvent {
+  id: string ;
   messageId: string;
   chatId: string;
   pin: boolean;
@@ -40,33 +42,44 @@ export interface FriendRequestAcceptedEvent {
   createdAt: string;
 }
 
-export interface FriendRemovedEvent {
-  userId: string;
-  userName: string;
+export interface FriendUnfriendedEvent {
+  friendId: string;
 }
-export interface FriendRequestDeclinedEvent {
+export interface FriendRequestRejectedEvent {
   requestId: string;
-  userId: string; // Người đã từ chối
+  receiverId: string;
 }
 export interface FriendRequestCancelledEvent {
   requestId: string;
-  userId: string; // Người đã hủy
+  senderId: string;
+}
+export interface FriendBlockedEvent {
+  blockedId?: string;
+  blockerId?: string;
+}
+export interface FriendUnblockedEvent {
+  blockedId: string;
 }
 
-// Socket URL - backend server (không có /api)
+// Document events
+export interface DocumentStatusChangedEvent {
+  documentId: number;
+  status: string;
+}
+
+// Socket URL - từ environment variable
 const getSocketUrl = (): string => {
-  // DEBUG: Hardcode URL để test
-  // TODO: Sau khi hoạt động, có thể dùng environment variable
-  // const url = "http://localhost:8080";
-  const url = "https://chat-backend-pearl-theta.vercel.app"
-  return url;
+  return process.env.NEXT_PUBLIC_WS_URL || "http://localhost:3001";
 };
 
 let socket: Socket | null = null;
+const messageListeners: Set<(data: { message: Message; chatId: string; tempId?: string }) => void> = new Set();
+
 
 export interface SocketCallbacks {
   onConnect?: () => void;
   onDisconnect?: () => void;
+  onReconnect?: (attempt: number) => void;
   onNewMessage?: (data: { message: Message; chatId: string; tempId?: string }) => void;
   onTypingStart?: (data: TypingEvent) => void;
   onTypingStop?: (data: { chatId: string; userId: string }) => void;
@@ -78,14 +91,42 @@ export interface SocketCallbacks {
   onUserOnline?: (data: UserOnlineEvent) => void;
   onUserOffline?: (data: UserOnlineEvent) => void;
   onUsersOnline?: (data: { userIds: string[] }) => void;
+  onInitialOnlineUsers?: (userIds: string[]) => void;
   onNotification?: (data: Notification) => void;
   onError?: (error: { message: string }) => void;
   // Friend events
   onFriendRequestReceived?: (data: FriendRequestReceivedEvent) => void;
+  onFriendRequestSent?: (data: { requestId: string; receiverId: string }) => void;
   onFriendRequestAccepted?: (data: FriendRequestAcceptedEvent) => void;
-  onFriendRemoved?: (data: FriendRemovedEvent) => void;
-  onFriendRequestDeclined?: (data: FriendRequestDeclinedEvent) => void;
+  onFriendUnfriended?: (data: FriendUnfriendedEvent) => void;
+  onFriendRequestRejected?: (data: FriendRequestRejectedEvent) => void;
   onFriendRequestCancelled?: (data: FriendRequestCancelledEvent) => void;
+  onFriendBlocked?: (data: FriendBlockedEvent) => void;
+  onFriendUnblocked?: (data: FriendUnblockedEvent) => void;
+  onUserAvatarUpdated?: (data: { userId: string; avatar: string }) => void;
+  onChatDeleted?: (data: { chatId: string }) => void;
+  onChatMemberRemoved?: (data: { chatId: string; isSelfLeave: boolean }) => void;
+  onChatMemberUpdated?: (data: { chatId: string; memberId: string; action: string; newRole?: string }) => void;
+  onChatRoleUpdated?: (data: { chatId: string; memberId: string; newRole: string }) => void;
+  onChatUpdated?: (data: { chatId: string; [key: string]: any }) => void;
+  onJoinRequestNew?: (data: { chatId: string; accountId: string; requestId: string }) => void;
+  onJoinRequestUpdated?: (data: { chatId: string; accountId: string; status: string }) => void;
+  onTaskNew?: (data: { chatId: string; [key: string]: any }) => void;
+  onTaskUpdated?: (data: { chatId: string; taskId: string; [key: string]: any }) => void;
+  onDocumentStatusChanged?: (data: DocumentStatusChangedEvent) => void;
+  onChatCallStatus?: (data: { chatId: string; roomName: string | null; isActive: boolean; [key: string]: any }) => void;
+  onCallActiveStatus?: (data: { chatId: string; isActive: boolean; roomName?: string; [key: string]: any }) => void;
+  onWorkspaceInvite?: (data: { workspaceName: string; role: string; token: string; inviterId: string; timestamp: string }) => void;
+  onWorkspaceDissolved?: (data: { workspaceId: string; dissolvedBy: string }) => void;
+  onWorkspaceRestored?: (data: { workspaceId: string; restoredBy: string }) => void;
+  onWorkspaceMemberLeft?: (data: { workspaceId: string; userId: string; reason: string; kickedBy?: string }) => void;
+  onWorkspaceMemberUpdated?: (data: { workspaceId: string; userId: string; action: string; role?: string; reason?: string }) => void;
+  onWorkspaceDeleted?: (data: { workspaceId: string }) => void;
+  onWorkspaceInviteRejected?: (data: { workspaceId: string; email: string }) => void;
+  onWorkspaceInviteAccepted?: (data: { workspaceId: string; userId: string }) => void;
+  onWorkspaceInviteCancelled?: (data: { workspaceId: string }) => void;
+  onWorkspaceOwnerTransferred?: (data: { workspaceId: string; oldOwnerId: string; newOwnerId: string }) => void;
+  onSystemBroadcast?: (data: { title: string; body: string; type: string; data?: any; timestamp: string }) => void;
 }
 
 // Kết nối socket
@@ -103,12 +144,15 @@ export const connectSocket = (token: string, callbacks?: SocketCallbacks): Socke
   // Kết nối đến root namespace "/"
   socket = io(socketUrl, {
     path: "/socket.io", // Đường dẫn mặc định của Socket.IO
-    auth: { token },
+    auth: { token }, // Keep for fallback if backend checks it occasionally, though usually unused with HttpOnly
+    withCredentials: true, // IMPORTANT for HttpOnly cookie passing
     transports: ["websocket", "polling"],
     reconnection: true,
-    reconnectionAttempts: 10,
-    reconnectionDelay: 1000,
-    timeout: 20000,
+    reconnectionAttempts: Infinity, // Thử lại vô hạn lần
+    reconnectionDelay: 1000, // Thời gian chờ ban đầu giữa các lần thử
+    reconnectionDelayMax: 5000, // Thời gian chờ tối đa
+    randomizationFactor: 0.5,
+    timeout: 60000, // Tăng timeout để tránh lỗi trong mạng chậm
     forceNew: true, // Tạo kết nối mới
   });
 
@@ -125,11 +169,18 @@ export const connectSocket = (token: string, callbacks?: SocketCallbacks): Socke
 
   socket.on("connect_error", (error) => {
     console.error("[Socket] ⚠️ Connection error:", error.message);
+    if (error.message === 'xhr poll error') {
+      console.error("[Socket] ⚠️ Network error - is the server running at", socketUrl, "?");
+    }
+    if (error.message === 'Authentication required' || error.message === 'jwt malformed') {
+      console.error("[Socket] ⚠️ Auth error - please check your token or login again.");
+    }
     callbacks?.onError?.({ message: error.message });
   });
 
   socket.on("reconnect", (attempt) => {
     console.log("[Socket] 🔄 Reconnected after", attempt, "attempts");
+    callbacks?.onReconnect?.(attempt);
   });
 
   socket.on("reconnect_error", (error) => {
@@ -140,7 +191,9 @@ export const connectSocket = (token: string, callbacks?: SocketCallbacks): Socke
   socket.on("message:new", (data) => {
     console.log("[Socket] 📩 New message:", data);
     callbacks?.onNewMessage?.(data);
+    messageListeners.forEach((l) => l(data));
   });
+
 
   // Typing events
   socket.on("typing:start", (data) => {
@@ -188,6 +241,11 @@ export const connectSocket = (token: string, callbacks?: SocketCallbacks): Socke
     callbacks?.onUserOffline?.(data);
   });
 
+  socket.on("user:avatar:updated", (data) => {
+    console.log("[Socket] 👤 User avatar updated:", data);
+    callbacks?.onUserAvatarUpdated?.(data);
+  });
+
   // Danh sách users online (nhận khi connect)
   socket.on("users:online", (data) => {
     console.log("[Socket] 📋 Online users list:", data);
@@ -212,10 +270,14 @@ export const connectSocket = (token: string, callbacks?: SocketCallbacks): Socke
     callbacks?.onMessageBlocked?.(data);
   });
 
-  // Friend events
   socket.on("friend:request:received", (data) => {
     console.log("[Socket] 👥 Friend request received:", data);
     callbacks?.onFriendRequestReceived?.(data);
+  });
+
+  socket.on("friend:request:sent", (data) => {
+    console.log("[Socket] 📤 Friend request sent (sync other tabs):", data);
+    callbacks?.onFriendRequestSent?.(data);
   });
 
   socket.on("friend:request:accepted", (data) => {
@@ -223,20 +285,145 @@ export const connectSocket = (token: string, callbacks?: SocketCallbacks): Socke
     callbacks?.onFriendRequestAccepted?.(data);
   });
 
-  socket.on("friend:removed", (data) => {
-    console.log("[Socket] ❌ Friend removed:", data);
-    callbacks?.onFriendRemoved?.(data);
+  socket.on("friend:unfriended", (data) => {
+    console.log("[Socket] ❌ Friend unfriended:", data);
+    callbacks?.onFriendUnfriended?.(data);
   });
 
-  socket.on("friend:request:declined", (data) => {
-    console.log("[Socket] 🚫 Friend request declined:", data);
-    callbacks?.onFriendRequestDeclined?.(data);
+  socket.on("friend:request:rejected", (data) => {
+    console.log("[Socket] 🚫 Friend request rejected:", data);
+    callbacks?.onFriendRequestRejected?.(data);
   });
 
-  // Khi đối phương hủy lời mời họ đã gửi cho mình (quan trọng để mất cái badge đỏ)
   socket.on("friend:request:cancelled", (data) => {
     console.log("[Socket] ↩️ Friend request cancelled:", data);
     callbacks?.onFriendRequestCancelled?.(data);
+  });
+
+  socket.on("friend:blocked", (data) => {
+    console.log("[Socket] 🚫 User blocked:", data);
+    callbacks?.onFriendBlocked?.(data);
+  });
+
+  socket.on("friend:unblocked", (data) => {
+    console.log("[Socket] ✅ User unblocked:", data);
+    callbacks?.onFriendUnblocked?.(data);
+  });
+
+  // Group lifecycle events
+  socket.on("chat:deleted", (data) => {
+    console.log("[Socket] 🗑️ Chat deleted:", data);
+    callbacks?.onChatDeleted?.(data);
+  });
+
+  socket.on("chat:member_removed", (data) => {
+    console.log("[Socket] 🚪 Member removed from chat:", data);
+    callbacks?.onChatMemberRemoved?.(data);
+  });
+
+  socket.on("chat:member_updated", (data) => {
+    console.log("[Socket] 👥 Chat member updated:", data);
+    callbacks?.onChatMemberUpdated?.(data);
+  });
+
+  socket.on("chat:role_updated", (data) => {
+    console.log("[Socket] 🛡️ Member role updated:", data);
+    callbacks?.onChatRoleUpdated?.(data);
+  });
+  
+  socket.on("chat:updated", (data) => {
+    console.log("[Socket] 🔄 Chat updated:", data);
+    callbacks?.onChatUpdated?.(data);
+  });
+
+  socket.on("chat:join_request:new", (data) => {
+    console.log("[Socket] 📩 New join request:", data);
+    callbacks?.onJoinRequestNew?.(data);
+  });
+
+  socket.on("chat:join_request:updated", (data) => {
+    console.log("[Socket] ✅ Join request updated:", data);
+    callbacks?.onJoinRequestUpdated?.(data);
+  });
+
+  socket.on("task:new", (data) => {
+    console.log("[Socket] ✅ New task created:", data);
+    callbacks?.onTaskNew?.(data);
+  });
+
+  socket.on("task:updated", (data) => {
+    console.log("[Socket] ✅ Task updated:", data);
+    callbacks?.onTaskUpdated?.(data);
+  });
+
+  socket.on("document:status_changed", (data) => {
+    console.log("[Socket] 📄 Document status changed:", data);
+    callbacks?.onDocumentStatusChanged?.(data);
+  });
+
+  socket.on("chat:call_status", (data) => {
+    console.log("[Socket] 📞 Chat call status changed:", data);
+    callbacks?.onChatCallStatus?.(data);
+  });
+
+  socket.on("call:active_status", (data) => {
+    console.log("[Socket] 📞 Call active status received:", data);
+    callbacks?.onCallActiveStatus?.(data);
+  });
+
+  socket.on("workspace:invite:new", (data) => {
+    console.log("[Socket] 🏢 New workspace invite:", data);
+    callbacks?.onWorkspaceInvite?.(data);
+  });
+
+  socket.on("workspace:dissolved", (data) => {
+    console.log("[Socket] 🏢 Workspace dissolved:", data);
+    callbacks?.onWorkspaceDissolved?.(data);
+  });
+
+  socket.on("workspace:restored", (data) => {
+    console.log("[Socket] 🏢 Workspace restored:", data);
+    callbacks?.onWorkspaceRestored?.(data);
+  });
+
+  socket.on("workspace:member:left", (data) => {
+    console.log("[Socket] 🚪 Left/Kicked from workspace:", data);
+    callbacks?.onWorkspaceMemberLeft?.(data);
+  });
+
+  socket.on("workspace:member:updated", (data) => {
+    console.log("[Socket] 👥 Workspace member updated:", data);
+    callbacks?.onWorkspaceMemberUpdated?.(data);
+  });
+
+  socket.on("workspace:deleted", (data) => {
+    console.log("[Socket] 🗑️ Workspace deleted:", data);
+    callbacks?.onWorkspaceDeleted?.(data);
+  });
+
+  socket.on("workspace:invite:rejected", (data) => {
+    console.log("[Socket] 🚫 Workspace invite rejected:", data);
+    callbacks?.onWorkspaceInviteRejected?.(data);
+  });
+
+  socket.on("workspace:invite:accepted", (data) => {
+    console.log("[Socket] ✅ Workspace invite accepted:", data);
+    callbacks?.onWorkspaceInviteAccepted?.(data);
+  });
+
+  socket.on("workspace:invite:cancelled", (data) => {
+    console.log("[Socket] ↩️ Workspace invite cancelled:", data);
+    callbacks?.onWorkspaceInviteCancelled?.(data);
+  });
+
+  socket.on("workspace:owner:transferred", (data) => {
+    console.log("[Socket] 👑 Workspace owner transferred:", data);
+    callbacks?.onWorkspaceOwnerTransferred?.(data);
+  });
+  
+  socket.on("system:broadcast", (data) => {
+    console.log("[Socket] 📢 System broadcast:", data);
+    callbacks?.onSystemBroadcast?.(data);
   });
 
   return socket;
@@ -277,24 +464,29 @@ export const stopTyping = (chatId: string) => {
   socket?.emit("typing:stop", { chatId });
 };
 
-// Đánh dấu đã đọc
-export const markRead = (chatId: string) => {
-  socket?.emit("message:read", { chatId });
+// Đánh dấu đã đọc (Scalable Flow)
+export const markRead = (chatId: string, messageId?: string) => {
+  socket?.emit("message:mark_as_read", { chatId, messageId });
 };
 
 // React tin nhắn
-export const reactMessage = (messageId: string, emoji: string) => {
-  socket?.emit("message:react", { messageId, emoji });
+export const reactMessage = (messageId: string, chatId: string, emoji: string) => {
+  socket?.emit("message:react", { messageId, chatId, emoji });
 };
 
 // Thu hồi tin nhắn
-export const recallMessage = (messageId: string) => {
-  socket?.emit("message:recall", { messageId });
+export const recallMessage = (messageId: string, chatId: string) => {
+  socket?.emit("message:recall", { messageId, chatId });
+};
+
+// Xóa tin nhắn
+export const deleteMessage = (messageId: string, chatId: string) => {
+  socket?.emit("message:delete", { messageId, chatId });
 };
 
 // Ghim/bỏ ghim tin nhắn
-export const pinMessage = (messageId: string) => {
-  socket?.emit("message:pin", { messageId });
+export const pinMessage = (messageId: string, chatId: string) => {
+  socket?.emit("message:pin", { messageId, chatId });
 };
 
 // Join chat room
@@ -305,6 +497,40 @@ export const joinChat = (chatId: string) => {
 // Leave chat room
 export const leaveChat = (chatId: string) => {
   socket?.emit("chat:leave", { chatId });
+};
+
+// Check active call status
+export const checkCallStatus = (chatId: string) => {
+  socket?.emit("call:check", { chatId });
+};
+
+// Đăng ký listener cho tin nhắn mới
+export const onMessageNew = (listener: (data: { message: Message; chatId: string; tempId?: string }) => void) => {
+  messageListeners.add(listener);
+  return () => messageListeners.delete(listener);
+};
+
+
+
+
+// ===== AI Assistant (Phase 1) =====
+
+/**
+ * Send an AI query to the ws-gateway.
+ * The gateway streams tokens back via `ai:thinking`, `ai:token`, `ai:done`, `ai:error`.
+ */
+export const sendAIQuery = (chatId: string, message: string, conversationId?: number) => {
+  socket?.emit('chat:ai_query', { chatId, message, conversationId });
+};
+
+// ===== AI Agent (Phase 2 — Tool Calling) =====
+
+/**
+ * Send an agent query — Gemini will autonomously call tools (search, summarize, create_task...)
+ * before composing a response. Same streaming events as Phase 1 but with mode: 'agent'.
+ */
+export const sendAgentQuery = (chatId: string, message: string, conversationId?: number, workspaceId?: string) => {
+  socket?.emit('chat:agent_query', { chatId, message, conversationId, workspaceId });
 };
 
 export const socketService = {
@@ -320,4 +546,11 @@ export const socketService = {
   pinMessage,
   joinChat,
   leaveChat,
+  checkCallStatus,
+  onMessageNew,
+  // AI Phase 1
+  sendAIQuery,
+  // AI Phase 2
+  sendAgentQuery,
 };
+

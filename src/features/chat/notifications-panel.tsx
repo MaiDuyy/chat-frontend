@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { vi } from "date-fns/locale";
+import { useRouter } from "next/navigation";
 
 const NOTIFICATION_ICONS: Record<NotificationType, React.ReactNode> = {
     FRIEND_REQUEST: <UserPlus className="h-5 w-5 text-blue-500" />,
@@ -30,12 +31,14 @@ const NOTIFICATION_ICONS: Record<NotificationType, React.ReactNode> = {
     NEW_MESSAGE: <MessageCircle className="h-5 w-5 text-purple-500" />,
     GROUP_INVITE: <Users className="h-5 w-5 text-indigo-500" />,
     GROUP_REMOVED: <Users className="h-5 w-5 text-red-500" />,
+    WORKSPACE_INVITE: <Users className="h-5 w-5 text-blue-500" />,
     MENTION: <AtSign className="h-5 w-5 text-orange-500" />,
     REACTION: <Heart className="h-5 w-5 text-pink-500" />,
     SYSTEM: <AlertCircle className="h-5 w-5 text-gray-500" />,
 };
 
 export default function NotificationsPanel() {
+    const router = useRouter();
     const { data, isLoading, refetch } = useGetNotificationsQuery();
     const [markAsRead] = useMarkNotificationAsReadMutation();
     const [markAllRead] = useMarkAllAsReadMutation();
@@ -44,6 +47,7 @@ export default function NotificationsPanel() {
     const notifications = data?.notifications || [];
     const unreadCount = data?.unreadCount || 0;
 
+    console.log("notifications", notifications);
     const handleMarkAsRead = async (id: string) => {
         try {
             await markAsRead(id).unwrap();
@@ -129,6 +133,23 @@ export default function NotificationsPanel() {
                                     <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-2">
                                         {notification.body}
                                     </p>
+                                    {notification.data?.action && (
+                                        <div className="mt-2">
+                                            <Button
+                                                variant="secondary" // Sử dụng variant của shadcn (có thể đổi thành 'default' hoặc 'outline' tuỳ ý)
+                                                size="sm"
+                                                onClick={(e) => {
+                                                    e.stopPropagation(); // Ngăn click lan ra div cha
+                                                    if (notification.data?.action.type === 'NAVIGATE') {
+                                                        router.push(notification.data.action.url);
+                                                    }
+                                                }}
+                                                className="h-8 text-xs font-medium bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-400 dark:hover:bg-blue-900/50"
+                                            >
+                                                {notification.data.action.label}
+                                            </Button>
+                                        </div>
+                                    )}
                                     <p className="text-xs text-gray-400 mt-1 flex items-center gap-1">
                                         {formatDistanceToNow(new Date(notification.createdAt), {
                                             addSuffix: true,
@@ -155,6 +176,7 @@ export default function NotificationsPanel() {
                                             <Check className="h-3.5 w-3.5 text-blue-500" />
                                         </Button>
                                     )}
+
                                     <Button
                                         variant="ghost"
                                         size="icon"

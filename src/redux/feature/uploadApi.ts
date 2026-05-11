@@ -12,6 +12,19 @@ export interface UploadResponse {
   bytes: number;
 }
 
+export interface FileServiceResponse {
+  success: boolean;
+  message: string;
+  file: {
+    id: string;
+    url: string;
+    mimeType: string;
+    originalName: string;
+    size: number;
+    classification?: string;
+  };
+}
+
 export const uploadApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     // Upload single file (general)
@@ -23,26 +36,22 @@ export const uploadApi = apiSlice.injectEndpoints({
       }),
     }),
 
-    // Upload avatar (POST /api/upload with type=avatar)
+    // Upload avatar (POST /api/upload/avatar)
     uploadAvatar: builder.mutation<UploadResponse, FormData>({
       query: (formData) => {
-        // Thêm type=avatar vào formData
-        formData.append("type", "avatar");
         return {
-          url: "/upload",
+          url: "/upload/avatar",
           method: "POST",
           body: formData,
         };
       },
     }),
 
-    // Upload group avatar (POST /api/upload with type=group)
+    // Upload group avatar (POST /api/upload/avatar)
     uploadGroupAvatar: builder.mutation<UploadResponse, FormData>({
       query: (formData) => {
-        // Thêm type=group vào formData
-        formData.append("type", "group");
         return {
-          url: "/upload",
+          url: "/upload/avatar",
           method: "POST",
           body: formData,
         };
@@ -50,17 +59,17 @@ export const uploadApi = apiSlice.injectEndpoints({
     }),
 
     // Upload chat media (images, videos, files)
-    uploadChatMedia: builder.mutation<UploadResponse, FormData>({
+    uploadChatMedia: builder.mutation<FileServiceResponse, FormData>({
       query: (formData) => {
-        formData.append("type", "chat");
         return {
-          url: "/upload",
+          url: "/upload/chat", // calls api-gateway proxy '/upload/chat' -> file-service '/chat'
           method: "POST",
-          body: formData,
+          body: formData, // the body MUST contain 'file' and optionally 'chatId'
         };
       },
     }),
   }),
+  overrideExisting: true,
 });
 
 export const {

@@ -68,19 +68,16 @@ export default function ChatInfoPanel({
     const searchResults = searchData?.messages || [];
     const mediaMessages = mediaData?.media || [];
 
-    // Handle search
     const handleSearch = () => {
         if (searchQuery.trim()) {
             searchMessages({ chatId, q: searchQuery.trim() });
         }
     };
 
-    // Listen for socket pinned events to refetch
     useEffect(() => {
         const handleMessagePinned = (event: CustomEvent) => {
             const { chatId: eventChatId } = event.detail;
             if (eventChatId === chatId && isOpen) {
-                // Refetch pinned messages using RTK Query
                 refetchPinned();
             }
         };
@@ -90,10 +87,60 @@ export default function ChatInfoPanel({
             window.removeEventListener("socket:message:pinned", handleMessagePinned as EventListener);
         };
     }, [chatId, isOpen, refetchPinned]);
+    const normalizeUrl = (url: string) => {
+        if (!url) return "";
+        if (url.startsWith("http://") || url.startsWith("https://")) return url;
+        return `https://${url}`;
+    };
 
-    // Render message item
     const renderMessageItem = (message: Message) => {
-        const msgType = message.type || "text"; // Default to text if type is undefined
+        const msgType = message.type || "text";
+
+
+        let contentDisplay = null;
+
+        if (msgType === "text" || !msgType) {
+            contentDisplay = (
+                <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2">
+                    {message.content || "[Tin nhắn trống]"}
+                </p>
+            );
+        } else if (msgType === "image") {
+            const imageUrl = normalizeUrl(message.content || "");
+            contentDisplay = (
+                <div className="rounded-lg overflow-hidden max-w-xs mt-1">
+                    <img
+                        src={imageUrl}
+                        alt="Image"
+                        className="w-full h-auto cursor-pointer hover:opacity-90 transition-opacity"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            window.open(imageUrl, "_blank");
+                        }}
+                    />
+                </div>
+            );
+        } else if (msgType === "video") {
+            const videoUrl = normalizeUrl(message.content || "");
+            contentDisplay = (
+                <div className="rounded-lg overflow-hidden max-w-xs mt-1">
+                    <video
+                        src={videoUrl}
+                        controls
+                        className="w-full h-auto"
+                        onClick={(e) => e.stopPropagation()}
+                    />
+                </div>
+            );
+        } else if (msgType === "file") {
+            contentDisplay = (
+                <span className="flex items-center gap-1">
+                    <FileText className="h-4 w-4" /> {message.file?.name || "File"}
+                </span>
+            );
+        } else {
+            contentDisplay = <span>{message.content || `[${msgType}]`}</span>;
+        }
 
         return (
             <div
@@ -110,32 +157,13 @@ export default function ChatInfoPanel({
                             </span>
                             {message.pin && <Pin className="h-3 w-3 text-blue-500" />}
                         </div>
-                        <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2">
-                            {msgType === "text" || !msgType ? (
-                                message.content || "[Tin nhắn trống]"
-                            ) : msgType === "image" ? (
-                                <span className="flex items-center gap-1">
-                                    <ImageIcon className="h-4 w-4" /> Hình ảnh
-                                </span>
-                            ) : msgType === "video" ? (
-                                <span className="flex items-center gap-1">
-                                    <Video className="h-4 w-4" /> Video
-                                </span>
-                            ) : msgType === "file" ? (
-                                <span className="flex items-center gap-1">
-                                    <FileText className="h-4 w-4" /> {message.file?.name || "File"}
-                                </span>
-                            ) : (
-                                message.content || `[${msgType}]`
-                            )}
-                        </p>
+                        {contentDisplay}
                     </div>
                 </div>
             </div>
         );
     };
 
-    // Render media item
     const renderMediaItem = (message: Message) => {
         if (message.type === "image") {
             return (
@@ -145,7 +173,7 @@ export default function ChatInfoPanel({
                     onClick={() => onMessageClick?.(message.id)}
                 >
                     <img
-                        src={message.content || ""}
+                        src={normalizeUrl(message.content || "")}
                         alt="Media"
                         className="w-full h-full object-cover"
                     />
@@ -156,13 +184,13 @@ export default function ChatInfoPanel({
                             className="h-8 w-8"
                             onClick={(e) => {
                                 e.stopPropagation();
-                                window.open(message.content || "", "_blank");
+                                window.open(normalizeUrl(message.content || ""), "_blank");
                             }}
                         >
                             <ExternalLink className="h-4 w-4" />
                         </Button>
                         <a
-                            href={message.content || ""}
+                            href={normalizeUrl(message.content || "")}
                             download
                             onClick={(e) => e.stopPropagation()}
                         >
@@ -172,7 +200,7 @@ export default function ChatInfoPanel({
                         </a>
                     </div>
                     <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/70 to-transparent">
-                        <p className="text-xs text-white truncate">{message.sender.name}</p>
+                        <p className="text-xs text-white truncate">{normalizeUrl(message.content || "")}</p>
                     </div>
                 </div>
             );
@@ -186,7 +214,7 @@ export default function ChatInfoPanel({
                     onClick={() => onMessageClick?.(message.id)}
                 >
                     <video
-                        src={message.content || ""}
+                        src={normalizeUrl(message.content || "")}
                         className="w-full h-full object-cover"
                     />
                     <div className="absolute inset-0 flex items-center justify-center bg-black/30">
@@ -195,13 +223,12 @@ export default function ChatInfoPanel({
                         </div>
                     </div>
                     <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/70 to-transparent">
-                        <p className="text-xs text-white truncate">{message.sender.name}</p>
+                        <p className="text-xs text-white truncate">{normalizeUrl(message.content || "")}</p>
                     </div>
                 </div>
             );
         }
 
-        // File
         return (
             <a
                 key={message.id}
@@ -249,7 +276,6 @@ export default function ChatInfoPanel({
                         </TabsTrigger>
                     </TabsList>
 
-                    {/* Pinned Messages */}
                     <TabsContent value="pinned" className="flex-1 overflow-y-auto p-4 space-y-3">
                         {pinnedLoading ? (
                             <div className="flex items-center justify-center py-8">
@@ -268,7 +294,6 @@ export default function ChatInfoPanel({
                         )}
                     </TabsContent>
 
-                    {/* Search Messages */}
                     <TabsContent value="search" className="flex-1 flex flex-col p-4">
                         <div className="flex gap-2 mb-4">
                             <Input
@@ -313,9 +338,7 @@ export default function ChatInfoPanel({
                         </div>
                     </TabsContent>
 
-                    {/* Media & Files */}
                     <TabsContent value="media" className="flex-1 flex flex-col p-4">
-                        {/* Filter buttons */}
                         <div className="flex gap-2 mb-4 flex-wrap">
                             {[
                                 { value: "all", label: "Tất cả", icon: null },
@@ -349,10 +372,12 @@ export default function ChatInfoPanel({
                                     </p>
                                 </div>
                             ) : (
-                                <div className={`${mediaFilter === "file" || (mediaFilter === "all" && mediaMessages.every(m => m.type === "file"))
-                                    ? "space-y-3"
-                                    : "grid grid-cols-3 gap-2"
-                                    }`}>
+                                <div className={`
+                                    ${mediaFilter === "file" || (mediaFilter === "all" && mediaMessages.every(m => m.type === "file"))
+                                        ? "space-y-3"
+                                        : "grid grid-cols-3 gap-2"
+                                    }
+                                `}>
                                     {mediaMessages.map((msg) => renderMediaItem(msg))}
                                 </div>
                             )}

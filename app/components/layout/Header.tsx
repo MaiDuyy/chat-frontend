@@ -15,7 +15,7 @@ interface HeaderProps {
 }
 
 const NAV_ITEMS: NavItem[] = [
-    { label: "Zalo PC", href: "#" },
+    { label: "OTT", href: "#" },
     { label: "Official Account", href: "#" },
     { label: "Nhà phát triển", href: "#" },
     { label: "Bảo mật", href: "#" },
@@ -50,7 +50,7 @@ const Header: React.FC<HeaderProps> = ({ darkMode, toggleDarkMode }) => {
                 {/* Logo */}
                 <div className="flex-shrink-0 flex items-center">
                     <a className="text-3xl font-bold text-primary tracking-tight" href="#">
-                        Zalo
+                        OTT-Chat
                     </a>
                 </div>
 
@@ -90,7 +90,7 @@ const Header: React.FC<HeaderProps> = ({ darkMode, toggleDarkMode }) => {
                             <span className="material-icons text-xl">logout : {user?.name}</span>
                         </button>
                     ) : (
-                        <Link href="/auth/sign-in">
+                        <Link href="/login">
                             <button
                                 className="p-2 text-slate-500 hover:text-primary dark:text-slate-400 dark:hover:text-white transition"
                                 aria-label="Login"

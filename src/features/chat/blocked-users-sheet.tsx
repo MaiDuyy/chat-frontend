@@ -100,28 +100,36 @@ export default function BlockedUsersSheet({
                                 </p>
                                 {blockedUsers.map((blockedItem) => {
                                     const initials = blockedItem.user.name
-                                        .split(" ")
-                                        .map((n: string) => n[0])
-                                        .join("")
-                                        .toUpperCase()
-                                        .slice(0, 2);
+                                        ? blockedItem.user.name
+                                            .split(" ")
+                                            .map((n: string) => n[0])
+                                            .join("")
+                                            .toUpperCase()
+                                            .slice(0, 2)
+                                        : "??";
 
                                     return (
                                         <div
                                             key={blockedItem.id}
-                                            className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
+                                            className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700 transition-all hover:shadow-sm"
                                         >
-                                            <Avatar className="h-12 w-12">
-                                                <AvatarImage src={blockedItem.user.avatar || undefined} alt={blockedItem.user.name} />
-                                                <AvatarFallback className="bg-gray-300 dark:bg-gray-600">
+                                            <Avatar className="h-10 w-10 ring-2 ring-white dark:ring-gray-900 overflow-hidden">
+                                                <AvatarImage 
+                                                    src={blockedItem.user.avatar || undefined} 
+                                                    alt={blockedItem.user.name} 
+                                                    className="object-cover"
+                                                />
+                                                <AvatarFallback className="bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 text-gray-600 dark:text-gray-300 font-semibold text-xs transition-colors group-hover:from-gray-200 group-hover:to-gray-300">
                                                     {initials}
                                                 </AvatarFallback>
                                             </Avatar>
                                             <div className="flex-1 min-w-0">
-                                                <p className="font-medium truncate">{blockedItem.user.name}</p>
+                                                <p className="font-semibold text-slate-900 dark:text-slate-100 truncate text-sm">
+                                                    {blockedItem.user.name}
+                                                </p>
                                                 {blockedItem.blockedAt && (
-                                                    <p className="text-xs text-gray-500">
-                                                        Đã chặn {format(new Date(blockedItem.blockedAt), "dd/MM/yyyy", { locale: vi })}
+                                                    <p className="text-[10px] text-slate-400 font-medium">
+                                                        Đã chặn {format(new Date(blockedItem.blockedAt), "HH:mm, dd MMMM yyyy", { locale: vi })}
                                                     </p>
                                                 )}
                                             </div>
@@ -129,9 +137,9 @@ export default function BlockedUsersSheet({
                                                 variant="outline"
                                                 size="sm"
                                                 onClick={() => setUserToUnblock({ id: blockedItem.user.id, name: blockedItem.user.name })}
-                                                className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                                                className="h-8 px-3 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 border-emerald-100 hover:border-emerald-200 font-bold text-xs rounded-md shadow-sm transition-all active:scale-95"
                                             >
-                                                <UserCheck className="h-4 w-4 mr-1" />
+                                                <UserCheck className="h-3.5 w-3.5 mr-1.5" />
                                                 Bỏ chặn
                                             </Button>
                                         </div>
