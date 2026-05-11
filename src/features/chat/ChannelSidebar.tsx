@@ -25,6 +25,7 @@ import {
 import { DirectorySearchModal } from './DirectorySearchModal';
 import { WorkspaceGuard } from '@/src/components/WorkspaceGuard';
 import { InviteMemberModal } from './InviteMemberModal';
+// import { InviteMemberModal } from './InviteMemberModal';
 
 interface ChannelSidebarProps {
     workspaceId: string;
@@ -145,7 +146,7 @@ export function ChannelSidebar({ workspaceId: propWorkspaceId, className }: Chan
                             )}
 
                             {/* Add Channel Button (Role-based) */}
-                            <WorkspaceGuard allowedRoles={['OWNER', 'ADMIN']}>
+                            <WorkspaceGuard allowedRoles={['WORKSPACE_OWNER', 'WORKSPACE_ADMIN']}>
                                 <Button
                                     variant="ghost"
                                     size="sm"
