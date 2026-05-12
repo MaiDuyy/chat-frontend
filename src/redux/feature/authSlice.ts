@@ -7,34 +7,55 @@ interface AuthState {
   token: string | null;
   refreshToken: string | null;
   isAuthenticated: boolean;
+  permissions: string[]; // RBAC permissions
+  roles: string[]; // User roles
 }
 
-// --- HÀM HELPER ĐỂ LẤY DỮ LIỆU TỪ LS ---
+// --- HÀM HELPER ĐỂ LẤY DỮ LIỆU TỪ LS (chỉ user info, KHÔNG lưu token) ---
 const getInitialStateFromStorage = (): AuthState => {
   if (typeof window === 'undefined') {
-    return { user: null, token: null, refreshToken: null, isAuthenticated: false };
+    return { 
+      user: null, 
+      token: null,
+      refreshToken: null,
+      isAuthenticated: false,
+      permissions: [],
+      roles: [],
+    };
   }
 
   try {
-    const token = localStorage.getItem("accessToken");
-    const refreshToken = localStorage.getItem("refreshToken");
-    // Lưu ý: User object nên được lưu vào LS dưới dạng JSON string khi login
     const userJson = localStorage.getItem("user"); 
     const user = userJson ? JSON.parse(userJson) : null;
+    const token = localStorage.getItem("accessToken") || null;
+    const refresh = localStorage.getItem("refreshToken") || null;
+    const permissionsJson = localStorage.getItem("permissions");
+    const permissions = permissionsJson ? JSON.parse(permissionsJson) : [];
+    const rolesJson = localStorage.getItem("roles");
+    const roles = rolesJson ? JSON.parse(rolesJson) : [];
 
-    if (token && refreshToken && user) {
+    if (user && token) {
       return {
-        user: user,
-        token: token,
-        refreshToken: refreshToken,
-        isAuthenticated: true, // Đã có token thì coi như đã login
+        user,
+        token,
+        refreshToken: refresh,
+        isAuthenticated: true,
+        permissions,
+        roles,
       };
     }
   } catch (error) {
     console.error("Lỗi parse JSON từ localStorage", error);
   }
 
-  return { user: null, token: null, refreshToken: null, isAuthenticated: false };
+  return { 
+    user: null, 
+    token: null,
+    refreshToken: null,
+    isAuthenticated: false,
+    permissions: [],
+    roles: [],
+  };
 };
 
 // SỬ DỤNG HÀM TRÊN ĐỂ KHỞI TẠO
@@ -46,19 +67,26 @@ const authSlice = createSlice({
   reducers: {
     setCredentials: (
       state,
-      action: PayloadAction<{ user: User; accessToken: string; refreshToken: string }>
+      action: PayloadAction<{ user: User; accessToken: string; refreshToken: string ,permissions?: string[]; roles?: string[]; }>
     ) => {
-      const { user, accessToken, refreshToken } = action.payload;
+      const { user, accessToken, refreshToken, permissions = [], roles = [] } = action.payload;
       state.user = user;
       state.token = accessToken;
       state.refreshToken = refreshToken;
       state.isAuthenticated = true;
+      if (permissions.length > 0) state.permissions = permissions;
+      if (roles.length > 0) state.roles = roles;
       
       if (typeof window !== 'undefined') {
+        localStorage.setItem("user", JSON.stringify(user));
         localStorage.setItem("accessToken", accessToken);
         localStorage.setItem("refreshToken", refreshToken);
-        // QUAN TRỌNG: Lưu cả thông tin user để khi F5 còn load lại được
-        localStorage.setItem("user", JSON.stringify(user)); 
+        if (permissions.length > 0) {
+          localStorage.setItem("permissions", JSON.stringify(permissions));
+        }
+        if (roles.length > 0) {
+          localStorage.setItem("roles", JSON.stringify(roles));
+        }
       }
     },
     logOut: (state) => {
@@ -66,23 +94,39 @@ const authSlice = createSlice({
       state.token = null;
       state.refreshToken = null;
       state.isAuthenticated = false;
+      state.permissions = [];
+      state.roles = [];
       
       if (typeof window !== 'undefined') {
+        localStorage.removeItem("user");
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
-        localStorage.removeItem("user"); // Xóa user
+        localStorage.removeItem("permissions");
+        localStorage.removeItem("roles");
       }
     },
     tokenReceived: (state, action: PayloadAction<{ accessToken: string, refreshToken: string }>) => {
       state.token = action.payload.accessToken;
       state.refreshToken = action.payload.refreshToken;
+      state.isAuthenticated = true;
+      
       if (typeof window !== 'undefined') {
         localStorage.setItem("accessToken", action.payload.accessToken);
         localStorage.setItem("refreshToken", action.payload.refreshToken);
       }
-    }
+    },
+    // RBAC: Set permissions after fetching from API
+    setPermissions: (state, action: PayloadAction<{ permissions: string[]; roles: string[] }>) => {
+      state.permissions = action.payload.permissions;
+      state.roles = action.payload.roles;
+      
+      if (typeof window !== 'undefined') {
+        localStorage.setItem("permissions", JSON.stringify(action.payload.permissions));
+        localStorage.setItem("roles", JSON.stringify(action.payload.roles));
+      }
+    },
   },
 });
 
-export const { setCredentials, logOut, tokenReceived } = authSlice.actions;
+export const { setCredentials, logOut, tokenReceived, setPermissions } = authSlice.actions;
 export default authSlice.reducer;

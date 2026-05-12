@@ -83,13 +83,13 @@ export default function ChatSidebar({
     if (!socket) return;
 
     const handleFriendRequestGone = (data: any) => {
-            console.log("[Sidebar] Request gone (Declined/Cancelled):", data);
-            
-            // Load lại danh sách lời mời nhận được (để xóa badge đỏ và xóa khỏi list)
-            refetchRequests(); 
-            
-            // Nếu bạn hiển thị danh sách "Lời mời đã gửi", cần gọi refetchSentRequests() ở đây
-        };
+      console.log("[Sidebar] Request gone (Declined/Cancelled):", data);
+
+      // Load lại danh sách lời mời nhận được (để xóa badge đỏ và xóa khỏi list)
+      refetchRequests();
+
+      // Nếu bạn hiển thị danh sách "Lời mời đã gửi", cần gọi refetchSentRequests() ở đây
+    };
     // Handler: Cập nhật danh sách Chat
     const handleChatUpdate = () => {
       console.log("[Sidebar] Updating Chats...");
@@ -160,9 +160,8 @@ export default function ChatSidebar({
             </h1>
             <div className="flex items-center gap-1">
               <span
-                className={`w-2 h-2 rounded-full ${
-                  isConnected ? "bg-green-500" : "bg-red-500"
-                }`}
+                className={`w-2 h-2 rounded-full ${isConnected ? "bg-green-500" : "bg-red-500"
+                  }`}
                 title={isConnected ? "Đã kết nối" : "Mất kết nối"}
               />
               <Button
@@ -200,11 +199,10 @@ export default function ChatSidebar({
         <div className="flex border-b border-gray-200 dark:border-gray-700">
           <button
             onClick={() => setActiveTab("chats")}
-            className={`flex-1 py-3 text-sm font-medium relative transition-colors ${
-              activeTab === "chats"
-                ? "text-blue-600 dark:text-blue-400"
-                : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
-            }`}
+            className={`flex-1 py-3 text-sm font-medium relative transition-colors ${activeTab === "chats"
+              ? "text-blue-600 dark:text-blue-400"
+              : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+              }`}
           >
             <MessageCircle className="h-5 w-5 mx-auto" />
             {activeTab === "chats" && (
@@ -213,11 +211,10 @@ export default function ChatSidebar({
           </button>
           <button
             onClick={() => setActiveTab("friends")}
-            className={`flex-1 py-3 text-sm font-medium relative transition-colors ${
-              activeTab === "friends"
-                ? "text-blue-600 dark:text-blue-400"
-                : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
-            }`}
+            className={`flex-1 py-3 text-sm font-medium relative transition-colors ${activeTab === "friends"
+              ? "text-blue-600 dark:text-blue-400"
+              : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+              }`}
           >
             <div className="relative inline-block">
               <Users className="h-5 w-5" />
@@ -233,11 +230,10 @@ export default function ChatSidebar({
           </button>
           <button
             onClick={() => setActiveTab("notifications")}
-            className={`flex-1 py-3 text-sm font-medium relative transition-colors ${
-              activeTab === "notifications"
-                ? "text-blue-600 dark:text-blue-400"
-                : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
-            }`}
+            className={`flex-1 py-3 text-sm font-medium relative transition-colors ${activeTab === "notifications"
+              ? "text-blue-600 dark:text-blue-400"
+              : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+              }`}
           >
             <div className="relative inline-block">
               <Bell className="h-5 w-5" />
@@ -290,10 +286,19 @@ export default function ChatSidebar({
                     let isOnline = false;
                     let isFriend = true; // Mặc định true cho group
 
-                    if (!chat.isGroup && chat.participants[0]) {
-                      isOnline = onlineUsers.has(chat.participants[0].id);
-                      // Kiểm tra xem participant có phải là bạn bè không
-                      isFriend = friendIds.has(chat.participants[0].id);
+                    // if (!chat.isGroup && chat.participants[0]) {
+                    //   isOnline = onlineUsers.has(chat.participants[0].id);
+                    //   // Kiểm tra xem participant có phải là bạn bè không
+                    //   isFriend = friendIds.has(chat.participants[0].id);
+                    // }
+                    if (!chat.isGroup) {
+                      const chatAny = chat as any;
+                      const partnerId = chatAny.participantIds?.[0] || chatAny.participants?.[0]?.accountId || chatAny.participants?.[0]?.id;
+                      if (partnerId) {
+                        isOnline = onlineUsers.has(partnerId);
+                        // Kiểm tra xem participant có phải là bạn bè không
+                        isFriend = friendIds.has(partnerId);
+                      }
                     }
 
                     return (

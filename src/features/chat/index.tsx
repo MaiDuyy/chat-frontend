@@ -13,3 +13,10 @@ export { default as ChatInfoPanel } from "./chat-info-panel";
 export { default as FriendProfileSheet } from "./friend-profile-sheet";
 export { default as BlockedUsersSheet } from "./blocked-users-sheet";
 export { default as GroupSettingsPanel } from "./group-settings-panel";
+
+// New enterprise components
+export { ChannelSidebar } from "./ChannelSidebar";
+export { ChannelHeader } from "./ChannelHeader";
+export { MessageList } from "./MessageList";
+export { MessageComposer } from "./MessageComposer";
+

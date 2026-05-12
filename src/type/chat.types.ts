@@ -59,16 +59,36 @@ export interface BlockedUser {
 }
 
 // ===== Chat Types =====
-export type ChatParticipantRole = "MEMBER" | "LEADER";
+export type ChatParticipantRole = "CHANNEL_OWNER" | "CHANNEL_MODERATOR" | "CHANNEL_MEMBER" | "CHANNEL_GUEST";
+export type JoinPolicy = "PUBLIC" | "PRIVATE" | "APPROVAL";
 
 export interface ChatParticipant {
-  id: string;
-  name: string;
+  participantId?: string;
+  accountId: string;
+  name?: string | null;
   avatar?: string | null;
   isOnline?: boolean;
   lastSeen?: string | null;
-  status?: string | null;
+  userStatus?: string | null;
   role?: ChatParticipantRole;
+  account?: {
+      id: string;
+      name: string;
+      avatar: string | null;
+  };
+}
+
+export interface JoinRequest {
+  id: string;
+  chatId: string;
+  accountId: string;
+  status: "PENDING" | "APPROVED" | "REJECTED";
+  createdAt: string;
+  account?: {
+      id: string;
+      name: string;
+      avatar: string | null;
+  };
 }
 
 export interface Chat {
@@ -76,6 +96,8 @@ export interface Chat {
   name?: string | null;
   avatar?: string | null;
   isGroup: boolean;
+  isBlocked: boolean;
+  isBlockedByMe: boolean;
   pin: boolean;
   notify: boolean;
   readed: boolean;
@@ -91,7 +113,41 @@ export interface Chat {
       name: string;
     };
   } | null;
+  unreadCount: number;
   updatedAt: string;
+  joinPolicy?: JoinPolicy;
+  joinRequests?: JoinRequest[];
+}
+
+export type TaskStatus = "TODO" | "IN_PROGRESS" | "DONE" | "CANCELLED";
+
+export interface TaskAssignee {
+  id: string;
+  taskId: string;
+  accountId: string;
+  account?: {
+    id: string;
+    name: string;
+    avatar: string | null;
+  };
+}
+
+export interface Task {
+  id: string;
+  chatId: string;
+  creatorId: string;
+  title: string;
+  description?: string | null;
+  status: TaskStatus;
+  deadlineAt?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  creator?: {
+    id: string;
+    name: string;
+    avatar: string | null;
+  };
+  assignees: TaskAssignee[];
 }
 
 export interface ChatDetails extends Chat {
@@ -110,7 +166,15 @@ export type MessageType =
   | "gif"
   | "location"
   | "contact"
-  | "system";
+  | "system"
+  | "call_started"
+  | "call_participant_joined"
+  | "call_participant_left"
+  | "call_ended"
+  | "call_missed"
+  | "call_declined"
+  | "call_cancelled";
+  
 
 export interface MessageReaction {
   emoji: string;
@@ -124,6 +188,7 @@ export interface Message {
   type: MessageType;
   time: string;
   pin: boolean;
+  senderId?: string;
   sender: {
     id: string;
     name: string;
@@ -141,6 +206,7 @@ export interface Message {
     type: string;
   } | null;
   reactions: MessageReaction[];
+  destroy?: boolean;
   isMe: boolean;
 }
 
@@ -160,6 +226,7 @@ export type NotificationType =
   | "NEW_MESSAGE"
   | "GROUP_INVITE"
   | "GROUP_REMOVED"
+  | "WORKSPACE_INVITE"
   | "MENTION"
   | "REACTION"
   | "SYSTEM";
@@ -226,6 +293,7 @@ export interface UserOnlineEvent {
 
 export interface MessageReactedEvent {
   messageId: string;
+  chatId: string;
   userId: string;
   userName: string;
   emoji: string;

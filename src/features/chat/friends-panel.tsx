@@ -137,7 +137,7 @@ export default function FriendsPanel({ onlineUsers, onStartChat }: FriendsPanelP
     const tabs = [
         { id: "all" as TabType, label: "Tất cả", count: friends.length },
         { id: "online" as TabType, label: "Online", count: onlineFriends.length },
-        { id: "requests" as TabType, label: "Lời mời", count: receivedRequests.length },
+        { id: "requests" as TabType, label: "Lời mời", count: receivedRequests.length + sentRequests.length },
         { id: "add" as TabType, label: "Thêm bạn", icon: UserPlus },
     ];
 

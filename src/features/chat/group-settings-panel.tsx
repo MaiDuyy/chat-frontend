@@ -1,532 +1,498 @@
 "use client";
 
-import { useState, useRef } from "react";
-import {
-    Sheet,
-    SheetContent,
-    SheetHeader,
-    SheetTitle,
-} from "@/components/ui/sheet";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Badge } from "@/components/ui/badge";
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from "@/components/ui/dialog";
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { Checkbox } from "@/components/ui/checkbox";
+import { useState, useRef, useEffect } from "react";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { Loader2 } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import {
-    Camera,
-    UserPlus,
-    UserMinus,
-    Users,
-    Crown,
-    Search,
-    Loader2,
-    Pencil,
-    X,
-    Check,
-} from "lucide-react";
+
+// API hooks
 import {
     useGetChatByIdQuery,
     useUpdateChatMutation,
     useAddMembersMutation,
-    useRemoveMemberMutation,
+    useRemoveChatMemberMutation,
+    useDeleteChatMutation,
+    useLeaveChatMutation,
+    useUpdateChatMemberRoleMutation,
+    useGetTasksQuery,
+    useCreateTaskMutation,
+    useUpdateTaskStatusMutation,
+    useApproveJoinRequestMutation,
+    useDeleteTaskMutation,
 } from "@/src/redux/feature/chatApi";
-import { useGetFriendsQuery } from "@/src/redux/feature/friendApi";
 import { useUploadGroupAvatarMutation } from "@/src/redux/feature/uploadApi";
+import {
+    useGetMediaMessagesQuery,
+    useGetPinnedMessagesQuery,
+} from "@/src/redux/feature/messageApi";
+import { useSearchDirectoryQuery } from "@/src/redux/feature/userApi";
 
-interface GroupSettingsPanelProps {
-    chatId: string;
-    isOpen: boolean;
-    onClose: () => void;
-    currentUserId?: string;
-}
+// Components
+import { GroupSettingsSidebar } from "../../components/group-settings/GroupSettingsSidebar";
+import { GroupSettingsHeader } from "../../components/group-settings/GroupSettingsHeader";
+import { MembersTab } from "../../components/group-settings/tabs/MembersTab";
+import { TasksTab } from "../../components/group-settings/tabs/TasksTab";
+import { PinnedTab } from "../../components/group-settings/tabs/PinnedTab";
+import { MediaTab } from "../../components/group-settings/tabs/MediaTab";
+import { SettingsTab } from "../../components/group-settings/tabs/SettingsTab";
+import { InviteTab } from "../../components/group-settings/tabs/InviteTab";
+import { AddMemberDialog } from "../../components/group-settings/dialogs/AddMemberDialog";
+import { AddTaskDialog } from "../../components/group-settings/dialogs/AddTaskDialog";
+import { RemoveMemberDialog } from "../../components/group-settings/dialogs/RemoveMemberDialog.tsx";
+import { LeaveGroupDialog } from "../../components/group-settings/dialogs/LeaveGroupDialog";
+import { DeleteGroupDialog } from "../../components/group-settings/dialogs/DeleteGroupDialog";
+import { TransferLeadershipDialog } from "../../components/group-settings/dialogs/TransferLeadershipDialog.tsx";
 
-interface Participant {
-    id: string;
-    accountId?: string;
-    isAdmin?: boolean;
-    account?: {
-        id: string;
-        name: string;
-        avatar: string | null;
-    };
-    // Trường hợp dữ liệu trả về trực tiếp từ participants
-    name?: string;
-    avatar?: string | null;
-}
-
-interface Friend {
-    id: string;
-    name: string;
-    avatar?: string | null;
-}
+// Types & utils
+import { GroupSettingsPanelProps, Participant, TabKey } from "../../components/group-settings/types";
+import { getInitials, normalizeUrl, avatarColor } from "../../components/group-settings/shared/utils";
 
 export default function GroupSettingsPanel({
     chatId,
     isOpen,
     onClose,
     currentUserId,
+    onMessageClick,
 }: GroupSettingsPanelProps) {
-    // States
+    const router = useRouter();
+
+    // UI State
+    const [activeTab, setActiveTab] = useState<TabKey>("members");
     const [isEditingName, setIsEditingName] = useState(false);
     const [newGroupName, setNewGroupName] = useState("");
+    const [memberSearch, setMemberSearch] = useState("");
+    const [directorySearch, setDirectorySearch] = useState("");
+    const [debouncedDirectorySearch, setDebouncedDirectorySearch] = useState("");
+    const [mediaFilter, setMediaFilter] = useState<"all" | "image" | "video" | "file">("all");
+    const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+
+    // Dialog states
     const [showAddMemberDialog, setShowAddMemberDialog] = useState(false);
     const [showRemoveMemberDialog, setShowRemoveMemberDialog] = useState(false);
+    const [showLeaveGroupDialog, setShowLeaveGroupDialog] = useState(false);
+    const [showDeleteGroupDialog, setShowDeleteGroupDialog] = useState(false);
+    const [showAddTaskDialog, setShowAddTaskDialog] = useState(false);
+    const [showTransferDialog, setShowTransferDialog] = useState(false);
+
+    // Feature states
     const [memberToRemove, setMemberToRemove] = useState<Participant | null>(null);
-    const [searchQuery, setSearchQuery] = useState("");
+    const [selectedSuccessor, setSelectedSuccessor] = useState<string | null>(null);
     const [selectedFriends, setSelectedFriends] = useState<string[]>([]);
-    const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+    const [taskTitle, setTaskTitle] = useState("");
+    const [taskStartTime, setTaskStartTime] = useState("");
+    const [taskDeadline, setTaskDeadline] = useState("");
+    const [selectedTaskAssignees, setSelectedTaskAssignees] = useState<string[]>([]);
 
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    // API hooks
+    // API Queries
     const { data: chatData, isLoading: chatLoading, refetch } = useGetChatByIdQuery(chatId, {
         skip: !isOpen || !chatId,
     });
-    const { data: friendsData } = useGetFriendsQuery();
-    const [updateChat, { isLoading: isUpdating }] = useUpdateChatMutation();
-    const [addMembers, { isLoading: isAddingMembers }] = useAddMembersMutation();
-    const [removeMember, { isLoading: isRemovingMember }] = useRemoveMemberMutation();
-    const [uploadGroupAvatar] = useUploadGroupAvatarMutation();
+    const { data: mediaData } = useGetMediaMessagesQuery(
+        { chatId, type: mediaFilter },
+        { skip: !isOpen || !chatId }
+    );
+    const { data: directoryData, isLoading: directoryLoading } = useSearchDirectoryQuery(
+        debouncedDirectorySearch,
+        { skip: !showAddMemberDialog || debouncedDirectorySearch.length < 2 }
+    );
+    const { data: pinnedData } = useGetPinnedMessagesQuery(chatId, { skip: !isOpen || !chatId });
+    const { data: taskData, isLoading: tasksLoading } = useGetTasksQuery(chatId, { skip: !isOpen || !chatId });
 
+    // API Mutations
+    const [updateChat] = useUpdateChatMutation();
+    const [addMembers, { isLoading: isAddingMembers }] = useAddMembersMutation();
+    const [removeMember, { isLoading: isRemovingMember }] = useRemoveChatMemberMutation();
+    const [deleteChat, { isLoading: isDeleting }] = useDeleteChatMutation();
+    const [leaveChat, { isLoading: isLeaving }] = useLeaveChatMutation();
+    const [updateMemberRole] = useUpdateChatMemberRoleMutation();
+    const [uploadGroupAvatar] = useUploadGroupAvatarMutation();
+    const [createTask, { isLoading: isCreatingTask }] = useCreateTaskMutation();
+    const [updateTaskStatus] = useUpdateTaskStatusMutation();
+    const [deleteTask] = useDeleteTaskMutation();
+    const [approveJoinRequest] = useApproveJoinRequestMutation();
+
+    // Derived data
     const chat = chatData?.chat;
     const participants: Participant[] = (chat?.participants || []) as Participant[];
-    const friends: Friend[] = (friendsData?.friends || []) as Friend[];
+    const tasks = taskData?.tasks || [];
+    const mediaMessages = mediaData?.media || [];
+    const pinnedMessages = pinnedData?.pinnedMessages || [];
+    const directoryUsers = directoryData?.users || [];
 
-    // Helper để lấy id thực của member
-    const getMemberId = (p: Participant) => p.account?.id || p.id;
+    const myRole = chat?.myRole;
+    const isLeader = myRole === "CHANNEL_OWNER";
+    const isAdmin = isLeader || myRole === "CHANNEL_MODERATOR";
+
+    const getMemberId = (p: Participant) => p.userId || p.accountId || p.account?.id;
     const getMemberName = (p: Participant) => p.account?.name || p.name || "Người dùng";
     const getMemberAvatar = (p: Participant) => p.account?.avatar || p.avatar;
-
-    // Filter friends not already in group
-    const existingMemberIds = participants.map((p) => getMemberId(p));
-    const availableFriends = friends.filter(
-        (f) => !existingMemberIds.includes(f.id) &&
-            f.name?.toLowerCase().includes(searchQuery.toLowerCase())
+    const existingMemberIds = participants.map(getMemberId).filter(Boolean);
+    const availableDirectoryUsers = directoryUsers.filter(
+        (u: any) => !existingMemberIds.includes(u.id) && u.id !== currentUserId
     );
 
-    // Get initials
-    const getInitials = (name: string) => {
-        return (name || "?")
-            .split(" ")
-            .map((n) => n[0])
-            .join("")
-            .toUpperCase()
-            .slice(0, 2);
-    };
+    const doneTasks = tasks.filter((t: any) => t.status === "DONE").length;
+    const inProgressTasks = tasks.filter((t: any) => t.status === "IN_PROGRESS").length;
 
-    // Handle update group name
+    // Effects
+    useEffect(() => {
+        const t = setTimeout(() => setDebouncedDirectorySearch(directorySearch), 300);
+        return () => clearTimeout(t);
+    }, [directorySearch]);
+
+    useEffect(() => {
+        if (chat?.name) setNewGroupName(chat.name);
+    }, [chat]);
+
+    // Handlers
     const handleUpdateName = async () => {
-        if (!newGroupName.trim()) {
-            toast.error("Tên nhóm không được để trống");
-            return;
-        }
-
+        if (!newGroupName.trim()) return toast.error("Tên nhóm không được để trống");
         try {
             await updateChat({ chatId, name: newGroupName.trim() }).unwrap();
             toast.success("Đã cập nhật tên nhóm");
             setIsEditingName(false);
             refetch();
-        } catch (error: any) {
-            toast.error(error?.data?.message || "Lỗi cập nhật tên nhóm");
+        } catch (e: any) {
+            toast.error(e?.data?.message || "Lỗi cập nhật tên nhóm");
         }
-    };
-
-    // Handle avatar upload
-    const handleAvatarClick = () => {
-        fileInputRef.current?.click();
     };
 
     const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
-
-        // Validate file type
-        if (!file.type.startsWith("image/")) {
-            toast.error("Vui lòng chọn file ảnh");
-            return;
-        }
-
-        // Validate file size (5MB max)
-        if (file.size > 5 * 1024 * 1024) {
-            toast.error("Ảnh không được vượt quá 5MB");
-            return;
-        }
-
         setIsUploadingAvatar(true);
-
         try {
-            // Upload to server with type=group
-            const formData = new FormData();
-            formData.append("file", file);
-
-            const uploadResult = await uploadGroupAvatar(formData).unwrap();
-            const avatarUrl = uploadResult.url;
-
-            // Update chat with new avatar
-            await updateChat({ chatId, avatar: avatarUrl }).unwrap();
+            const fd = new FormData();
+            fd.append("file", file);
+            const res = await uploadGroupAvatar(fd).unwrap();
+            await updateChat({ chatId, avatar: res.url }).unwrap();
             toast.success("Đã cập nhật ảnh nhóm");
             refetch();
-        } catch (error: any) {
-            console.error("Upload error:", error);
-            toast.error(error?.data?.message || "Lỗi tải ảnh lên");
+        } catch (e: any) {
+            toast.error(e?.data?.message || "Lỗi tải ảnh lên");
         } finally {
             setIsUploadingAvatar(false);
-            if (fileInputRef.current) {
-                fileInputRef.current.value = "";
-            }
         }
     };
 
-    // Handle add members
     const handleAddMembers = async () => {
-        if (selectedFriends.length === 0) {
-            toast.error("Vui lòng chọn ít nhất 1 người");
-            return;
-        }
-
+        if (selectedFriends.length === 0) return toast.error("Vui lòng chọn ít nhất 1 người");
         try {
             await addMembers({ chatId, memberIds: selectedFriends }).unwrap();
             toast.success(`Đã thêm ${selectedFriends.length} thành viên`);
             setShowAddMemberDialog(false);
             setSelectedFriends([]);
-            setSearchQuery("");
             refetch();
-        } catch (error: any) {
-            toast.error(error?.data?.message || "Lỗi thêm thành viên");
+        } catch (e: any) {
+            toast.error(e?.data?.message || "Lỗi thêm thành viên");
         }
     };
 
-    // Handle remove member
     const handleRemoveMember = async () => {
         if (!memberToRemove) return;
-
         try {
-            await removeMember({
-                chatId,
-                memberId: getMemberId(memberToRemove),
-            }).unwrap();
-            toast.success(`Đã xóa ${getMemberName(memberToRemove)} khỏi nhóm`);
+            await removeMember({ chatId, memberId: getMemberId(memberToRemove) as string }).unwrap();
+            toast.success(`Đã xóa ${getMemberName(memberToRemove)}`);
             setShowRemoveMemberDialog(false);
             setMemberToRemove(null);
             refetch();
-        } catch (error: any) {
-            toast.error(error?.data?.message || "Lỗi xóa thành viên");
+        } catch (e: any) {
+            toast.error(e?.data?.message || "Lỗi xóa thành viên");
         }
     };
 
-    // Toggle friend selection
-    const toggleFriendSelection = (friendId: string) => {
-        setSelectedFriends((prev) =>
-            prev.includes(friendId)
-                ? prev.filter((id) => id !== friendId)
-                : [...prev, friendId]
-        );
+    const handleLeaveGroup = async () => {
+        try {
+            await leaveChat(chatId).unwrap();
+            toast.success("Đã rời nhóm");
+            onClose();
+            router.replace("/chat");
+        } catch (e: any) {
+            toast.error(e?.data?.message || "Lỗi rời nhóm");
+        }
+    };
+
+    const handleDeleteGroup = async () => {
+        try {
+            await deleteChat(chatId).unwrap();
+            toast.success("Đã giải tán nhóm");
+            onClose();
+            router.replace("/chat");
+        } catch (e: any) {
+            toast.error(e?.data?.message || "Lỗi giải tán");
+        }
+    };
+
+    const handleUpdateRole = async (memberId: string, role: string) => {
+        try {
+            await updateMemberRole({ chatId, memberId, role }).unwrap();
+            toast.success("Đã cập nhật vai trò");
+            refetch();
+        } catch (e: any) {
+            toast.error(e?.data?.message || "Lỗi cập nhật vai trò");
+        }
+    };
+
+    const handleCreateTask = async () => {
+        if (!taskTitle.trim()) return toast.error("Vui lòng nhập tiêu đề");
+        try {
+            await createTask({
+                chatId,
+                title: taskTitle,
+                startAt: taskStartTime || undefined,
+                deadlineAt: taskDeadline || undefined,
+                assigneeIds: selectedTaskAssignees,
+            }).unwrap();
+            toast.success("Đã tạo kế hoạch");
+            setShowAddTaskDialog(false);
+            setTaskTitle("");
+            setTaskStartTime("");
+            setTaskDeadline("");
+            setSelectedTaskAssignees([]);
+        } catch (e: any) {
+            toast.error(e?.data?.message || "Lỗi tạo kế hoạch");
+        }
+    };
+
+    const handleUpdateTaskStatus = async (taskId: string, status: string) => {
+        try {
+            await updateTaskStatus({ taskId, status, chatId }).unwrap();
+            toast.success("Đã cập nhật trạng thái");
+        } catch {
+            toast.error("Lỗi cập nhật trạng thái");
+        }
+    };
+
+    const handleDeleteTask = async (taskId: string) => {
+        try {
+            await deleteTask({ taskId, chatId }).unwrap();
+            toast.success("Đã xóa kế hoạch");
+        } catch (e: any) {
+            toast.error(e?.data?.message || "Lỗi xóa kế hoạch");
+        }
+    };
+
+    const handleUpdateJoinPolicy = async (policy: string) => {
+        try {
+            await updateChat({ chatId, joinPolicy: policy }).unwrap();
+            toast.success("Đã cập nhật chính sách");
+            refetch();
+        } catch {
+            toast.error("Lỗi cập nhật chính sách");
+        }
+    };
+
+    const handleApproveJoin = async (targetId: string, approve: boolean) => {
+        try {
+            await approveJoinRequest({ chatId, targetAccountId: targetId, approve }).unwrap();
+            toast.success("Đã xử lý yêu cầu");
+            refetch();
+        } catch {
+            toast.error("Lỗi thực hiện yêu cầu");
+        }
+    };
+
+    const handleInitiateLeaveGroup = () => {
+        if (isLeader && participants.length > 1) {
+            setShowTransferDialog(true);
+        } else {
+            setShowLeaveGroupDialog(true);
+        }
+    };
+
+    const handleTransferAndLeave = async () => {
+        if (!selectedSuccessor) return toast.error("Vui lòng chọn người kế nhiệm");
+        try {
+            await updateMemberRole({ chatId, memberId: selectedSuccessor, role: "CHANNEL_OWNER" }).unwrap();
+            await leaveChat(chatId).unwrap();
+            toast.success("Đã chuyển quyền và rời nhóm");
+            onClose();
+            router.replace("/chat");
+        } catch (e: any) {
+            toast.error(e?.data?.message || "Lỗi chuyển quyền");
+        }
     };
 
     if (!isOpen) return null;
 
+    const topbarConfig: Record<TabKey, { title: string; action?: () => void; actionLabel?: string }> = {
+        members: { title: "Thành viên", action: isAdmin ? () => setShowAddMemberDialog(true) : undefined, actionLabel: "Thêm thành viên" },
+        tasks: { title: "Kế hoạch", action: isAdmin ? () => setShowAddTaskDialog(true) : undefined, actionLabel: "Tạo kế hoạch" },
+        pinned: { title: "Tin nhắn ghim" },
+        media: { title: "File & Media" },
+        settings: { title: "Cài đặt nhóm" },
+        invite: { title: "Chia sẻ nhóm" },
+    };
+
+    const currentTab = topbarConfig[activeTab];
+
+    // Common props for tabs
+    const tabProps = {
+        chatId,
+        participants,
+        tasks,
+        pinnedMessages,
+        mediaMessages,
+        mediaFilter,
+        setMediaFilter,
+        memberSearch,
+        setMemberSearch,
+        currentUserId,
+        isAdmin,
+        isLeader,
+        getMemberId,
+        getMemberName,
+        handleUpdateRole,
+        handleUpdateTaskStatus,
+        handleDeleteTask,
+        handleUpdateJoinPolicy,
+        handleApproveJoin,
+        onMessageClick,
+        setMemberToRemove,
+        setShowRemoveMemberDialog,
+    };
+
     return (
-        <>
-            <Sheet open={isOpen} onOpenChange={onClose}>
-                <SheetContent className="w-[400px] sm:w-[450px] p-0">
-                    <SheetHeader className="p-4 border-b">
-                        <SheetTitle className="flex items-center gap-2">
-                            <Users className="w-5 h-5" />
-                            Thông tin nhóm
-                        </SheetTitle>
-                    </SheetHeader>
-
-                    {chatLoading ? (
-                        <div className="flex items-center justify-center h-64">
-                            <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
-                        </div>
-                    ) : (
-                        <ScrollArea className="h-[calc(100vh-80px)]">
-                            {/* Group Avatar & Name */}
-                            <div className="p-6 flex flex-col items-center border-b">
-                                {/* Avatar */}
-                                <div className="relative group mb-4">
-                                    <Avatar className="w-24 h-24 ring-4 ring-white dark:ring-gray-800 shadow-lg">
-                                        <AvatarImage src={chat?.avatar || undefined} />
-                                        <AvatarFallback className="bg-gradient-to-br from-green-400 to-green-600 text-white text-2xl">
-                                            {getInitials(chat?.name || "Nhóm")}
-                                        </AvatarFallback>
-                                    </Avatar>
-                                    <button
-                                        onClick={handleAvatarClick}
-                                        disabled={isUploadingAvatar}
-                                        className="absolute bottom-0 right-0 w-8 h-8 bg-blue-500 hover:bg-blue-600 rounded-full flex items-center justify-center text-white shadow-lg transition-all"
-                                    >
-                                        {isUploadingAvatar ? (
-                                            <Loader2 className="w-4 h-4 animate-spin" />
-                                        ) : (
-                                            <Camera className="w-4 h-4" />
-                                        )}
-                                    </button>
-                                    <input
-                                        ref={fileInputRef}
-                                        type="file"
-                                        accept="image/*"
-                                        className="hidden"
-                                        onChange={handleAvatarUpload}
-                                    />
-                                </div>
-
-                                {/* Group Name */}
-                                {isEditingName ? (
-                                    <div className="flex items-center gap-2 w-full max-w-[250px]">
-                                        <Input
-                                            value={newGroupName}
-                                            onChange={(e) => setNewGroupName(e.target.value)}
-                                            placeholder="Nhập tên nhóm"
-                                            className="text-center"
-                                            autoFocus
-                                        />
-                                        <Button
-                                            size="icon"
-                                            variant="ghost"
-                                            onClick={handleUpdateName}
-                                            disabled={isUpdating}
-                                        >
-                                            {isUpdating ? (
-                                                <Loader2 className="w-4 h-4 animate-spin" />
-                                            ) : (
-                                                <Check className="w-4 h-4 text-green-500" />
-                                            )}
-                                        </Button>
-                                        <Button
-                                            size="icon"
-                                            variant="ghost"
-                                            onClick={() => setIsEditingName(false)}
-                                        >
-                                            <X className="w-4 h-4 text-gray-500" />
-                                        </Button>
-                                    </div>
-                                ) : (
-                                    <button
-                                        onClick={() => {
-                                            setNewGroupName(chat?.name || "");
-                                            setIsEditingName(true);
-                                        }}
-                                        className="flex items-center gap-2 group"
-                                    >
-                                        <h2 className="text-xl font-semibold">{chat?.name || "Nhóm chat"}</h2>
-                                        <Pencil className="w-4 h-4 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity" />
-                                    </button>
-                                )}
-
-                                <p className="text-sm text-gray-500 mt-1">
-                                    {participants.length} thành viên
-                                </p>
-                            </div>
-
-                            {/* Members Section */}
-                            <div className="p-4">
-                                <div className="flex items-center justify-between mb-3">
-                                    <h3 className="font-semibold flex items-center gap-2">
-                                        <Users className="w-4 h-4" />
-                                        Thành viên ({participants.length})
-                                    </h3>
-                                    <Button
-                                        size="sm"
-                                        variant="outline"
-                                        onClick={() => setShowAddMemberDialog(true)}
-                                        className="text-blue-600 border-blue-200 hover:bg-blue-50"
-                                    >
-                                        <UserPlus className="w-4 h-4 mr-1" />
-                                        Thêm
-                                    </Button>
-                                </div>
-
-                                {/* Members List */}
-                                <div className="space-y-2">
-                                    {participants.map((participant) => {
-                                        const memberId = getMemberId(participant);
-                                        const memberName = getMemberName(participant);
-                                        const memberAvatar = getMemberAvatar(participant);
-                                        const isCurrentUser = memberId === currentUserId;
-                                        const isAdmin = participant.isAdmin;
-
-                                        return (
-                                            <div
-                                                key={participant.id}
-                                                className="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                                            >
-                                                <div className="flex items-center gap-3">
-                                                    <Avatar className="w-10 h-10">
-                                                        <AvatarImage src={memberAvatar || undefined} />
-                                                        <AvatarFallback className="bg-gradient-to-br from-blue-400 to-blue-600 text-white">
-                                                            {getInitials(memberName)}
-                                                        </AvatarFallback>
-                                                    </Avatar>
-                                                    <div>
-                                                        <p className="font-medium flex items-center gap-2">
-                                                            {memberName}
-                                                            {isCurrentUser && (
-                                                                <span className="text-xs text-gray-500">(Bạn)</span>
-                                                            )}
-                                                        </p>
-                                                        {isAdmin && (
-                                                            <Badge variant="secondary" className="text-xs">
-                                                                <Crown className="w-3 h-3 mr-1 text-yellow-500" />
-                                                                Quản trị viên
-                                                            </Badge>
-                                                        )}
-                                                    </div>
-                                                </div>
-
-                                                {/* Remove button - don't show for self */}
-                                                {!isCurrentUser && (
-                                                    <Button
-                                                        size="icon"
-                                                        variant="ghost"
-                                                        className="text-red-500 hover:text-red-600 hover:bg-red-50"
-                                                        onClick={() => {
-                                                            setMemberToRemove(participant);
-                                                            setShowRemoveMemberDialog(true);
-                                                        }}
-                                                    >
-                                                        <UserMinus className="w-4 h-4" />
-                                                    </Button>
-                                                )}
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                            </div>
-                        </ScrollArea>
-                    )}
-                </SheetContent>
-            </Sheet>
-
-            {/* Add Members Dialog */}
-            <Dialog open={showAddMemberDialog} onOpenChange={setShowAddMemberDialog}>
-                <DialogContent className="max-w-md">
-                    <DialogHeader>
-                        <DialogTitle className="flex items-center gap-2">
-                            <UserPlus className="w-5 h-5" />
-                            Thêm thành viên
-                        </DialogTitle>
-                        <DialogDescription>
-                            Chọn bạn bè để thêm vào nhóm
-                        </DialogDescription>
-                    </DialogHeader>
-
-                    {/* Search */}
-                    <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                        <Input
-                            placeholder="Tìm kiếm bạn bè..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className="pl-9"
-                        />
+        <Sheet open={isOpen} onOpenChange={onClose}>
+            <SheetContent
+                side="right"
+                className={cn(
+                    "w-1/2 flex flex-col bg-white border-l border-slate-200 shadow-2xl p-0",
+                    "sm:max-w-none sm:w-[540px] md:w-[700px] lg:w-[900px]"
+                )}
+            >
+                {chatLoading ? (
+                    <div className="flex-1 flex items-center justify-center w-full">
+                        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
                     </div>
+                ) : (
+                    <div className="flex h-full overflow-hidden w-full">
+                        {/* Sidebar */}
+                        <GroupSettingsSidebar
+                            chat={chat}
+                            participantsCount={participants.length}
+                            tasksCount={tasks.length}
+                            pinnedCount={pinnedMessages.length}
+                            activeTab={activeTab}
+                            setActiveTab={setActiveTab}
+                            isAdmin={isAdmin}
+                            isLeader={isLeader}
+                            isEditingName={isEditingName}
+                            setIsEditingName={setIsEditingName}
+                            newGroupName={newGroupName}
+                            setNewGroupName={setNewGroupName}
+                            handleUpdateName={handleUpdateName}
+                            fileInputRef={fileInputRef}
+                            handleAvatarUpload={handleAvatarUpload}
+                            isUploadingAvatar={isUploadingAvatar}
+                            onLeaveGroup={handleInitiateLeaveGroup}
+                            onDeleteGroup={() => setShowDeleteGroupDialog(true)}
+                        />
 
-                    {/* Friends List */}
-                    <ScrollArea className="h-[300px]">
-                        {availableFriends.length === 0 ? (
-                            <p className="text-center text-gray-500 py-8">
-                                {searchQuery
-                                    ? "Không tìm thấy bạn bè"
-                                    : "Tất cả bạn bè đã trong nhóm"}
-                            </p>
-                        ) : (
-                            <div className="space-y-2">
-                                {availableFriends.map((friend) => (
-                                    <div
-                                        key={friend.id}
-                                        onClick={() => toggleFriendSelection(friend.id)}
-                                        className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors ${selectedFriends.includes(friend.id)
-                                            ? "bg-blue-50 dark:bg-blue-900/30 border border-blue-200"
-                                            : "bg-gray-50 dark:bg-gray-800 hover:bg-gray-100"
-                                            }`}
-                                    >
-                                        <Checkbox
-                                            checked={selectedFriends.includes(friend.id)}
-                                            onCheckedChange={() => toggleFriendSelection(friend.id)}
-                                        />
-                                        <Avatar className="w-10 h-10">
-                                            <AvatarImage src={friend.avatar || undefined} />
-                                            <AvatarFallback className="bg-gradient-to-br from-purple-400 to-purple-600 text-white">
-                                                {getInitials(friend.name)}
-                                            </AvatarFallback>
-                                        </Avatar>
-                                        <span className="font-medium">{friend.name}</span>
-                                    </div>
-                                ))}
+                        {/* Main Content */}
+                        <div className="flex-1 flex flex-col min-w-0">
+                            <GroupSettingsHeader
+                                title={currentTab.title}
+                                action={currentTab.action}
+                                actionLabel={currentTab.actionLabel}
+                            />
+
+                            <div className="flex-1 overflow-auto p-5">
+                                {activeTab === "members" && <MembersTab {...tabProps} chat={chat} />}
+                                {activeTab === "tasks" && <TasksTab {...tabProps} tasksLoading={tasksLoading} doneTasks={doneTasks} inProgressTasks={inProgressTasks} />}
+                                {activeTab === "pinned" && <PinnedTab {...tabProps} />}
+                                {activeTab === "media" && <MediaTab {...tabProps} />}
+                                {activeTab === "invite" && (
+                                    <InviteTab 
+                                        chat={chat} 
+                                        handleApproveJoin={handleApproveJoin}
+                                    />
+                                )}
+                                {activeTab === "settings" && <SettingsTab {...tabProps} chat={chat} onLeaveGroup={handleInitiateLeaveGroup} onDeleteGroup={() => setShowDeleteGroupDialog(true)} />}
                             </div>
-                        )}
-                    </ScrollArea>
+                        </div>
+                    </div>
+                )}
 
-                    <DialogFooter>
-                        <Button
-                            variant="outline"
-                            onClick={() => {
-                                setShowAddMemberDialog(false);
-                                setSelectedFriends([]);
-                                setSearchQuery("");
-                            }}
-                        >
-                            Hủy
-                        </Button>
-                        <Button
-                            onClick={handleAddMembers}
-                            disabled={selectedFriends.length === 0 || isAddingMembers}
-                        >
-                            {isAddingMembers && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                            Thêm ({selectedFriends.length})
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
+                {/* Dialogs */}
+                <AddMemberDialog
+                    open={showAddMemberDialog}
+                    onOpenChange={setShowAddMemberDialog}
+                    directorySearch={directorySearch}
+                    setDirectorySearch={setDirectorySearch}
+                    availableDirectoryUsers={availableDirectoryUsers}
+                    directoryLoading={directoryLoading}
+                    selectedFriends={selectedFriends}
+                    setSelectedFriends={setSelectedFriends}
+                    onAddMembers={handleAddMembers}
+                    isAddingMembers={isAddingMembers}
+                />
 
-            {/* Remove Member Alert */}
-            <AlertDialog open={showRemoveMemberDialog} onOpenChange={setShowRemoveMemberDialog}>
-                <AlertDialogContent>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>Xóa thành viên?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            Bạn có chắc muốn xóa{" "}
-                            <span className="font-semibold">{memberToRemove ? getMemberName(memberToRemove) : ""}</span>{" "}
-                            khỏi nhóm? Người này sẽ cần được mời lại để tham gia.
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                        <AlertDialogCancel onClick={() => setMemberToRemove(null)}>
-                            Hủy
-                        </AlertDialogCancel>
-                        <AlertDialogAction
-                            onClick={handleRemoveMember}
-                            className="bg-red-600 hover:bg-red-700"
-                            disabled={isRemovingMember}
-                        >
-                            {isRemovingMember && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                            Xóa
-                        </AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
-        </>
+                <AddTaskDialog
+                    open={showAddTaskDialog}
+                    onOpenChange={setShowAddTaskDialog}
+                    taskTitle={taskTitle}
+                    setTaskTitle={setTaskTitle}
+                    taskStartTime={taskStartTime}
+                    setTaskStartTime={setTaskStartTime}
+                    taskDeadline={taskDeadline}
+                    setTaskDeadline={setTaskDeadline}
+                    selectedTaskAssignees={selectedTaskAssignees}
+                    setSelectedTaskAssignees={setSelectedTaskAssignees}
+                    participants={participants}
+                    getMemberId={getMemberId}
+                    getMemberName={getMemberName}
+                    onCreateTask={handleCreateTask}
+                    isCreatingTask={isCreatingTask}
+                />
+
+                <RemoveMemberDialog
+                    open={showRemoveMemberDialog}
+                    onOpenChange={setShowRemoveMemberDialog}
+                    memberToRemove={memberToRemove}
+                    getMemberName={getMemberName}
+                    onConfirm={handleRemoveMember}
+                    isRemoving={isRemovingMember}
+                />
+
+                <LeaveGroupDialog
+                    open={showLeaveGroupDialog}
+                    onOpenChange={setShowLeaveGroupDialog}
+                    groupName={chat?.name || ""}
+                    onConfirm={handleLeaveGroup}
+                    isLoading={isLeaving}
+                />
+
+                <DeleteGroupDialog
+                    open={showDeleteGroupDialog}
+                    onOpenChange={setShowDeleteGroupDialog}
+                    onConfirm={handleDeleteGroup}
+                    isLoading={isDeleting}
+                />
+
+                <TransferLeadershipDialog
+                    open={showTransferDialog}
+                    onOpenChange={setShowTransferDialog}
+                    participants={participants}
+                    currentUserId={currentUserId}
+                    getMemberId={getMemberId}
+                    getMemberName={getMemberName}
+                    selectedSuccessor={selectedSuccessor}
+                    setSelectedSuccessor={setSelectedSuccessor}
+                    onConfirm={handleTransferAndLeave}
+                    // isUpdating={false}
+                    // isLoading={isTransferring}
+                    isLoading={false}
+                    groupName={chat?.name || ""}
+                    getInitials={getInitials}
+                    getMemberAvatar={getMemberAvatar}
+                    normalizeUrl={normalizeUrl}
+                />
+            </SheetContent>
+        </Sheet>
     );
 }

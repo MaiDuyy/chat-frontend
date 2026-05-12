@@ -1,66 +1,71 @@
 // src/redux/feature/otpApi.ts
-// API endpoints cho OTP - xác thực email, quên mật khẩu
+// API endpoints cho OTP - kết hợp auth service + notification service routes
 
 import { apiSlice } from "../api/baseApi";
-import {
-  SendOTPRequest,
-  VerifyEmailOTPRequest,
-  ResetPasswordRequest,
-  VerifyOTPRequest,
-  ResendOTPRequest,
-  OTPResponse,
-  VerifyOTPResponse,
-} from "@/src/type/auth.types";
+
+// Response types
+interface OtpSuccessResponse {
+  success: boolean;
+  message: string;
+  resendAvailableIn?: number;
+}
+
+// ==========================================
+// Auth Service OTP routes (email verification after signup)
+// Gateway: /api/auth/verify-otp, /api/auth/resend-otp
+// ==========================================
+// Notification Service OTP routes (forgot password, generic OTP)
+// Gateway: /api/otp/request, /api/otp/resend, /api/otp/verify
+// ==========================================
 
 export const otpApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    // Gửi OTP xác thực email
-    sendVerificationOTP: builder.mutation<OTPResponse, SendOTPRequest>({
+    // === AUTH SERVICE: Verify email OTP (sau signup) ===
+    verifyEmailOTP: builder.mutation<OtpSuccessResponse, { email: string; code: string }>({
       query: (data) => ({
-        url: "/otp/send-verification",
+        url: "/auth/verify-otp",
         method: "POST",
         body: data,
       }),
     }),
 
-    // Xác thực email bằng OTP
-    verifyEmailOTP: builder.mutation<OTPResponse, VerifyEmailOTPRequest>({
+    // === AUTH SERVICE: Resend verification OTP ===
+    resendVerificationOTP: builder.mutation<OtpSuccessResponse, { email: string }>({
       query: (data) => ({
-        url: "/otp/verify-email",
+        url: "/auth/resend-otp",
         method: "POST",
         body: data,
       }),
     }),
 
-    // Gửi OTP quên mật khẩu
-    sendForgotPasswordOTP: builder.mutation<OTPResponse, SendOTPRequest>({
+    // === NOTIFICATION SERVICE: Send OTP (forgot password, etc.) ===
+    sendVerificationOTP: builder.mutation<OtpSuccessResponse, { email: string }>({
       query: (data) => ({
-        url: "/otp/forgot-password",
+        url: "/otp/request",
         method: "POST",
-        body: data,
+        body: { ...data, type: "VERIFY_EMAIL" },
       }),
     }),
 
-    // Đặt lại mật khẩu với OTP
-    resetPasswordWithOTP: builder.mutation<OTPResponse, ResetPasswordRequest>({
+    sendForgotPasswordOTP: builder.mutation<OtpSuccessResponse, { email: string }>({
       query: (data) => ({
-        url: "/otp/reset-password",
+        url: "/otp/request",
         method: "POST",
-        body: data,
+        body: { ...data, type: "RESET_PASSWORD" },
       }),
     }),
 
-    // Kiểm tra mã OTP (không consume)
-    verifyOTPCode: builder.mutation<VerifyOTPResponse, VerifyOTPRequest>({
+    // === NOTIFICATION SERVICE: Reset password with OTP ===
+    resetPasswordWithOTP: builder.mutation<OtpSuccessResponse, { email: string; code: string; newPassword: string }>({
       query: (data) => ({
         url: "/otp/verify",
         method: "POST",
-        body: data,
+        body: { email: data.email, otpCode: data.code, type: "RESET_PASSWORD" },
       }),
     }),
 
-    // Gửi lại OTP
-    resendOTP: builder.mutation<OTPResponse, ResendOTPRequest>({
+    // === NOTIFICATION SERVICE: Resend OTP (generic) ===
+    resendOTP: builder.mutation<OtpSuccessResponse, { email: string; type: "VERIFY_EMAIL" | "RESET_PASSWORD" | "CHANGE_EMAIL" }>({
       query: (data) => ({
         url: "/otp/resend",
         method: "POST",
@@ -71,10 +76,10 @@ export const otpApi = apiSlice.injectEndpoints({
 });
 
 export const {
-  useSendVerificationOTPMutation,
   useVerifyEmailOTPMutation,
+  useResendVerificationOTPMutation,
+  useSendVerificationOTPMutation,
   useSendForgotPasswordOTPMutation,
   useResetPasswordWithOTPMutation,
-  useVerifyOTPCodeMutation,
   useResendOTPMutation,
 } = otpApi;

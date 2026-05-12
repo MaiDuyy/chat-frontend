@@ -3,7 +3,7 @@
 import { useState, useRef } from "react";
 import { useAppSelector, useAppDispatch } from "@/src/redux/hooks";
 import { useUpdateProfileMutation, useChangePasswordMutation } from "@/src/redux/feature/userApi";
-import { setCredentials } from "@/src/redux/feature/authSlice";
+import { setCredentials, logOut } from "@/src/redux/feature/authSlice";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,13 +30,15 @@ import {
     Ban,
 } from "lucide-react";
 import { AccountSettingsPage } from "../account";
-import { BlockedUsersSheet } from "../chat";
+import BlockedUsersSheet from "../chat/blocked-users-sheet";
+
+
 
 type SettingsSection = "profile" | "notifications" | "privacy" | "appearance" | "language" | "help";
 
 export default function SettingsPage() {
     const dispatch = useAppDispatch();
-    const { user, token, refreshToken } = useAppSelector((state) => state.auth);
+    const { user } = useAppSelector((state) => state.auth);
     const [activeSection, setActiveSection] = useState<SettingsSection>("profile");
     const [isDarkMode, setIsDarkMode] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
@@ -101,11 +103,11 @@ export default function SettingsPage() {
             if (avatarFile) formData.append("avatar", avatarFile);
 
             const result = await updateProfile(formData).unwrap();
-            if (result.user && token) {
+            if (result.user) {
                 dispatch(setCredentials({
                     user: result.user,
-                    accessToken: token,
-                    refreshToken: refreshToken || ""
+                    accessToken: "",
+                    refreshToken: ""
                 }));
                 toast.success("Cập nhật thông tin thành công!");
                 setIsEditing(false);
@@ -142,9 +144,8 @@ export default function SettingsPage() {
     };
 
     const handleLogout = () => {
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("refreshToken");
-        window.location.href = "/auth/login";
+        dispatch(logOut());
+        window.location.href = "/auth/sign-in";
     };
 
     const toggleDarkMode = () => {

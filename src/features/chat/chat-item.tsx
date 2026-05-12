@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useAppSelector } from "@/src/redux/hooks";
 import { formatDistanceToNow } from "date-fns";
 import { vi } from "date-fns/locale";
 import {
@@ -21,6 +22,7 @@ import {
     Pin,
     BellOff,
     Bell,
+    ShieldCheck,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -46,15 +48,19 @@ import { toast } from "sonner";
 import {
     useUnfriendMutation,
     useBlockUserMutation,
+    useUnblockUserMutation,
     useSendFriendRequestMutation,
 } from "@/src/redux/feature/friendApi";
 import {
     useDeleteChatMutation,
-    useTogglePinChatMutation,
     useToggleNotifyChatMutation,
     useLeaveChatMutation,
+    useMarkChatAsReadMutation,
+    useTogglePinChatMutation,
 } from "@/src/redux/feature/chatApi";
 import { Chat } from "@/src/type/chat.types";
+import { socketService } from "@/src/services/socket.service";
+import { LeaveGroupDialog } from "@/src/components/group-settings/dialogs";
 
 // Định nghĩa lại Categories
 const FRIEND_CATEGORIES = [
@@ -98,7 +104,53 @@ export const ChatItem = ({
     const [deleteChat, { isLoading: isDeleting }] = useDeleteChatMutation();
     const [togglePinChat] = useTogglePinChatMutation();
     const [toggleNotifyChat] = useToggleNotifyChatMutation();
+    const [unblockUser, { isLoading: isUnblocking }] = useUnblockUserMutation();
     const [leaveChat, { isLoading: isLeaving }] = useLeaveChatMutation();
+    const [markAsRead] = useMarkChatAsReadMutation();
+
+    // useEffect(() => {
+    //     if (isSelected && chat.unreadCount > 0) {
+    //         markAsRead(chat.id);
+    //     }
+    // }, []);
+
+    const handleSelectChat = () => {
+        onSelectChat(chat.id);
+        if (chat.unreadCount > 0) {
+            // Chuyển sang dùng WebSocket Flow (Scalable)
+            socketService.markRead(chat.id, chat.lastMessage?.id);
+        }
+    };
+    //   const { data: accountData } = useGetAccountDetailsQuery();
+    //   const user = accountData?.user;
+    const { user: currentUser } = useAppSelector((state) => state.auth);
+
+    // Xử lý logic hiển thị tên và avatar cho chat 1-1
+    const getChatPartner = () => {
+        if (chat.isGroup) return null;
+        return chat.participants?.find(p => p.accountId !== currentUser?.id);
+    };
+
+    const partner = getChatPartner();
+    const displayName = chat.name || partner?.name || "Người dùng";
+    const rawAvatar = chat.avatar || partner?.avatar;
+
+    const getAvatarUrl = (url: string | null | undefined, name: string) => {
+        if (!url) return `https://api.dicebear.com/7.x/avataaars/svg?seed=${name}`;
+        if (url.startsWith("http://") || url.startsWith("https://") || url.startsWith("data:")) {
+            return url;
+        }
+        return `https://${url}`;
+    };
+
+    const imageUrl = getAvatarUrl(rawAvatar, displayName);
+
+    const initials = displayName
+        .split(" ")
+        .map((n: string) => n[0])
+        .join("")
+        .toUpperCase()
+        .slice(0, 2);
 
     // Xử lý logic hiển thị thời gian
     const lastMessageTime = chat.lastMessage?.time
@@ -108,15 +160,12 @@ export const ChatItem = ({
         })
         : "";
 
-    const initials = (chat.name || "?")
-        .split(" ")
-        .map((n: string) => n[0])
-        .join("")
-        .toUpperCase()
-        .slice(0, 2);
-
     // Lấy ID của người chat trong chat 1-1
-    const getPartnerId = () => chat.participants?.[0]?.id;
+    // const getPartnerId = () => chat.participants?.[0]?.accountId;
+    const getPartnerId = () => {
+        if (chat.isGroup) return null;
+        return chat.participants?.find(p => p.accountId !== currentUser?.id)?.accountId;
+    };
 
     // --- Handlers ---
     const handleSendFriendRequest = async () => {
@@ -136,24 +185,37 @@ export const ChatItem = ({
             const friendId = getPartnerId();
             if (!friendId) return;
 
+            console.log(friendId);
+
             await unfriend(friendId).unwrap();
-            toast.success(`Đã hủy kết bạn với ${chat.name}`);
+            toast.success(`Đã hủy kết bạn với ${displayName}`);
             setShowUnfriendDialog(false);
         } catch (error: any) {
             toast.error(error?.data?.message || "Lỗi hủy kết bạn");
         }
     };
-
     const handleBlock = async () => {
         try {
             const friendId = getPartnerId();
             if (!friendId) return;
 
             await blockUser(friendId).unwrap();
-            toast.success(`Đã chặn ${chat.name}`);
+            toast.success(`Đã chặn ${displayName}`);
             setShowBlockDialog(false);
         } catch (error: any) {
             toast.error(error?.data?.message || "Lỗi chặn người dùng");
+        }
+    };
+
+    const handleUnblock = async () => {
+        try {
+            const friendId = getPartnerId();
+            if (!friendId) return;
+
+            await unblockUser(friendId).unwrap();
+            toast.success(`Đã mở chặn ${displayName}`);
+        } catch (error: any) {
+            toast.error(error?.data?.message || "Lỗi mở chặn người dùng");
         }
     };
 
@@ -220,7 +282,7 @@ export const ChatItem = ({
     return (
         <>
             <div
-                onClick={() => onSelectChat(chat.id)}
+                onClick={handleSelectChat}
                 className={`
           group relative flex items-center gap-3 p-3 cursor-pointer transition-all duration-200
           hover:bg-blue-50 dark:hover:bg-gray-700
@@ -231,7 +293,7 @@ export const ChatItem = ({
                 {/* Avatar Section */}
                 <div className="relative flex-shrink-0">
                     <Avatar className="h-12 w-12 ring-2 ring-white dark:ring-gray-800">
-                        <AvatarImage src={chat.avatar || undefined} alt={chat.name || ""} />
+                        <AvatarImage src={imageUrl} alt={displayName} />
                         <AvatarFallback
                             className={`${chat.isGroup
                                 ? "bg-gradient-to-br from-green-400 to-green-600"
@@ -262,7 +324,7 @@ export const ChatItem = ({
                                     : "text-gray-700 dark:text-gray-300"
                                     }`}
                             >
-                                {chat.name}
+                                {displayName}
                             </span>
 
                             {/* Hiển thị Icon category nếu có */}
@@ -304,19 +366,29 @@ export const ChatItem = ({
                                             )}
                                         </span>
                                     )}
-                                    {chat.lastMessage.type === "text"
-                                        ? chat.lastMessage.content
-                                        : `[${chat.lastMessage.type}]`}
+                                    {(() => {
+                                        const t = chat.lastMessage.type;
+                                        if (t === "text") return chat.lastMessage.content;
+                                        if (t === "call_ended") return "📞 Cuộc gọi";
+                                        if (t === "call_missed") return "📵 Cuộc gọi nhỡ";
+                                        if (t === "call_declined") return "📵 Từ chối cuộc gọi";
+                                        if (t === "image") return "🖼️ Hình ảnh";
+                                        if (t === "video") return "🎥 Video";
+                                        if (t === "file") return "📎 Tệp đính kèm";
+                                        if (t === "audio") return "🎵 Âm thanh";
+                                        if (t === "sticker" || t === "gif") return "🎭 Sticker";
+                                        return `[${t}]`;
+                                    })()}
                                 </>
                             ) : (
                                 <span className="italic">Bắt đầu trò chuyện...</span>
                             )}
                         </p>
 
-                        {/* Unread Badge */}
-                        {!chat.readed && (
-                            <Badge className="bg-red-500 text-white text-xs px-1.5 py-0 h-5 min-w-[20px] flex items-center justify-center">
-                                •
+                        {/* Unread Badge - Ẩn nếu đang được chọn/đang chat */}
+                        {chat.unreadCount > 0 && !isSelected && (
+                            <Badge className="bg-red-500 text-white text-xs px-1.5 py-0 h-5 min-w-[20px] flex items-center justify-center rounded-full animate-in zoom-in duration-300">
+                                {chat.unreadCount > 99 ? "99+" : chat.unreadCount}
                             </Badge>
                         )}
 
@@ -406,13 +478,30 @@ export const ChatItem = ({
                                             </DropdownMenuItem>
                                         )}
 
-                                        <DropdownMenuItem
-                                            onClick={() => setShowBlockDialog(true)}
-                                            className="text-red-600 focus:text-red-700"
-                                        >
-                                            <Ban className="h-4 w-4 mr-2" />
-                                            Chặn
-                                        </DropdownMenuItem>
+                                        {chat.isBlocked ? (
+                                            chat.isBlockedByMe && (
+                                                <DropdownMenuItem
+                                                    onClick={handleUnblock}
+                                                    disabled={isUnblocking}
+                                                    className="text-emerald-600 focus:text-emerald-700 font-bold"
+                                                >
+                                                    {isUnblocking ? (
+                                                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                                    ) : (
+                                                        <ShieldCheck className="h-4 w-4 mr-2" />
+                                                    )}
+                                                    Mở chặn
+                                                </DropdownMenuItem>
+                                            )
+                                        ) : (
+                                            <DropdownMenuItem
+                                                onClick={() => setShowBlockDialog(true)}
+                                                className="text-red-600 focus:text-red-700"
+                                            >
+                                                <Ban className="h-4 w-4 mr-2" />
+                                                Chặn
+                                            </DropdownMenuItem>
+                                        )}
 
                                         <DropdownMenuSeparator />
 
@@ -491,7 +580,7 @@ export const ChatItem = ({
                 <AlertDialog open={showUnfriendDialog} onOpenChange={setShowUnfriendDialog}>
                     <AlertDialogContent>
                         <AlertDialogHeader>
-                            <AlertDialogTitle>Hủy kết bạn với {chat.name}?</AlertDialogTitle>
+                            <AlertDialogTitle>Hủy kết bạn với {displayName}?</AlertDialogTitle>
                             <AlertDialogDescription>
                                 Bạn sẽ không còn là bạn bè. Tuy nhiên lịch sử trò chuyện vẫn được giữ lại.
                             </AlertDialogDescription>
@@ -510,7 +599,7 @@ export const ChatItem = ({
                 <AlertDialog open={showBlockDialog} onOpenChange={setShowBlockDialog}>
                     <AlertDialogContent>
                         <AlertDialogHeader>
-                            <AlertDialogTitle>Chặn {chat.name}?</AlertDialogTitle>
+                            <AlertDialogTitle>Chặn {displayName}?</AlertDialogTitle>
                             <AlertDialogDescription>
                                 Người này sẽ không thể nhắn tin hay tìm thấy bạn nữa.
                             </AlertDialogDescription>
@@ -545,23 +634,12 @@ export const ChatItem = ({
                 </AlertDialog>
 
                 {/* Rời nhóm */}
-                <AlertDialog open={showLeaveGroupDialog} onOpenChange={setShowLeaveGroupDialog}>
-                    <AlertDialogContent>
-                        <AlertDialogHeader>
-                            <AlertDialogTitle>Rời khỏi nhóm {chat.name}?</AlertDialogTitle>
-                            <AlertDialogDescription>
-                                Bạn sẽ không còn nhận được tin nhắn từ nhóm này. Bạn sẽ cần được mời lại để tham gia.
-                            </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                            <AlertDialogCancel>Hủy</AlertDialogCancel>
-                            <AlertDialogAction onClick={handleLeaveGroup} className="bg-orange-600 hover:bg-orange-700">
-                                {isLeaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                Rời nhóm
-                            </AlertDialogAction>
-                        </AlertDialogFooter>
-                    </AlertDialogContent>
-                </AlertDialog>
+
+                <LeaveGroupDialog open={showLeaveGroupDialog} onOpenChange={setShowLeaveGroupDialog} groupName={displayName}
+                    onConfirm={handleLeaveGroup}
+                    isLoading={isLeaving}
+                />
+
             </div>
         </>
     );

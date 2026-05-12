@@ -8,16 +8,41 @@ import {
   SendMessageRequest,
 } from "@/src/type/chat.types";
 
+/** Get current userId from localStorage (set by auth) */
+function getCurrentUserId(): string | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = localStorage.getItem("user");
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      return parsed?.id || null;
+    }
+  } catch {}
+  return null;
+}
+
 export const messageApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     // Lấy tin nhắn
+    // Real-time updates handled by RealtimeChatProvider invalidating "Messages" tags
     getMessages: builder.query<MessagesResponse, { chatId: string; cursor?: string; limit?: number }>({
       query: ({ chatId, cursor, limit }) => ({
         url: `/messages/${chatId}`,
         params: { cursor, limit },
       }),
+      transformResponse: (response: MessagesResponse) => {
+        const currentUserId = getCurrentUserId();
+        return {
+          ...response,
+          messages: response.messages.map(m => ({
+            ...m,
+            isMe: m.senderId === currentUserId || m.sender?.id === currentUserId
+          }))
+        };
+      },
       providesTags: (_result, _error, { chatId }) => [{ type: "Messages", id: chatId }],
     }),
+
 
     // Gửi tin nhắn
     sendMessage: builder.mutation<{ message: Message }, { chatId: string; data: SendMessageRequest }>({
@@ -77,11 +102,39 @@ export const messageApi = apiSlice.injectEndpoints({
     }),
 
     // Ghim/bỏ ghim tin nhắn
-    togglePinMessage: builder.mutation<{ message: string; pin: boolean }, string>({
-      query: (messageId) => ({
+    togglePinMessage: builder.mutation<{ message: string; pin: boolean }, { messageId: string; chatId: string }>({
+      query: ({ messageId }) => ({
         url: `/messages/${messageId}/pin`,
         method: "PUT",
       }),
+      async onQueryStarted({ messageId, chatId }, { dispatch, queryFulfilled }) {
+        const updateArgs = [
+          { chatId, limit: 50 },
+          { chatId }
+        ];
+
+        const patches = updateArgs.map(args => 
+          dispatch(
+            messageApi.util.updateQueryData("getMessages", args as any, (draft) => {
+              if (draft && draft.messages) {
+                const msg = draft.messages.find((m) => m.id === messageId);
+                if (msg) {
+                  msg.pin = !msg.pin; // Optimistically toggle
+                }
+              }
+            })
+          )
+        );
+
+        try {
+          await queryFulfilled;
+          // Successfully updated on server
+          dispatch(apiSlice.util.invalidateTags([{ type: "PinnedMessages", id: chatId }]));
+        } catch {
+          // If error, rollback patches
+          patches.forEach(patch => patch.undo());
+        }
+      },
     }),
   }),
 });
