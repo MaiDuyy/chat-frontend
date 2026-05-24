@@ -13,14 +13,17 @@ import { apiSlice } from '../api/baseApi';
 export interface Document {
   id: number;
   userId: string;
+  workspaceId?: string;
   fileName: string;
   fileSize: number;
   filePath?: string;
   documentType: 'pdf' | 'docx' | 'txt' | string;
-  status: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED';
+  status: 'PENDING' | 'PREVIEW' | 'PROCESSING' | 'COMPLETED' | 'FAILED';
+  markdownContent?: string;
   chunkCount: number;
   errorMessage?: string;
   securityClassification?: 'PUBLIC' | 'INTERNAL' | 'CONFIDENTIAL' | 'RESTRICTED';
+  parserMethod?: string;
   tags?: string[];
   createdAt: string;
   updatedAt: string;
@@ -48,6 +51,7 @@ export interface DocumentUploadResponse {
   fileName: string;
   status: string;
   message: string;
+  markdownContent?: string;
 }
 
 export interface DocumentStatsDTO {
@@ -81,6 +85,29 @@ export interface ChunkSearchRequest {
   query: string;
   topK?: number;
   minSimilarity?: number;
+  workspaceId?: string;
+}
+
+export interface AiRefactorRequest {
+  mode: 'FULL_DOCUMENT' | 'PARTIAL';
+  targetText?: string;
+  instruction?: string;
+}
+
+export interface AiRefactorResponse {
+  refactoredMarkdown: string;
+}
+
+export interface PagedResponse<T> {
+  content: T[];
+  totalPages: number;
+  totalElements: number;
+  size: number;
+  number: number;
+  numberOfElements: number;
+  first: boolean;
+  last: boolean;
+  empty: boolean;
 }
 
 // Chat types removed and delegated to aiApi.ts
@@ -93,8 +120,19 @@ export const knowledgeApi = apiSlice.injectEndpoints({
 
     // ============= DOCUMENTS (Direct to Spring AI) =============
 
-    getDocuments: builder.query<Document[], void>({
-      query: () => '/documents',
+    getDocuments: builder.query<Document[] | PagedResponse<Document>, { workspaceId?: string; page?: number; size?: number } | void>({
+      query: (params) => {
+        const { workspaceId, page, size } = params || {};
+        const targetWorkspaceId = workspaceId === undefined ? 'default-workspace' : workspaceId;
+        const queryParts: string[] = [];
+        if (targetWorkspaceId) {
+          queryParts.push(`workspaceId=${encodeURIComponent(targetWorkspaceId)}`);
+        }
+        if (typeof page === 'number' && typeof size === 'number') {
+          queryParts.push(`page=${page}&size=${size}`);
+        }
+        return queryParts.length ? `/documents?${queryParts.join('&')}` : '/documents';
+      },
       providesTags: ['Documents'],
     }),
 
@@ -103,12 +141,29 @@ export const knowledgeApi = apiSlice.injectEndpoints({
       providesTags: (_r, _e, id) => [{ type: 'Documents', id }],
     }),
 
-    uploadDocument: builder.mutation<DocumentUploadResponse, FormData>({
-      query: (formData) => ({
-        url: '/documents/upload',
-        method: 'POST',
-        body: formData,
+    getRawDocument: builder.query<Blob, string>({
+      query: (id) => ({
+        url: `/documents/${id}/raw`,
+        responseHandler: (response) => response.blob(),
       }),
+    }),
+
+    uploadDocument: builder.mutation<DocumentUploadResponse, FormData | { formData: FormData; preview: boolean; parser?: string; workspaceId?: string }>({
+      query: (arg) => {
+        const formData = arg instanceof FormData ? arg : arg.formData;
+        const preview = arg instanceof FormData ? false : arg.preview;
+        const parser = arg instanceof FormData ? 'gemini' : (arg.parser || 'gemini');
+        const workspaceId = arg instanceof FormData ? undefined : arg.workspaceId;
+        let url = `/documents/upload?preview=${preview}&parser=${parser}`;
+        if (workspaceId) {
+          url += `&workspaceId=${encodeURIComponent(workspaceId)}`;
+        }
+        return {
+          url,
+          method: 'POST',
+          body: formData,
+        };
+      },
       invalidatesTags: ['Documents'],
     }),
 
@@ -158,6 +213,25 @@ export const knowledgeApi = apiSlice.injectEndpoints({
       invalidatesTags: (_result, _error, id) => [{ type: 'Documents', id }, 'Documents'],
     }),
 
+    ingestDocument: builder.mutation<void, { id: string | number; markdownContent: string }>({
+      query: ({ id, markdownContent }) => ({
+        url: `/documents/${id}/ingest`,
+        method: 'POST',
+        body: { markdownContent },
+      }),
+      invalidatesTags: ['Documents', 'Chunks'],
+    }),
+
+    aiRefactorDocument: builder.mutation<AiRefactorResponse, { id: string | number; body: AiRefactorRequest }>({
+      query: ({ id, body }) => ({
+        url: `/documents/${id}/ai-refactor`,
+        method: 'POST',
+        body,
+      }),
+      // Refactoring changes the whole document and its chunks
+      invalidatesTags: (_result, _error, { id }) => [{ type: 'Documents', id }, 'Documents', 'Chunks'],
+    }),
+
     // Chat endpoints moved down to aiApi.ts
   }),
 });
@@ -165,6 +239,7 @@ export const knowledgeApi = apiSlice.injectEndpoints({
 export const {
   useGetDocumentsQuery,
   useGetDocumentByIdQuery,
+  useGetRawDocumentQuery,
   useUploadDocumentMutation,
   useDeleteDocumentMutation,
   useGetDocumentChunksQuery,
@@ -173,4 +248,6 @@ export const {
   useSearchChunksMutation,
   useUpdateDocumentMetadataMutation,
   useApproveDocumentMutation,
+  useIngestDocumentMutation,
+  useAiRefactorDocumentMutation,
 } = knowledgeApi;
