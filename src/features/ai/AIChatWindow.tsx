@@ -134,7 +134,7 @@ export function AIChatWindow({ conversationId, className }: AIChatWindowProps) {
                     {messages.length === 0 ? (
                         // ── Empty / Welcome State ──────────────────────────────
                         <div className="flex flex-col items-center justify-center min-h-[60vh] text-center animate-in fade-in zoom-in duration-500">
-                            <div className="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center shadow-lg mb-6">
+                            <div className="w-16 h-16 bg-primary rounded-xl flex items-center justify-center shadow-lg mb-6">
                                 <Sparkles className="w-8 h-8 text-primary-foreground" />
                             </div>
                             <h2 className="text-2xl font-bold text-foreground tracking-tight mb-3">
@@ -154,7 +154,7 @@ export function AIChatWindow({ conversationId, className }: AIChatWindowProps) {
                                         key={suggestion}
                                         onClick={() => setInput(suggestion)}
                                         className={cn(
-                                            'px-3 py-1.5 text-sm font-medium rounded-lg cursor-pointer',
+                                            'px-3 py-1.5 text-sm font-medium rounded-md cursor-pointer',
                                             'bg-card border border-border text-foreground',
                                             'hover:border-primary/40 hover:bg-primary/5 hover:text-primary',
                                             'transition-colors duration-150'
@@ -190,7 +190,7 @@ export function AIChatWindow({ conversationId, className }: AIChatWindowProps) {
                     <div
                         className={cn(
                             'relative flex items-end gap-2',
-                            'bg-card border border-border rounded-xl shadow-sm',
+                            'bg-card border border-border rounded-lg shadow-sm',
                             'ring-0 focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary/60',
                             'transition-all duration-200 overflow-hidden'
                         )}
@@ -215,7 +215,7 @@ export function AIChatWindow({ conversationId, className }: AIChatWindowProps) {
                                 disabled={!input.trim() && !isStreaming}
                                 size="icon"
                                 className={cn(
-                                    'h-9 w-9 rounded-lg shrink-0 transition-all duration-200',
+                                    'h-9 w-9 rounded-md shrink-0 transition-all duration-200',
                                     isStreaming
                                         ? 'bg-destructive hover:bg-destructive/90 text-destructive-foreground'
                                         : 'bg-primary hover:bg-primary/90 text-primary-foreground',

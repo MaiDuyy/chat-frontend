@@ -16,7 +16,7 @@ export function RoleBadge({ role }: { role: string }) {
             </Badge>
         );
     return (
-        <Badge variant="outline" className="text-[10px] text-slate-500 font-medium">
+        <Badge variant="outline" className="text-[10px] text-muted-foreground font-medium">
             Thành viên
         </Badge>
     );

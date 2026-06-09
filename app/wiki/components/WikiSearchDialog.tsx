@@ -102,14 +102,14 @@ export function WikiSearchDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg p-0 overflow-hidden border border-border bg-card rounded-xl shadow-lg gap-0 animate-in fade-in zoom-in-95 duration-100">
+      <DialogContent className="sm:max-w-lg p-0 overflow-hidden border border-border bg-card rounded-lg shadow-lg gap-0 animate-in fade-in zoom-in-95 duration-100">
         
         {selectedChunk ? (
           /* Detailed Chunk Preview Mode */
           <div className="flex flex-col gap-0 w-full font-sans">
             <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-border bg-muted">
               <div className="flex items-center gap-2 select-none">
-                <Brain className="w-4 h-4 text-slate-800 dark:text-slate-200" />
+                <Brain className="w-4 h-4 text-foreground dark:text-foreground" />
                 <span className="font-mono text-[10px] uppercase font-extrabold text-foreground">
                   Chi tiết đoạn tri thức (Raw Chunk)
                 </span>
@@ -127,12 +127,12 @@ export function WikiSearchDialog({
                 <h3 className="text-xs font-black text-foreground">
                   {selectedChunk.chunkTitle || `Đoạn tri thức #${selectedChunk.chunkIndex + 1}`}
                 </h3>
-                <span className="text-[9.5px] font-mono font-extrabold shrink-0 border border-border px-1.5 py-0.5 bg-slate-50 text-slate-650 dark:bg-slate-900 dark:text-slate-400 rounded-md">
+                <span className="text-[9.5px] font-mono font-extrabold shrink-0 border border-border px-1.5 py-0.5 bg-muted text-muted-foreground dark:bg-slate-900 dark:text-muted-foreground rounded-md">
                   {Math.round(selectedChunk.similarity * 100)}% Khớp
                 </span>
               </div>
 
-              <div className="border border-border p-3 bg-muted/10 rounded-lg text-xs leading-relaxed font-sans text-foreground/90 whitespace-pre-wrap select-text max-h-[220px] overflow-y-auto">
+              <div className="border border-border p-3 bg-muted/10 rounded-md text-xs leading-relaxed font-sans text-foreground/90 whitespace-pre-wrap select-text max-h-[220px] overflow-y-auto">
                 {selectedChunk.text}
               </div>
 
@@ -181,9 +181,9 @@ export function WikiSearchDialog({
               {/* Slate UI AI Semantic Search Toggle */}
               <button
                 onClick={() => setSemanticSearch((prev) => !prev)}
-                className={`flex items-center gap-1.5 px-2.5 py-1.5 border text-[10px] font-mono font-bold uppercase transition-all rounded-lg select-none shrink-0 ${
+                className={`flex items-center gap-1.5 px-2.5 py-1.5 border text-[10px] font-mono font-bold uppercase transition-all rounded-md select-none shrink-0 ${
                   semanticSearch
-                    ? "bg-slate-900 text-white border-slate-900 dark:bg-slate-100 dark:text-slate-900 dark:border-slate-100 shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]"
+                    ? "bg-slate-900 text-white border-slate-900 dark:bg-muted dark:text-foreground dark:border-border shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]"
                     : "border-border bg-background hover:bg-muted text-muted-foreground"
                 }`}
                 title="Tìm kiếm ngữ nghĩa bằng AI"
@@ -208,14 +208,14 @@ export function WikiSearchDialog({
                 /* AI Semantic Search Results */
                 isSearching ? (
                   <div className="py-12 text-center flex flex-col items-center justify-center gap-2 bg-background">
-                    <div className="w-6 h-6 border-2 border-slate-900 border-t-transparent animate-spin rounded-full dark:border-slate-100" />
+                    <div className="w-6 h-6 border-2 border-slate-900 border-t-transparent animate-spin rounded-full dark:border-border" />
                     <p className="text-[11px] font-mono text-muted-foreground uppercase tracking-wider">
                       Đang phân tích ngữ nghĩa AI...
                     </p>
                   </div>
                 ) : !debouncedQuery.trim() ? (
                   <div className="text-center py-10 bg-background select-none flex flex-col items-center justify-center gap-2">
-                    <Brain className="w-8 h-8 text-slate-400 shrink-0" />
+                    <Brain className="w-8 h-8 text-muted-foreground shrink-0" />
                     <p className="text-sm font-bold text-foreground">Tìm kiếm ngữ nghĩa AI (Vector Search)</p>
                     <p className="text-xs text-muted-foreground max-w-[280px] leading-relaxed">
                       Nhập câu hỏi tự nhiên để tìm kiếm theo ý nghĩa và ngữ cảnh thay vì từ khóa chính xác.
@@ -231,7 +231,7 @@ export function WikiSearchDialog({
                 ) : (
                   <div className="mb-2.5 last:mb-0">
                     <div className="flex items-center gap-1.5 px-4 py-1 border-b border-border pb-2 mb-2 bg-muted/20 select-none">
-                      <Network className="w-3.5 h-3.5 text-slate-700 dark:text-slate-300" />
+                      <Network className="w-3.5 h-3.5 text-muted-foreground dark:text-muted-foreground" />
                       <span className="text-[10px] font-mono font-extrabold uppercase text-muted-foreground tracking-wider">
                         Đoạn tri thức Vector ({searchResult.chunks.length})
                       </span>
@@ -251,7 +251,7 @@ export function WikiSearchDialog({
                               <span className="text-xs font-bold text-foreground group-hover:text-primary transition-colors truncate">
                                 {chunk.chunkTitle || `Đoạn tri thức #${chunk.chunkIndex + 1}`}
                               </span>
-                              <span className="text-[9.5px] font-mono font-extrabold shrink-0 border border-border px-1.5 py-0.5 bg-slate-50 text-slate-650 dark:bg-slate-900 dark:text-slate-400 rounded-md">
+                              <span className="text-[9.5px] font-mono font-extrabold shrink-0 border border-border px-1.5 py-0.5 bg-muted text-muted-foreground dark:bg-slate-900 dark:text-muted-foreground rounded-md">
                                 {similarityPercent}% Khớp
                               </span>
                             </div>

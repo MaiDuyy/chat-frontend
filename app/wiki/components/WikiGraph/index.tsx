@@ -433,7 +433,7 @@ export function WikiGraph({
   return (
     <div
       ref={containerRef}
-      className={`relative w-full overflow-hidden border border-border bg-slate-50 dark:bg-[#090d16] ${mini ? "rounded-lg" : "rounded-xl"}`}
+      className={`relative w-full overflow-hidden border border-border bg-muted dark:bg-[#090d16] ${mini ? "rounded-md" : "rounded-lg"}`}
       style={{ height: height ?? "100%", background: BG_COLOR }}
       onMouseMove={(e) => {
         const rect = containerRef.current?.getBoundingClientRect();
@@ -478,7 +478,7 @@ export function WikiGraph({
       {/* Tooltip */}
       {tooltip && (
         <div
-          className="pointer-events-none z-50 px-2.5 py-1.5 border border-border bg-card/95 text-foreground rounded-lg shadow-md text-xs font-sans backdrop-blur-sm"
+          className="pointer-events-none z-50 px-2.5 py-1.5 border border-border bg-card/95 text-foreground rounded-md shadow-md text-xs font-sans backdrop-blur-sm"
           style={{
             position: "absolute",
             left: Math.min(tooltip.x + 12, dimensions.w - 220),
@@ -500,7 +500,7 @@ export function WikiGraph({
 
       {/* Legend */}
       {!mini && (
-        <div className="absolute bottom-3 left-3 border border-border bg-card/90 backdrop-blur-sm p-2 rounded-xl shadow-md text-[10.5px] font-sans max-w-[200px] select-none">
+        <div className="absolute bottom-3 left-3 border border-border bg-card/90 backdrop-blur-sm p-2 rounded-lg shadow-md text-[10.5px] font-sans max-w-[200px] select-none">
           <div className="mb-2 font-mono font-extrabold text-[10px] text-muted-foreground uppercase tracking-wider">CHÚ GIẢI LOẠI</div>
           <div className="flex flex-col gap-1.5">
             {Object.entries(typeCounts)
@@ -530,7 +530,7 @@ export function WikiGraph({
 
       {/* Zoom controls */}
       {!mini && (
-        <div className="absolute bottom-3 right-3 flex flex-col items-center gap-1 border border-border bg-card/90 backdrop-blur-sm shadow-md p-1 rounded-lg select-none">
+        <div className="absolute bottom-3 right-3 flex flex-col items-center gap-1 border border-border bg-card/90 backdrop-blur-sm shadow-md p-1 rounded-md select-none">
           <button
             onClick={() => fgRef.current?.zoom(fgRef.current.zoom() * 1.2, 200)}
             className="w-7 h-7 flex items-center justify-center hover:bg-muted border border-transparent hover:border-border rounded-md transition-all text-foreground cursor-pointer"

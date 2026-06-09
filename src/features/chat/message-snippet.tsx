@@ -43,7 +43,7 @@ export const MessageSnippet: React.FC<MessageSnippetProps> = ({
   content,
   file,
   className = "",
-  iconClassName = "h-4 w-4 inline-block align-middle shrink-0 mr-1.5 text-slate-500 dark:text-slate-400",
+  iconClassName = "h-4 w-4 inline-block align-middle shrink-0 mr-1.5 text-muted-foreground dark:text-muted-foreground",
   chatId
 }) => {
   // Clear markdown mentions formatting: @[Name](userId) -> @Name
@@ -60,7 +60,7 @@ export const MessageSnippet: React.FC<MessageSnippetProps> = ({
       return (
         <span className={`inline-flex items-center gap-1 ${className}`}>
           <BarChart2 className={iconClassName} />
-          <span className="font-semibold text-slate-700 dark:text-slate-200">Khảo sát: </span>
+          <span className="font-semibold text-muted-foreground dark:text-foreground">Khảo sát: </span>
           {content ? <PollTitleResolver pollId={content} /> : <span>Khảo sát ý kiến</span>}
         </span>
       );
@@ -69,7 +69,7 @@ export const MessageSnippet: React.FC<MessageSnippetProps> = ({
       return (
         <span className={`inline-flex items-center gap-1 ${className}`}>
           <BarChart2 className={iconClassName} />
-          <span className="font-semibold text-slate-700 dark:text-slate-200">Kế hoạch: </span>
+          <span className="font-semibold text-muted-foreground dark:text-foreground">Kế hoạch: </span>
           {content && chatId ? (
             <TaskTitleResolver taskId={content} chatId={chatId} />
           ) : (
@@ -82,9 +82,9 @@ export const MessageSnippet: React.FC<MessageSnippetProps> = ({
       return (
         <span className={`inline-flex items-center gap-1 ${className}`}>
           <Image className={iconClassName} />
-          <span className="font-semibold text-slate-700 dark:text-slate-200">Hình ảnh</span>
+          <span className="font-semibold text-muted-foreground dark:text-foreground">Hình ảnh</span>
           {content && !content.startsWith("http") && !content.startsWith("/") && !content.startsWith("data:") && (
-            <span className="text-xs text-slate-400 dark:text-slate-500 truncate max-w-[120px]">
+            <span className="text-xs text-muted-foreground dark:text-muted-foreground truncate max-w-[120px]">
               ({cleanText(content)})
             </span>
           )}
@@ -95,9 +95,9 @@ export const MessageSnippet: React.FC<MessageSnippetProps> = ({
       return (
         <span className={`inline-flex items-center gap-1 ${className}`}>
           <Video className={iconClassName} />
-          <span className="font-semibold text-slate-700 dark:text-slate-200">Video</span>
+          <span className="font-semibold text-muted-foreground dark:text-foreground">Video</span>
           {content && !content.startsWith("http") && !content.startsWith("/") && (
-            <span className="text-xs text-slate-400 dark:text-slate-500 truncate max-w-[120px]">
+            <span className="text-xs text-muted-foreground dark:text-muted-foreground truncate max-w-[120px]">
               ({cleanText(content)})
             </span>
           )}
@@ -109,7 +109,7 @@ export const MessageSnippet: React.FC<MessageSnippetProps> = ({
       return (
         <span className={`inline-flex items-center gap-1 ${className}`}>
           <Paperclip className={iconClassName} />
-          <span className="font-semibold text-slate-700 dark:text-slate-200">Tệp đính kèm: </span>
+          <span className="font-semibold text-muted-foreground dark:text-foreground">Tệp đính kèm: </span>
           <span className="truncate max-w-[200px]" title={fileName}>
             {fileName}
           </span>
@@ -121,7 +121,7 @@ export const MessageSnippet: React.FC<MessageSnippetProps> = ({
       return (
         <span className={`inline-flex items-center gap-1 ${className}`}>
           <Mic className={iconClassName} />
-          <span className="font-semibold text-slate-700 dark:text-slate-200">Âm thanh</span>
+          <span className="font-semibold text-muted-foreground dark:text-foreground">Âm thanh</span>
         </span>
       );
 
@@ -130,7 +130,7 @@ export const MessageSnippet: React.FC<MessageSnippetProps> = ({
       return (
         <span className={`inline-flex items-center gap-1 ${className}`}>
           <Smile className={iconClassName} />
-          <span className="font-semibold text-slate-700 dark:text-slate-200">
+          <span className="font-semibold text-muted-foreground dark:text-foreground">
             {type === "gif" ? "GIF" : "Nhãn dán"}
           </span>
         </span>
@@ -189,7 +189,7 @@ export const MessageSnippet: React.FC<MessageSnippetProps> = ({
 
     case "system":
       return (
-        <span className={`italic text-slate-400 dark:text-slate-500 ${className}`}>
+        <span className={`italic text-muted-foreground dark:text-muted-foreground ${className}`}>
           {cleanText(content)}
         </span>
       );

@@ -107,7 +107,7 @@ export function WikilinkAutocomplete({ pages, query, caret, onPick, onClose }: P
         maxHeight: POPUP_MAX_HEIGHT,
         zIndex: 100,
       }}
-      className="rounded-xl border border-border bg-card text-card-foreground shadow-lg overflow-hidden flex flex-col font-sans"
+      className="rounded-lg border border-border bg-card text-card-foreground shadow-lg overflow-hidden flex flex-col font-sans"
       onMouseDown={(e) => e.preventDefault()}
     >
       <div className="px-3 py-1.5 border-b border-border bg-muted flex items-center justify-between text-[10px] font-mono font-bold uppercase tracking-wide text-muted-foreground select-none">

@@ -49,7 +49,7 @@ export function CitationCard({
     return (
         <div
             className={cn(
-                'group flex items-start gap-3 p-3 rounded-lg border',
+                'group flex items-start gap-3 p-3 rounded-md border',
                 'bg-muted/50 hover:bg-muted transition-colors cursor-pointer',
                 className
             )}

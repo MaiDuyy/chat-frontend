@@ -60,45 +60,45 @@ export function AddTaskDialog({
                 </DialogHeader>
                 <div className="space-y-4 py-3">
                     <div>
-                        <label className="text-xs font-medium text-slate-600 mb-1.5 block">Tiêu đề *</label>
+                        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Tiêu đề *</label>
                         <Input
                             placeholder="Nhập tiêu đề kế hoạch..."
                             value={taskTitle}
                             onChange={(e) => setTaskTitle(e.target.value)}
-                            className="h-9 text-sm rounded-lg"
+                            className="h-9 text-sm rounded-md"
                         />
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                         <div>
-                            <label className="text-xs font-medium text-slate-600 mb-1.5 block">Bắt đầu</label>
+                            <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Bắt đầu</label>
                             <Input
                                 type="datetime-local"
                                 value={taskStartTime}
                                 onChange={(e) => setTaskStartTime(e.target.value)}
-                                className="h-9 text-sm rounded-lg"
+                                className="h-9 text-sm rounded-md"
                             />
                         </div>
                         <div>
-                            <label className="text-xs font-medium text-slate-600 mb-1.5 block">Deadline</label>
+                            <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Deadline</label>
                             <Input
                                 type="datetime-local"
                                 value={taskDeadline}
                                 onChange={(e) => setTaskDeadline(e.target.value)}
-                                className="h-9 text-sm rounded-lg"
+                                className="h-9 text-sm rounded-md"
                             />
                         </div>
                     </div>
                     <div>
-                        <label className="text-xs font-medium text-slate-600 mb-1.5 block">Giao cho</label>
-                        <ScrollArea className="h-40 border border-slate-100 rounded-xl p-2">
+                        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Giao cho</label>
+                        <ScrollArea className="h-40 border border-border rounded-lg p-2">
                             {participants.map((p, i) => {
                                 const id = getMemberId(p) as string;
                                 return (
                                     <div
                                         key={i}
                                         className={cn(
-                                            "flex items-center gap-2.5 p-2 rounded-lg cursor-pointer transition-all",
-                                            selectedTaskAssignees.includes(id) ? "bg-blue-50" : "hover:bg-slate-50"
+                                            "flex items-center gap-2.5 p-2 rounded-md cursor-pointer transition-all",
+                                            selectedTaskAssignees.includes(id) ? "bg-blue-50" : "hover:bg-muted"
                                         )}
                                         onClick={() =>
                                             setSelectedTaskAssignees(
@@ -110,7 +110,7 @@ export function AddTaskDialog({
                                     >
                                         <Checkbox checked={selectedTaskAssignees.includes(id)} className="rounded" />
                                         <MemberAvatar participant={p} size="sm" />
-                                        <span className="text-[13px] font-medium text-slate-700">{getMemberName(p)}</span>
+                                        <span className="text-[13px] font-medium text-muted-foreground">{getMemberName(p)}</span>
                                     </div>
                                 );
                             })}
@@ -123,7 +123,7 @@ export function AddTaskDialog({
                     </Button>
                     <Button
                         size="sm"
-                        className="bg-blue-600 hover:bg-blue-700"
+                        className="bg-primary hover:bg-primary/90"
                         onClick={onCreateTask}
                         disabled={isCreatingTask || !taskTitle.trim()}
                     >

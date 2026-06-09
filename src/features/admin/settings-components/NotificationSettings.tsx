@@ -16,8 +16,8 @@ interface NotificationSettingsProps {
 
 export function NotificationSettings({ orgSettings, handleOrgChange }: NotificationSettingsProps) {
     return (
-        <Card className="rounded-xl border border-border shadow-sm bg-card text-card-foreground overflow-hidden">
-            <CardHeader className="bg-slate-50/40 dark:bg-slate-900/10 border-b border-border py-3 px-4">
+        <Card className="rounded-lg border border-border shadow-sm bg-card text-card-foreground overflow-hidden">
+            <CardHeader className="bg-muted/40 dark:bg-slate-900/10 border-b border-border py-3 px-4">
                 <CardTitle className="text-sm font-semibold flex items-center gap-2">
                     <Bell className="w-4 h-4 text-primary" />
                     Quản lý quyền & Thông báo

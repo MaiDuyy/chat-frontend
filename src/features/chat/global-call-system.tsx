@@ -650,7 +650,7 @@ export function GlobalCallSystem() {
 
           <div className="relative flex flex-col items-center pt-14 pb-10 px-8 gap-8">
             {/* Call type badge */}
-            <div className="absolute top-5 left-5 flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs text-slate-400 font-medium">
+            <div className="absolute top-5 left-5 flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs text-muted-foreground font-medium">
               {callData.isVideo ? <Video className="h-3 w-3" /> : <Phone className="h-3 w-3" />}
               {callData.callType === "group" ? "Cuộc gọi nhóm" : callData.isVideo ? "Video" : "Thoại"}
             </div>
@@ -675,14 +675,14 @@ export function GlobalCallSystem() {
               <button
                 id="call-decline-btn"
                 onClick={declineCall}
-                className="flex-1 h-14 rounded-2xl bg-red-500/15 hover:bg-red-500/25 text-red-400 border border-red-500/40 flex items-center justify-center gap-2 font-bold transition-all hover:scale-[1.02] active:scale-[0.98] text-sm"
+                className="flex-1 h-14 rounded-xl bg-red-500/15 hover:bg-red-500/25 text-red-400 border border-red-500/40 flex items-center justify-center gap-2 font-bold transition-all hover:scale-[1.02] active:scale-[0.98] text-sm"
               >
                 <PhoneOff className="h-5 w-5" /> Từ chối
               </button>
               <button
                 id="call-accept-btn"
                 onClick={acceptCall}
-                className="flex-1 h-14 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-white flex items-center justify-center gap-2 font-bold transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-emerald-500/30 text-sm"
+                className="flex-1 h-14 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white flex items-center justify-center gap-2 font-bold transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-emerald-500/30 text-sm"
               >
                 <Phone className="h-5 w-5" /> {callData.callType === "group" ? "Tham gia" : "Trả lời"}
               </button>
@@ -710,7 +710,7 @@ export function GlobalCallSystem() {
 
             <div className="text-center space-y-1.5">
               <h3 className="text-xl font-bold text-white">{callData.callerName}</h3>
-              <div className="flex items-center justify-center gap-1.5 text-slate-400 text-sm">
+              <div className="flex items-center justify-center gap-1.5 text-muted-foreground text-sm">
                 <span className="animate-pulse">Đang đổ chuông</span>
                 <span className="flex gap-0.5">
                   <span className="w-1 h-1 rounded-full bg-slate-400 animate-bounce" style={{ animationDelay: "0ms" }} />
@@ -728,7 +728,7 @@ export function GlobalCallSystem() {
             >
               <PhoneOff className="h-7 w-7 text-white" />
             </button>
-            <p className="text-[11px] text-slate-500 font-semibold tracking-widest uppercase -mt-3">Nhấn để hủy</p>
+            <p className="text-[11px] text-muted-foreground font-semibold tracking-widest uppercase -mt-3">Nhấn để hủy</p>
           </div>
         </div>
       </div>
@@ -751,7 +751,7 @@ export function GlobalCallSystem() {
           </div>
           <div className="text-center">
             <p className="text-lg font-bold text-white">Đang kết nối</p>
-            <p className="text-sm text-slate-400 mt-1">Vui lòng chờ trong giây lát...</p>
+            <p className="text-sm text-muted-foreground mt-1">Vui lòng chờ trong giây lát...</p>
           </div>
         </div>
       </div>
@@ -763,7 +763,7 @@ export function GlobalCallSystem() {
     if (isMinimized) {
       return (
         <div
-          className="fixed bottom-4 right-4 z-[9999] w-80 h-48 bg-slate-950/95 border border-white/10 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col overflow-hidden transition-all duration-300 hover:scale-[1.02]"
+          className="fixed bottom-4 right-4 z-[9999] w-80 h-48 bg-slate-950/95 border border-white/10 rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col overflow-hidden transition-all duration-300 hover:scale-[1.02]"
           style={{
             transform: `translate3d(${position.x}px, ${position.y}px, 0)`,
             transition: isDragging ? "none" : "transform 0.2s ease-out"
@@ -784,14 +784,14 @@ export function GlobalCallSystem() {
             <div className="flex items-center gap-1.5">
               <button
                 onClick={() => setIsMinimized(false)}
-                className="w-7 h-7 rounded-lg bg-black/40 hover:bg-black/60 text-white flex items-center justify-center transition-colors border border-white/5"
+                className="w-7 h-7 rounded-md bg-black/40 hover:bg-black/60 text-white flex items-center justify-center transition-colors border border-white/5"
                 title="Phóng to"
               >
                 <Maximize2 className="h-3.5 w-3.5" />
               </button>
               <button
                 onClick={endCall}
-                className="w-7 h-7 rounded-lg bg-red-600 hover:bg-red-500 text-white flex items-center justify-center transition-colors shadow-md active:scale-95"
+                className="w-7 h-7 rounded-md bg-red-600 hover:bg-red-500 text-white flex items-center justify-center transition-colors shadow-md active:scale-95"
                 title="Gác máy"
               >
                 <PhoneOff className="h-3.5 w-3.5" />
@@ -848,7 +848,7 @@ export function GlobalCallSystem() {
                 <button
                   id="end-call-all-btn"
                   onClick={endCallForAll}
-                  className="flex items-center gap-2 px-4 py-2 bg-red-600/90 hover:bg-red-600 text-white text-xs font-bold rounded-xl transition-all shadow-lg active:scale-95 backdrop-blur-md border border-red-500/50"
+                  className="flex items-center gap-2 px-4 py-2 bg-red-600/90 hover:bg-red-600 text-white text-xs font-bold rounded-lg transition-all shadow-lg active:scale-95 backdrop-blur-md border border-red-500/50"
                 >
                   <PhoneOff className="h-3.5 w-3.5" /> Kết thúc cho tất cả
                 </button>
@@ -856,7 +856,7 @@ export function GlobalCallSystem() {
               <button
                 id="leave-call-btn"
                 onClick={endCall}
-                className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 backdrop-blur-md text-white text-xs font-bold rounded-xl transition-all border border-white/15 active:scale-95"
+                className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 backdrop-blur-md text-white text-xs font-bold rounded-lg transition-all border border-white/15 active:scale-95"
               >
                 <LogOut className="h-3.5 w-3.5" /> Rời đi
               </button>
@@ -868,7 +868,7 @@ export function GlobalCallSystem() {
             <button
               id="end-private-call-btn"
               onClick={endCall}
-              className="pointer-events-auto flex items-center gap-2 px-4 py-2 bg-red-600/80 hover:bg-red-600 backdrop-blur-md text-white text-xs font-bold rounded-xl transition-all border border-red-500/40 active:scale-95"
+              className="pointer-events-auto flex items-center gap-2 px-4 py-2 bg-red-600/80 hover:bg-red-600 backdrop-blur-md text-white text-xs font-bold rounded-lg transition-all border border-red-500/40 active:scale-95"
             >
               <PhoneOff className="h-3.5 w-3.5" /> Kết thúc
             </button>

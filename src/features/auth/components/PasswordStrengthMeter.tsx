@@ -19,14 +19,14 @@ export const PasswordStrengthMeter: React.FC<PasswordStrengthMeterProps> = ({ pa
   
   const labels = ['Không có', 'Yếu', 'Trung bình', 'Mạnh'];
   const colors = [
-    'bg-slate-200 dark:bg-zinc-800',
+    'bg-muted dark:bg-muted',
     'bg-red-500 dark:bg-red-600',
     'bg-amber-500 dark:bg-amber-600',
-    'bg-blue-600 dark:bg-blue-700'
+    'bg-primary dark:bg-primary/90'
   ];
 
   const textColors = [
-    'text-slate-400 dark:text-zinc-600',
+    'text-muted-foreground dark:text-muted-foreground',
     'text-red-500 dark:text-red-400',
     'text-amber-500 dark:text-amber-400',
     'text-blue-600 dark:text-blue-450'
@@ -40,13 +40,13 @@ export const PasswordStrengthMeter: React.FC<PasswordStrengthMeterProps> = ({ pa
             key={step}
             className={cn(
                 "flex-1 rounded-[1px] transition-all duration-350",
-                step <= strength ? colors[strength] : "bg-slate-100 dark:bg-zinc-850"
+                step <= strength ? colors[strength] : "bg-muted dark:bg-zinc-850"
             )}
           />
         ))}
       </div>
       <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-wider font-mono">
-        <span className="text-slate-400 dark:text-zinc-500">Độ mạnh mật khẩu</span>
+        <span className="text-muted-foreground dark:text-muted-foreground">Độ mạnh mật khẩu</span>
         <span className={cn("transition-colors", textColors[strength])}>
           {labels[strength]}
         </span>
@@ -65,11 +65,11 @@ export const PasswordStrengthMeter: React.FC<PasswordStrengthMeterProps> = ({ pa
 const PasswordRequirement = ({ met, label }: { met: boolean; label: string }) => (
     <div className={cn(
         "flex items-center gap-2 text-xs transition-colors",
-        met ? "text-blue-600 dark:text-blue-400 font-semibold" : "text-slate-400 dark:text-zinc-500"
+        met ? "text-primary font-semibold" : "text-muted-foreground dark:text-muted-foreground"
     )}>
         <div className={cn(
             "h-1.5 w-1.5 rounded-[1px] transition-colors",
-            met ? "bg-blue-600 dark:bg-blue-400" : "bg-slate-200 dark:bg-zinc-800"
+            met ? "bg-primary dark:bg-blue-400" : "bg-muted dark:bg-muted"
         )} />
         <span className="font-mono text-[11px]">{label}</span>
     </div>

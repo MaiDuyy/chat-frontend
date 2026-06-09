@@ -13,12 +13,12 @@ export function SettingRow({ icon: Icon, label, description, children }: Setting
         <div className="flex items-center justify-between py-2.5 group first:pt-0 last:pb-0 border-b border-border/50 last:border-0">
             <div className="flex items-start gap-2.5">
                 {Icon && (
-                    <div className="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 group-hover:bg-primary/10 group-hover:text-primary transition-colors mt-0.5">
+                    <div className="p-1.5 rounded-md bg-muted dark:bg-slate-800 text-muted-foreground dark:text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary transition-colors mt-0.5">
                         <Icon className="w-4 h-4" />
                     </div>
                 )}
                 <div className="flex flex-col">
-                    <Label className="text-xs font-semibold text-slate-900 dark:text-slate-100 leading-none">
+                    <Label className="text-xs font-semibold text-foreground leading-none">
                         {label}
                     </Label>
                     {description && (

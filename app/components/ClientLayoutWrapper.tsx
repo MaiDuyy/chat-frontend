@@ -22,7 +22,7 @@ export default function ClientLayoutWrapper({ children }: { children: React.Reac
 
         // Dashboard / App UI with Sidebar
         return (
-          <div className="flex h-screen w-full overflow-hidden bg-slate-50 dark:bg-slate-950 font-sans">
+          <div className="flex h-screen w-full overflow-hidden bg-muted dark:bg-slate-950 font-sans">
             <Sidebar />
             <main className="flex-1 overflow-hidden relative flex flex-col">
               {children}

@@ -105,14 +105,14 @@ export function OrganizationsTable() {
                         placeholder="Tìm kiếm tổ chức..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="pl-8 h-8 text-xs rounded-lg"
+                        className="pl-8 h-8 text-xs rounded-md"
                     />
                 </div>
             </div>
 
-            <div className="border border-border rounded-xl overflow-hidden bg-background shadow-sm">
+            <div className="border border-border rounded-lg overflow-hidden bg-background shadow-sm">
                 <Table>
-                    <TableHeader className="bg-slate-50/50 dark:bg-slate-800/30 border-b border-border">
+                    <TableHeader className="bg-muted/50 dark:bg-slate-800/30 border-b border-border">
                         <TableRow>
                             <TableHead className="h-8 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Tổ chức</TableHead>
                             <TableHead className="h-8 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Domain / Slug</TableHead>
@@ -131,10 +131,10 @@ export function OrganizationsTable() {
                             </TableRow>
                         ) : (
                             data.items.map((org) => (
-                                <TableRow key={org.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/40 border-b border-border transition-colors">
+                                <TableRow key={org.id} className="hover:bg-muted/50 dark:hover:bg-slate-800/40 border-b border-border transition-colors">
                                     <TableCell className="py-2">
                                         <div className="flex items-center gap-2">
-                                            <div className="h-7 w-7 rounded-lg bg-indigo-50 dark:bg-indigo-950/30 flex items-center justify-center shrink-0">
+                                            <div className="h-7 w-7 rounded-md bg-indigo-50 dark:bg-indigo-950/30 flex items-center justify-center shrink-0">
                                                 <Building2 className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
                                             </div>
                                             <div className="flex flex-col">
@@ -165,7 +165,7 @@ export function OrganizationsTable() {
                                             <Button 
                                                 variant="ghost" 
                                                 size="icon" 
-                                                className="h-6 w-6 text-slate-400 hover:text-primary rounded-md"
+                                                className="h-6 w-6 text-muted-foreground hover:text-primary rounded-md"
                                                 onClick={() => {
                                                     setSelectedOrg(org);
                                                     setNewQuota(org.maxWorkspaces);
@@ -177,7 +177,7 @@ export function OrganizationsTable() {
                                         </div>
                                     </TableCell>
                                     <TableCell className="py-2">
-                                        <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">
+                                        <span className="text-[10px] text-muted-foreground dark:text-muted-foreground font-medium">
                                             {format(new Date(org.createdAt), 'dd/MM/yyyy')}
                                         </span>
                                     </TableCell>
@@ -222,19 +222,19 @@ export function OrganizationsTable() {
                                     min="1"
                                     value={newQuota}
                                     onChange={(e) => setNewQuota(parseInt(e.target.value))}
-                                    className="flex-1 h-8 text-xs rounded-lg"
+                                    className="flex-1 h-8 text-xs rounded-md"
                                 />
                             </div>
                         </div>
                     </div>
                     <DialogFooter>
-                        <Button variant="outline" onClick={() => setShowQuotaDialog(false)} className="h-8 text-xs rounded-lg">
+                        <Button variant="outline" onClick={() => setShowQuotaDialog(false)} className="h-8 text-xs rounded-md">
                             Hủy
                         </Button>
                         <Button
                             onClick={handleUpdateQuota}
                             disabled={isUpdating}
-                            className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold h-8 text-xs rounded-lg"
+                            className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold h-8 text-xs rounded-md"
                         >
                             {isUpdating ? <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" /> : <Save className="w-3.5 h-3.5 mr-1.5" />}
                             Lưu thay đổi

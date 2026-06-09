@@ -172,16 +172,16 @@ export function WorkspaceTable() {
             {/* Action Bar */}
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <div className="relative w-full sm:w-64">
-                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
+                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
                     <Input
                         placeholder="Tìm kiếm workspace..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="pl-8 h-8 text-xs rounded-lg bg-transparent border-border focus-visible:ring-1 focus-visible:ring-primary"
+                        className="pl-8 h-8 text-xs rounded-md bg-transparent border-border focus-visible:ring-1 focus-visible:ring-primary"
                     />
                 </div>
                 <Tabs value={activeTab} onValueChange={(val: any) => { setActiveTab(val); setPage(0); }}>
-                    <div className="bg-slate-100/60 dark:bg-slate-800/60 p-0.5 rounded-lg w-fit">
+                    <div className="bg-muted/60 dark:bg-slate-800/60 p-0.5 rounded-md w-fit">
                         <TabsList className="bg-transparent h-7 gap-0.5 p-0">
                             <TabsTrigger value="active" className="rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-slate-900 data-[state=active]:shadow-sm px-3 h-6 text-[11px] font-semibold">
                                 Đang hoạt động
@@ -196,9 +196,9 @@ export function WorkspaceTable() {
             </div>
 
             {/* Table Container */}
-            <div className="rounded-xl border border-border bg-card text-card-foreground shadow-sm overflow-hidden">
+            <div className="rounded-lg border border-border bg-card text-card-foreground shadow-sm overflow-hidden">
                 <Table>
-                    <TableHeader className="bg-slate-50/40 dark:bg-slate-900/10 border-b border-border">
+                    <TableHeader className="bg-muted/40 dark:bg-slate-900/10 border-b border-border">
                         <TableRow className="hover:bg-transparent">
                             <TableHead className="text-[10px] uppercase font-bold text-muted-foreground py-2 px-3 h-auto">Workspace</TableHead>
                             <TableHead className="text-[10px] uppercase font-bold text-muted-foreground py-2 px-3 h-auto">Đường dẫn (Slug)</TableHead>
@@ -216,14 +216,14 @@ export function WorkspaceTable() {
                             </TableRow>
                         ) : (
                             paginatedWorkspaces.map((ws) => (
-                                <TableRow key={ws.id} className="hover:bg-slate-50/40 dark:hover:bg-slate-800/40 border-b border-border/50 last:border-0">
+                                <TableRow key={ws.id} className="hover:bg-muted/40 dark:hover:bg-slate-800/40 border-b border-border/50 last:border-0">
                                     <TableCell className="py-2 px-3">
                                         <div className="flex items-center gap-2.5">
-                                            <div className="h-7 w-7 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                                                <img className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0" src={getAvatarUrl(ws.icon)} alt={ws.name} />
+                                            <div className="h-7 w-7 rounded-md bg-primary/10 flex items-center justify-center flex-shrink-0">
+                                                <img className="w-7 h-7 rounded-md bg-primary/10 flex items-center justify-center flex-shrink-0" src={getAvatarUrl(ws.icon)} alt={ws.name} />
                                             </div>
                                             <div className="flex flex-col min-w-0">
-                                                <span className="text-xs font-semibold text-slate-900 dark:text-slate-100 truncate max-w-[200px]">
+                                                <span className="text-xs font-semibold text-foreground truncate max-w-[200px]">
                                                     {ws.name}
                                                 </span>
                                                 <span className="text-[10px] text-muted-foreground truncate max-w-[240px] mt-0.5">
@@ -233,19 +233,19 @@ export function WorkspaceTable() {
                                         </div>
                                     </TableCell>
                                     <TableCell className="py-2 px-3">
-                                        <code className="text-[10px] font-mono bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 border border-slate-200/50 dark:border-slate-700/50 px-1 py-0.5 rounded-md">
+                                        <code className="text-[10px] font-mono bg-muted dark:bg-slate-800/80 text-muted-foreground dark:text-muted-foreground border border-border/50 dark:border-border/50 px-1 py-0.5 rounded-md">
                                             {ws.slug}
                                         </code>
                                     </TableCell>
                                     <TableCell className="py-2 px-3">
                                         <div className="flex items-center gap-3">
                                             <div className="flex items-center gap-1 text-[11px] text-muted-foreground" title="Thành viên">
-                                                <Users className="w-3 h-3 text-slate-400" />
-                                                <span className="font-medium text-slate-700 dark:text-slate-300">{ws.memberCount}</span>
+                                                <Users className="w-3 h-3 text-muted-foreground" />
+                                                <span className="font-medium text-muted-foreground dark:text-muted-foreground">{ws.memberCount}</span>
                                             </div>
                                             <div className="flex items-center gap-1 text-[11px] text-muted-foreground" title="Kênh chat">
-                                                <MessageSquare className="w-3 h-3 text-slate-400" />
-                                                <span className="font-medium text-slate-700 dark:text-slate-300">{ws.channelCount}</span>
+                                                <MessageSquare className="w-3 h-3 text-muted-foreground" />
+                                                <span className="font-medium text-muted-foreground dark:text-muted-foreground">{ws.channelCount}</span>
                                             </div>
                                         </div>
                                     </TableCell>
@@ -255,7 +255,7 @@ export function WorkspaceTable() {
                                     <TableCell className="py-2 px-3 text-right">
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
-                                                <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800">
+                                                <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md hover:bg-muted dark:hover:bg-slate-800">
                                                     <MoreHorizontal className="h-3.5 w-3.5" />
                                                 </Button>
                                             </DropdownMenuTrigger>
@@ -266,7 +266,7 @@ export function WorkspaceTable() {
                                                     setSelectedWorkspace(ws);
                                                     setShowMembersDialog(true);
                                                 }}>
-                                                    <Users className="w-3.5 h-3.5 mr-2 text-slate-400" />
+                                                    <Users className="w-3.5 h-3.5 mr-2 text-muted-foreground" />
                                                     Xem thành viên
                                                 </DropdownMenuItem>
                                                 <DropdownMenuSeparator className="bg-border/60" />
@@ -274,7 +274,7 @@ export function WorkspaceTable() {
                                                     setSelectedWorkspace(ws);
                                                     setShowTransferDialog(true);
                                                 }}>
-                                                    <Shield className="w-3.5 h-3.5 mr-2 text-slate-400" />
+                                                    <Shield className="w-3.5 h-3.5 mr-2 text-muted-foreground" />
                                                     Chuyển nhượng sở hữu
                                                 </DropdownMenuItem>
                                                 {activeTab === 'active' ? (
@@ -333,7 +333,7 @@ export function WorkspaceTable() {
 
             {/* Permanent Delete Dialog */}
             <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-                <DialogContent className="rounded-xl max-w-sm border-border bg-card">
+                <DialogContent className="rounded-lg max-w-sm border-border bg-card">
                     <DialogHeader className="space-y-1">
                         <DialogTitle className="text-sm font-semibold flex items-center gap-2 text-red-600">
                             <AlertTriangle className="w-4 h-4" />
@@ -345,7 +345,7 @@ export function WorkspaceTable() {
                         </DialogDescription>
                     </DialogHeader>
                     <DialogFooter className="gap-2 sm:gap-0">
-                        <Button variant="outline" size="sm" onClick={() => setShowDeleteDialog(false)} className="h-8 text-xs rounded-lg">
+                        <Button variant="outline" size="sm" onClick={() => setShowDeleteDialog(false)} className="h-8 text-xs rounded-md">
                             Hủy
                         </Button>
                         <Button
@@ -353,7 +353,7 @@ export function WorkspaceTable() {
                             size="sm"
                             onClick={handleDelete}
                             disabled={isDeleting}
-                            className="h-8 text-xs rounded-lg bg-rose-600 hover:bg-rose-700 text-white"
+                            className="h-8 text-xs rounded-md bg-rose-600 hover:bg-rose-700 text-white"
                         >
                             {isDeleting && <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />}
                             Xác nhận xóa
@@ -364,7 +364,7 @@ export function WorkspaceTable() {
 
             {/* Dissolve Dialog */}
             <Dialog open={showDissolveDialog} onOpenChange={setShowDissolveDialog}>
-                <DialogContent className="rounded-xl max-w-md border-border bg-card">
+                <DialogContent className="rounded-lg max-w-md border-border bg-card">
                     <DialogHeader className="space-y-1">
                         <DialogTitle className="text-sm font-semibold flex items-center gap-2 text-amber-600">
                             <XCircle className="w-4 h-4" />
@@ -384,11 +384,11 @@ export function WorkspaceTable() {
                             placeholder="Nhập tên workspace..."
                             value={confirmName}
                             onChange={(e) => setConfirmName(e.target.value)}
-                            className="h-8 text-xs rounded-lg focus-visible:ring-1 focus-visible:ring-primary"
+                            className="h-8 text-xs rounded-md focus-visible:ring-1 focus-visible:ring-primary"
                         />
                     </div>
                     <DialogFooter className="gap-2 sm:gap-0">
-                        <Button variant="outline" size="sm" onClick={() => { setShowDissolveDialog(false); setConfirmName(''); }} className="h-8 text-xs rounded-lg">
+                        <Button variant="outline" size="sm" onClick={() => { setShowDissolveDialog(false); setConfirmName(''); }} className="h-8 text-xs rounded-md">
                             Hủy
                         </Button>
                         <Button
@@ -396,7 +396,7 @@ export function WorkspaceTable() {
                             size="sm"
                             onClick={handleDissolve}
                             disabled={isDissolving || confirmName !== selectedWorkspace?.name}
-                            className="h-8 text-xs rounded-lg bg-rose-600 hover:bg-rose-700 text-white disabled:opacity-50"
+                            className="h-8 text-xs rounded-md bg-rose-600 hover:bg-rose-700 text-white disabled:opacity-50"
                         >
                             {isDissolving && <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />}
                             Xác nhận giải tán

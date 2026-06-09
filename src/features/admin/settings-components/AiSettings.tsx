@@ -121,8 +121,8 @@ export function AiSettings({
     return (
         <div className="space-y-4">
             {/* LLM Config Card */}
-            <Card className="rounded-xl border border-border shadow-sm bg-card text-card-foreground overflow-hidden">
-                <CardHeader className="bg-slate-50/40 dark:bg-slate-900/10 border-b border-border py-3 px-4">
+            <Card className="rounded-lg border border-border shadow-sm bg-card text-card-foreground overflow-hidden">
+                <CardHeader className="bg-muted/40 dark:bg-slate-900/10 border-b border-border py-3 px-4">
                     <CardTitle className="text-sm font-semibold flex items-center gap-2">
                         <Cpu className="w-4 h-4 text-primary" />
                         Cấu hình Mô hình ngôn ngữ lớn (LLM)
@@ -139,7 +139,7 @@ export function AiSettings({
                                 value={aiSettings.llm_provider}
                                 onValueChange={handleLlmProviderChange}
                             >
-                                <SelectTrigger id="llm_provider" className="h-8 rounded-lg text-xs">
+                                <SelectTrigger id="llm_provider" className="h-8 rounded-md text-xs">
                                     <SelectValue placeholder="Chọn nhà cung cấp" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -170,14 +170,14 @@ export function AiSettings({
                                     value={aiSettings.llm_model}
                                     onChange={(e) => handleAiChange('llm_model', e.target.value)}
                                     placeholder="Ví dụ: gpt-4o-mini hoặc llama3.1"
-                                    className="h-8 rounded-lg text-xs"
+                                    className="h-8 rounded-md text-xs"
                                 />
                             ) : (
                                 <Select
                                     value={aiSettings.llm_model}
                                     onValueChange={(value) => handleAiChange('llm_model', value)}
                                 >
-                                    <SelectTrigger id="llm_model" className="h-8 rounded-lg text-xs">
+                                    <SelectTrigger id="llm_model" className="h-8 rounded-md text-xs">
                                         <SelectValue placeholder="Chọn mô hình" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -207,12 +207,12 @@ export function AiSettings({
                                     value={aiSettings.llm_api_key}
                                     onChange={(e) => handleAiChange('llm_api_key', e.target.value)}
                                     placeholder="Nhập khóa API..."
-                                    className="h-8 rounded-lg text-xs pr-8"
+                                    className="h-8 rounded-md text-xs pr-8"
                                 />
                                 <button
                                     type="button"
                                     onClick={() => setShowLlmKey(!showLlmKey)}
-                                    className="absolute right-2 top-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                                    className="absolute right-2 top-2 text-muted-foreground hover:text-muted-foreground dark:hover:text-muted-foreground"
                                 >
                                     {showLlmKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                                 </button>
@@ -226,7 +226,7 @@ export function AiSettings({
                                 value={aiSettings.llm_base_url}
                                 onChange={(e) => handleAiChange('llm_base_url', e.target.value)}
                                 placeholder="https://api.openai.com/v1 (Để trống nếu dùng mặc định)"
-                                className="h-8 rounded-lg text-xs"
+                                className="h-8 rounded-md text-xs"
                             />
                         </div>
                     </div>
@@ -234,8 +234,8 @@ export function AiSettings({
             </Card>
 
             {/* Embedding & RAG Card */}
-            <Card className="rounded-xl border border-border shadow-sm bg-card text-card-foreground overflow-hidden">
-                <CardHeader className="bg-slate-50/40 dark:bg-slate-900/10 border-b border-border py-3 px-4">
+            <Card className="rounded-lg border border-border shadow-sm bg-card text-card-foreground overflow-hidden">
+                <CardHeader className="bg-muted/40 dark:bg-slate-900/10 border-b border-border py-3 px-4">
                     <CardTitle className="text-sm font-semibold flex items-center gap-2">
                         <Sparkles className="w-4 h-4 text-primary" />
                         Bộ sinh vector (Embedding) & Xử lý văn bản (RAG)
@@ -252,7 +252,7 @@ export function AiSettings({
                                 value={aiSettings.embedding_provider}
                                 onValueChange={handleEmbedProviderChange}
                             >
-                                <SelectTrigger id="embedding_provider" className="h-8 rounded-lg text-xs">
+                                <SelectTrigger id="embedding_provider" className="h-8 rounded-md text-xs">
                                     <SelectValue placeholder="Chọn nhà cung cấp" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -282,14 +282,14 @@ export function AiSettings({
                                     value={aiSettings.embedding_model}
                                     onChange={(e) => handleAiChange('embedding_model', e.target.value)}
                                     placeholder="Ví dụ: text-embedding-3-small"
-                                    className="h-8 rounded-lg text-xs"
+                                    className="h-8 rounded-md text-xs"
                                 />
                             ) : (
                                 <Select
                                     value={aiSettings.embedding_model}
                                     onValueChange={(value) => handleAiChange('embedding_model', value)}
                                 >
-                                    <SelectTrigger id="embedding_model" className="h-8 rounded-lg text-xs">
+                                    <SelectTrigger id="embedding_model" className="h-8 rounded-md text-xs">
                                         <SelectValue placeholder="Chọn mô hình nhúng" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -319,12 +319,12 @@ export function AiSettings({
                                     value={aiSettings.embedding_api_key}
                                     onChange={(e) => handleAiChange('embedding_api_key', e.target.value)}
                                     placeholder="Nhập khóa API cho embedding..."
-                                    className="h-8 rounded-lg text-xs pr-8"
+                                    className="h-8 rounded-md text-xs pr-8"
                                 />
                                 <button
                                     type="button"
                                     onClick={() => setShowEmbedKey(!showEmbedKey)}
-                                    className="absolute right-2 top-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                                    className="absolute right-2 top-2 text-muted-foreground hover:text-muted-foreground dark:hover:text-muted-foreground"
                                 >
                                     {showEmbedKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                                 </button>
@@ -341,7 +341,7 @@ export function AiSettings({
                                 value={aiSettings.chunk_size}
                                 onChange={(e) => handleAiChange('chunk_size', e.target.value)}
                                 placeholder="1000"
-                                className="h-8 rounded-lg text-xs"
+                                className="h-8 rounded-md text-xs"
                             />
                         </div>
 
@@ -353,7 +353,7 @@ export function AiSettings({
                                 value={aiSettings.chunk_overlap}
                                 onChange={(e) => handleAiChange('chunk_overlap', e.target.value)}
                                 placeholder="200"
-                                className="h-8 rounded-lg text-xs"
+                                className="h-8 rounded-md text-xs"
                             />
                         </div>
                     </div>

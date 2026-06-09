@@ -27,7 +27,7 @@ export const KnowledgeHubWidget: React.FC = () => {
       onRetry={refetch}
     >
       <div className="space-y-4">
-        <h4 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-2">
+        <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2">
           From your chats
         </h4>
 
@@ -35,23 +35,23 @@ export const KnowledgeHubWidget: React.FC = () => {
           {completedFiles?.map((doc, i) => (
             <div
               key={doc.id || i}
-              className="p-3 bg-zinc-900 border border-zinc-800 hover:border-blue-500/50 hover:bg-blue-950/20 transition-all cursor-pointer rounded-sm group flex flex-col justify-between h-20 relative overflow-hidden"
+              className="p-3 bg-muted border border-border hover:border-blue-500/50 hover:bg-blue-950/20 transition-all cursor-pointer rounded-sm group flex flex-col justify-between h-20 relative overflow-hidden"
               onClick={() => doc.id && window.open(`/knowledge/${doc.id}`, '_blank')}
             >
               <div className="absolute top-0 right-0 p-2 opacity-0 group-hover:opacity-100 transition-opacity">
                 <ExternalLink className="w-3 h-3 text-blue-400" />
               </div>
-              <FileText className="w-4 h-4 text-zinc-500 group-hover:text-blue-400 transition-colors" />
+              <FileText className="w-4 h-4 text-muted-foreground group-hover:text-blue-400 transition-colors" />
               <div>
-                <p className="text-[10px] text-zinc-500 font-mono tracking-wider truncate">{doc.documentType}</p>
-                <p className="text-xs font-medium text-zinc-300 truncate">{doc.fileName}</p>
+                <p className="text-[10px] text-muted-foreground font-mono tracking-wider truncate">{doc.documentType}</p>
+                <p className="text-xs font-medium text-muted-foreground truncate">{doc.fileName}</p>
               </div>
             </div>
           ))}
 
           {/* Empty state UI if no files exist */}
           {!isLoading && allFiles.length === 0 && (
-            <div className="col-span-2 text-center py-6 text-zinc-500 text-xs italic bg-zinc-900/50 rounded-sm border border-zinc-800/50">
+            <div className="col-span-2 text-center py-6 text-muted-foreground text-xs italic bg-muted/50 rounded-sm border border-border/50">
               Chưa có tài liệu nào được chia sẻ gần đây.
             </div>
           )}

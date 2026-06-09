@@ -64,8 +64,8 @@ export function LegacyUserManagement() {
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Quản lý người dùng</h2>
-          <p className="text-sm text-slate-500">Xem và quản lý tất cả người dùng trong hệ thống</p>
+          <h2 className="text-2xl font-bold text-foreground dark:text-white">Quản lý người dùng</h2>
+          <p className="text-sm text-muted-foreground">Xem và quản lý tất cả người dùng trong hệ thống</p>
         </div>
         <Button 
           className="bg-primary hover:bg-primary/90"
@@ -79,7 +79,7 @@ export function LegacyUserManagement() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card className="border-none shadow-sm bg-white dark:bg-slate-900">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-slate-500">Tổng người dùng</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Tổng người dùng</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{users.length}</div>
@@ -87,7 +87,7 @@ export function LegacyUserManagement() {
         </Card>
         <Card className="border-none shadow-sm bg-white dark:bg-slate-900">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-slate-500">Đang hoạt động</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Đang hoạt động</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-emerald-600">
@@ -97,7 +97,7 @@ export function LegacyUserManagement() {
         </Card>
         <Card className="border-none shadow-sm bg-white dark:bg-slate-900">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-slate-500">Tài khoản mới (30 ngày)</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Tài khoản mới (30 ngày)</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-blue-600">12</div>
@@ -106,13 +106,13 @@ export function LegacyUserManagement() {
       </div>
 
       <Card className="border-none shadow-sm bg-white dark:bg-slate-900 overflow-hidden">
-        <CardHeader className="p-4 border-b border-slate-100 dark:border-slate-800">
+        <CardHeader className="p-4 border-b border-border dark:border-border">
           <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
             <div className="relative w-full md:w-96">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
               <Input
                 placeholder="Tìm kiếm theo tên hoặc email..."
-                className="pl-10 h-10 border-slate-200 dark:border-slate-800"
+                className="pl-10 h-10 border-border dark:border-border"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -128,7 +128,7 @@ export function LegacyUserManagement() {
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <Table>
-              <TableHeader className="bg-slate-50/50 dark:bg-slate-800/50">
+              <TableHeader className="bg-muted/50 dark:bg-slate-800/50">
                 <TableRow>
                   <TableHead className="w-[300px]">Người dùng</TableHead>
                   <TableHead>Vai trò</TableHead>
@@ -141,28 +141,28 @@ export function LegacyUserManagement() {
                 {isLoading ? (
                   Array.from({ length: 5 }).map((_, i) => (
                     <TableRow key={i}>
-                      <TableCell colSpan={5} className="h-16 animate-pulse bg-slate-50/20" />
+                      <TableCell colSpan={5} className="h-16 animate-pulse bg-muted/20" />
                     </TableRow>
                   ))
                 ) : filteredUsers.length > 0 ? (
                   filteredUsers.map((user) => (
-                    <TableRow key={user.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+                    <TableRow key={user.id} className="hover:bg-muted/50 dark:hover:bg-slate-800/30 transition-colors">
                       <TableCell>
                         <div className="flex items-center gap-3">
-                          <Avatar className="h-10 w-10 border-2 border-white dark:border-slate-800">
+                          <Avatar className="h-10 w-10 border-2 border-white dark:border-border">
                             <AvatarImage src={user.avatar} />
                             <AvatarFallback className="font-bold bg-primary/10 text-primary">
                                 {user.name.charAt(0)}
                             </AvatarFallback>
                           </Avatar>
                           <div className="min-w-0">
-                            <p className="font-bold text-slate-900 dark:text-white truncate">{user.name}</p>
-                            <p className="text-xs text-slate-500 truncate">{user.email}</p>
+                            <p className="font-bold text-foreground dark:text-white truncate">{user.name}</p>
+                            <p className="text-xs text-muted-foreground truncate">{user.email}</p>
                           </div>
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Badge variant="outline" className="bg-slate-100 dark:bg-slate-800 border-none font-medium text-slate-600 dark:text-slate-300">
+                        <Badge variant="outline" className="bg-muted dark:bg-slate-800 border-none font-medium text-muted-foreground dark:text-muted-foreground">
                           User
                         </Badge>
                       </TableCell>
@@ -172,12 +172,12 @@ export function LegacyUserManagement() {
                             Đang hoạt động
                           </Badge>
                         ) : (
-                          <Badge className="bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400 border-none">
+                          <Badge className="bg-muted text-muted-foreground dark:bg-slate-800 dark:text-muted-foreground border-none">
                             Vô hiệu hóa
                           </Badge>
                         )}
                       </TableCell>
-                      <TableCell className="text-sm text-slate-500">
+                      <TableCell className="text-sm text-muted-foreground">
                         {new Date(user.createdAt).toLocaleDateString('vi-VN')}
                       </TableCell>
                       <TableCell className="text-right">
@@ -212,7 +212,7 @@ export function LegacyUserManagement() {
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={5} className="h-32 text-center text-slate-500 italic">
+                    <TableCell colSpan={5} className="h-32 text-center text-muted-foreground italic">
                       Không tìm thấy người dùng nào
                     </TableCell>
                   </TableRow>

@@ -75,7 +75,7 @@ export function WikiEditor({
             <button
               type="button"
               onClick={onCancel}
-              className="p-1.5 border border-border bg-secondary hover:bg-secondary/80 text-secondary-foreground transition-colors rounded-lg shadow-sm active:scale-[0.98]"
+              className="p-1.5 border border-border bg-secondary hover:bg-secondary/80 text-secondary-foreground transition-colors rounded-md shadow-sm active:scale-[0.98]"
               title="Quay lại"
             >
               <ArrowLeft className="w-4 h-4" />
@@ -96,7 +96,7 @@ export function WikiEditor({
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         {/* Basic Fields */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-3 border border-border bg-card p-3 rounded-xl shadow-md">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-3 border border-border bg-card p-3 rounded-lg shadow-md">
           <div className="md:col-span-2 flex flex-col gap-1.5">
             <label className="text-xs font-mono font-extrabold uppercase text-foreground">Tiêu đề trang (Title)</label>
             <input
@@ -105,7 +105,7 @@ export function WikiEditor({
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Nhập tiêu đề trang..."
               required
-              className="border border-border bg-background rounded-lg px-3 py-1.5 text-sm font-sans focus:outline-none focus:ring-0 focus:border-primary"
+              className="border border-border bg-background rounded-md px-3 py-1.5 text-sm font-sans focus:outline-none focus:ring-0 focus:border-primary"
             />
           </div>
 
@@ -114,7 +114,7 @@ export function WikiEditor({
             <select
               value={pageType}
               onChange={(e) => setPageType(e.target.value)}
-              className="border border-border bg-background rounded-lg px-3 py-1.5 text-sm font-sans focus:outline-none focus:ring-0 focus:border-primary"
+              className="border border-border bg-background rounded-md px-3 py-1.5 text-sm font-sans focus:outline-none focus:ring-0 focus:border-primary"
             >
               <option value="concept">Concept (Khái niệm)</option>
               <option value="entity">Entity (Thực thể)</option>
@@ -130,7 +130,7 @@ export function WikiEditor({
               value={tags}
               onChange={(e) => setTags(e.target.value)}
               placeholder="ngôn-ngữ, java, spring..."
-              className="border border-border bg-background rounded-lg px-3 py-1.5 text-sm font-sans focus:outline-none focus:ring-0 focus:border-primary"
+              className="border border-border bg-background rounded-md px-3 py-1.5 text-sm font-sans focus:outline-none focus:ring-0 focus:border-primary"
             />
           </div>
         </div>
@@ -139,7 +139,7 @@ export function WikiEditor({
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           {/* Main workspace */}
           <div
-            className="lg:col-span-8 flex flex-col gap-3 border border-border bg-card p-4 rounded-xl shadow-md"
+            className="lg:col-span-8 flex flex-col gap-3 border border-border bg-card p-4 rounded-lg shadow-md"
           >
             <div className="flex items-center justify-between border-b border-border pb-2 mb-1">
               <span className="font-mono text-xs uppercase font-extrabold text-foreground">
@@ -169,7 +169,7 @@ export function WikiEditor({
             />
 
             {/* Change Note Block */}
-            <div className="border border-border bg-card p-4 rounded-xl shadow-md flex flex-col gap-3">
+            <div className="border border-border bg-card p-4 rounded-lg shadow-md flex flex-col gap-3">
               <div className="border-b border-border pb-2">
                 <span className="font-mono text-xs uppercase font-extrabold text-foreground">
                   XÁC NHẬN GỬI ĐỀ XUẤT (SUBMIT PROPOSAL)
@@ -184,7 +184,7 @@ export function WikiEditor({
                   placeholder="Mô tả tóm tắt lý do hoặc những gì bạn đã chỉnh sửa..."
                   required
                   rows={3}
-                  className="w-full border border-border bg-background rounded-lg p-2 text-xs font-sans focus:outline-none focus:ring-0 focus:border-primary"
+                  className="w-full border border-border bg-background rounded-md p-2 text-xs font-sans focus:outline-none focus:ring-0 focus:border-primary"
                 />
               </div>
 
@@ -192,7 +192,7 @@ export function WikiEditor({
                 <button
                   type="submit"
                   disabled={isLoading || !title.trim() || !content.trim()}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium bg-primary hover:bg-primary/90 text-primary-foreground transition-colors duration-200 rounded-lg shadow-sm active:scale-[0.98] disabled:opacity-50"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium bg-primary hover:bg-primary/90 text-primary-foreground transition-colors duration-200 rounded-md shadow-sm active:scale-[0.98] disabled:opacity-50"
                 >
                   <CheckCircle className="w-4 h-4" />
                   {isLoading ? "Đang gửi..." : "Gửi đề xuất nháp"}
@@ -202,7 +202,7 @@ export function WikiEditor({
                   <button
                     type="button"
                     onClick={onCancel}
-                    className="w-full px-4 py-2 text-xs font-medium border border-border bg-secondary hover:bg-secondary/80 text-secondary-foreground transition-colors duration-200 rounded-lg shadow-sm active:scale-[0.98]"
+                    className="w-full px-4 py-2 text-xs font-medium border border-border bg-secondary hover:bg-secondary/80 text-secondary-foreground transition-colors duration-200 rounded-md shadow-sm active:scale-[0.98]"
                   >
                     Hủy bỏ
                   </button>

@@ -65,7 +65,7 @@ export function AIMessageBubble({
             className={cn(
                 'group flex gap-3 w-full py-3 transition-colors duration-200',
                 isAssistant ? 'flex-row' : 'flex-row-reverse',
-                isAssistant ? 'hover:bg-muted/30 rounded-xl px-2' : 'px-2',
+                isAssistant ? 'hover:bg-muted/30 rounded-lg px-2' : 'px-2',
                 className
             )}
         >
@@ -73,7 +73,7 @@ export function AIMessageBubble({
             <div className="flex-shrink-0 flex flex-col items-center">
                 <div
                     className={cn(
-                        'w-8 h-8 rounded-lg flex items-center justify-center shadow-sm',
+                        'w-8 h-8 rounded-md flex items-center justify-center shadow-sm',
                         'transition-colors duration-150',
                         isAssistant
                             ? mode === 'agent'
@@ -131,9 +131,9 @@ export function AIMessageBubble({
                         'relative transition-all duration-200 w-full',
                         isAssistant
                             ? error
-                                ? 'text-destructive bg-destructive/5 p-4 rounded-xl border border-destructive/20'
+                                ? 'text-destructive bg-destructive/5 p-4 rounded-lg border border-destructive/20'
                                 : 'text-foreground leading-relaxed'
-                            : 'bg-primary text-primary-foreground px-4 py-2.5 rounded-xl shadow-sm rounded-tr-none w-fit'
+                            : 'bg-primary text-primary-foreground px-4 py-2.5 rounded-lg shadow-sm rounded-tr-none w-fit'
                     )}
                 >
                     <div
@@ -207,7 +207,7 @@ export function AIMessageBubble({
 
                     {/* Insufficient sources warning */}
                     {hasInsufficientSources && !isStreaming && (
-                        <div className="flex items-center gap-2 mt-4 p-3 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/30 rounded-lg text-xs text-amber-700 dark:text-amber-400 animate-in fade-in slide-in-from-top-2">
+                        <div className="flex items-center gap-2 mt-4 p-3 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/30 rounded-md text-xs text-amber-700 dark:text-amber-400 animate-in fade-in slide-in-from-top-2">
                             <AlertCircle className="w-4 h-4 text-amber-500 flex-shrink-0" />
                             <p>Câu trả lời này dựa trên thông tin hạn chế từ các tài liệu nội bộ hiện có.</p>
                         </div>

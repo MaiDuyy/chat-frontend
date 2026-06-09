@@ -133,7 +133,7 @@ export function UserEditDialog({
                 {user && (
                     <form onSubmit={handleSubmit} className="space-y-4">
                         {/* User Avatar & Email */}
-                        <div className="flex items-center gap-4 p-3 bg-muted/50 rounded-lg">
+                        <div className="flex items-center gap-4 p-3 bg-muted/50 rounded-md">
                             <Avatar className="h-12 w-12">
                                 <AvatarImage src={user.avatar} alt={user.name} />
                                 <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
@@ -210,7 +210,7 @@ export function UserEditDialog({
                         </div>
 
                         {/* Active Status */}
-                        <div className="flex items-center justify-between p-3 border rounded-lg">
+                        <div className="flex items-center justify-between p-3 border rounded-md">
                             <div className="space-y-0.5">
                                 <Label>Account Status</Label>
                                 <p className="text-xs text-muted-foreground">

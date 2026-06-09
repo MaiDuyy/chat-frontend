@@ -261,14 +261,14 @@ export function DocumentManagement() {
                 className="hidden" 
                 accept=".pdf,.docx,.txt"
             />
-            <div className="flex flex-wrap gap-2 items-center justify-between bg-slate-50/50 dark:bg-slate-900/10 p-2.5 rounded-xl border border-border">
+            <div className="flex flex-wrap gap-2 items-center justify-between bg-muted/50 dark:bg-slate-900/10 p-2.5 rounded-lg border border-border">
                 <div className="flex-1 min-w-[260px] relative">
                     <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
                     <Input
                         placeholder="Tìm kiếm tài liệu..."
                         value={searchTerm}
                         onChange={(e) => handleSearchChange(e.target.value)}
-                        className="pl-8 h-8 text-xs rounded-lg border-border shadow-sm focus-visible:ring-1 bg-background"
+                        className="pl-8 h-8 text-xs rounded-md border-border shadow-sm focus-visible:ring-1 bg-background"
                     />
                 </div>
 
@@ -280,7 +280,7 @@ export function DocumentManagement() {
                         <button
                             type="button"
                             onClick={() => setFilterWorkspaceId('all')}
-                            className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold border transition-all whitespace-nowrap cursor-pointer ${
+                            className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-bold border transition-all whitespace-nowrap cursor-pointer ${
                                 filterWorkspaceId === 'all'
                                     ? 'border-primary bg-primary/10 text-primary'
                                     : 'border-border bg-background text-muted-foreground hover:bg-accent'
@@ -292,7 +292,7 @@ export function DocumentManagement() {
                         <button
                             type="button"
                             onClick={() => setFilterWorkspaceId('default-workspace')}
-                            className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold border transition-all whitespace-nowrap cursor-pointer ${
+                            className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-bold border transition-all whitespace-nowrap cursor-pointer ${
                                 filterWorkspaceId === 'default-workspace'
                                     ? 'border-primary bg-primary/10 text-primary'
                                     : 'border-border bg-background text-muted-foreground hover:bg-accent'
@@ -307,7 +307,7 @@ export function DocumentManagement() {
                                 key={ws.id}
                                 type="button"
                                 onClick={() => setFilterWorkspaceId(filterWorkspaceId === ws.id ? 'all' : ws.id)}
-                                className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-semibold border transition-all whitespace-nowrap cursor-pointer ${
+                                className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-semibold border transition-all whitespace-nowrap cursor-pointer ${
                                     filterWorkspaceId === ws.id
                                         ? 'border-blue-400 bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300'
                                         : 'border-border bg-background text-muted-foreground hover:bg-accent'
@@ -323,7 +323,7 @@ export function DocumentManagement() {
                                 key={ws.id}
                                 type="button"
                                 onClick={() => setFilterWorkspaceId(filterWorkspaceId === ws.id ? 'all' : ws.id)}
-                                className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-semibold border transition-all whitespace-nowrap cursor-pointer ${
+                                className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-semibold border transition-all whitespace-nowrap cursor-pointer ${
                                     filterWorkspaceId === ws.id
                                         ? 'border-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300'
                                         : 'border-border bg-background text-muted-foreground hover:bg-accent'
@@ -339,7 +339,7 @@ export function DocumentManagement() {
                         <button
                             type="button"
                             onClick={() => setFilterWorkspaceId('all')}
-                            className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-medium border border-rose-200 dark:border-rose-800 bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 cursor-pointer hover:bg-rose-100 transition-colors ml-auto"
+                            className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-medium border border-rose-200 dark:border-rose-800 bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 cursor-pointer hover:bg-rose-100 transition-colors ml-auto"
                         >
                             <X className="w-3 h-3" /> Xóa bộ lọc
                         </button>
@@ -347,7 +347,7 @@ export function DocumentManagement() {
                 </div>
                 <div className="flex flex-wrap gap-2 items-center">
                     {/* Segmented Control for Parser Selection */}
-                    <div className="flex bg-slate-100/60 dark:bg-slate-800/40 p-0.5 rounded-lg border border-border">
+                    <div className="flex bg-muted/60 dark:bg-slate-800/40 p-0.5 rounded-md border border-border">
                         <button
                             type="button"
                             onClick={() => setParserMethod('gemini')}
@@ -376,7 +376,7 @@ export function DocumentManagement() {
                         </button>
                     </div>
 
-                    <label className="flex items-center gap-1.5 text-[10px] font-semibold text-muted-foreground bg-background border border-border px-2.5 py-1 h-8 rounded-lg cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/55 transition-all shadow-sm">
+                    <label className="flex items-center gap-1.5 text-[10px] font-semibold text-muted-foreground bg-background border border-border px-2.5 py-1 h-8 rounded-md cursor-pointer hover:bg-muted dark:hover:bg-slate-800/55 transition-all shadow-sm">
                         <input
                             type="checkbox"
                             checked={previewMode}
@@ -385,12 +385,12 @@ export function DocumentManagement() {
                         />
                         <span>Xem trước & Duyệt</span>
                     </label>
-                    <Button variant="outline" className="rounded-lg h-8 text-xs border-border px-3" onClick={() => refetch()}>
+                    <Button variant="outline" className="rounded-md h-8 text-xs border-border px-3" onClick={() => refetch()}>
                         <RefreshCw className={cn("w-3.5 h-3.5 mr-1.5", isLoading && "animate-spin")} />
                         Làm mới
                     </Button>
                     <Button 
-                        className="rounded-lg h-8 text-xs px-3 bg-primary text-primary-foreground hover:bg-primary/90" 
+                        className="rounded-md h-8 text-xs px-3 bg-primary text-primary-foreground hover:bg-primary/90" 
                         onClick={handleUploadClick}
                         disabled={isUploading}
                     >
@@ -404,11 +404,11 @@ export function DocumentManagement() {
                 </div>
             </div>
 
-            <Card className="border border-border shadow-sm rounded-xl overflow-hidden bg-card">
+            <Card className="border border-border shadow-sm rounded-lg overflow-hidden bg-card">
                 <CardContent className="p-0">
                     <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-slate-800 scrollbar-track-transparent">
                         <Table>
-                        <TableHeader className="bg-slate-50/60 dark:bg-slate-900/40 border-b border-border">
+                        <TableHeader className="bg-muted/60 dark:bg-slate-900/40 border-b border-border">
                             <TableRow className="hover:bg-transparent border-border">
                                 <TableHead className="font-bold text-xs text-foreground pl-4 py-2">Tài liệu</TableHead>
                                 <TableHead className="font-bold text-xs text-foreground py-2">Kích thước</TableHead>
@@ -432,17 +432,17 @@ export function DocumentManagement() {
                                     const StatusIcon = status.icon;
 
                                     return (
-                                        <TableRow key={doc.id} className="hover:bg-slate-50/30 dark:hover:bg-slate-800/10 transition-colors border-border group">
+                                        <TableRow key={doc.id} className="hover:bg-muted/30 dark:hover:bg-slate-800/10 transition-colors border-border group">
                                             <TableCell className="pl-4 py-1.5">
                                                 <div className="flex items-center gap-2.5">
-                                                    <div className="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary transition-colors">
+                                                    <div className="p-1.5 rounded-md bg-muted dark:bg-slate-800 text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary transition-colors">
                                                         <FileText className="w-4 h-4" />
                                                     </div>
                                                     <div>
                                                         <p className="text-xs font-bold text-foreground leading-snug">{doc.fileName}</p>
                                                         <div className="flex items-center gap-1.5 mt-0.5">
                                                             <span className="text-[9px] text-muted-foreground font-mono uppercase tracking-wider">{doc.documentType}</span>
-                                                            <span className="text-slate-300 dark:text-slate-700 text-[9px]">•</span>
+                                                            <span className="text-muted-foreground dark:text-muted-foreground text-[9px]">•</span>
                                                             <span className={cn(
                                                                 "text-[8px] font-bold px-1 py-0.2 rounded uppercase tracking-wider border flex items-center gap-0.5",
                                                                 doc.parserMethod === 'tika'
@@ -469,7 +469,7 @@ export function DocumentManagement() {
                                                 {formatFileSize(doc.fileSize)}
                                             </TableCell>
                                             <TableCell className="py-1.5">
-                                                <Badge variant="outline" className="rounded-md text-[9px] font-bold uppercase tracking-tight bg-slate-50 dark:bg-slate-800/40 border-border px-1.5 py-0.5">
+                                                <Badge variant="outline" className="rounded-md text-[9px] font-bold uppercase tracking-tight bg-muted dark:bg-slate-800/40 border-border px-1.5 py-0.5">
                                                     {doc.securityClassification || 'INTERNAL'}
                                                 </Badge>
                                             </TableCell>
@@ -492,7 +492,7 @@ export function DocumentManagement() {
                                                                 setEditingDoc(doc);
                                                                 setEditorOpen(true);
                                                             }}
-                                                            className="rounded-lg h-7 text-[10px] font-semibold text-primary hover:text-primary border-indigo-200 dark:border-indigo-900 bg-indigo-50/30 dark:bg-indigo-950/20 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 transition-all shadow-sm"
+                                                            className="rounded-md h-7 text-[10px] font-semibold text-primary hover:text-primary border-indigo-200 dark:border-indigo-900 bg-indigo-50/30 dark:bg-indigo-950/20 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 transition-all shadow-sm"
                                                         >
                                                             <Eye className="w-3.5 h-3.5 mr-1" /> Duyệt & Lưu
                                                         </Button>
@@ -506,16 +506,16 @@ export function DocumentManagement() {
                                                                     setInspectingDoc(doc);
                                                                     setChunkInspectorOpen(true);
                                                                 }}
-                                                                className="rounded-lg h-7 text-[10px] font-semibold text-muted-foreground hover:text-foreground border-border bg-background hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-all shadow-sm flex items-center gap-1 cursor-pointer"
+                                                                className="rounded-md h-7 text-[10px] font-semibold text-muted-foreground hover:text-foreground border-border bg-background hover:bg-muted dark:hover:bg-slate-800/60 transition-all shadow-sm flex items-center gap-1 cursor-pointer"
                                                             >
-                                                                <Database className="w-3 h-3 text-slate-500" /> Phân mảnh
+                                                                <Database className="w-3 h-3 text-muted-foreground" /> Phân mảnh
                                                             </Button>
                                                             <Button
                                                                 variant="outline"
                                                                 size="sm"
                                                                 onClick={() => handleStartMRP(doc)}
                                                                 disabled={isCompiling}
-                                                                className="rounded-lg h-7 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 border-emerald-200/60 dark:border-emerald-900/40 bg-emerald-50/30 dark:bg-emerald-950/20 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 transition-all shadow-sm flex items-center gap-1 cursor-pointer"
+                                                                className="rounded-md h-7 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 border-emerald-200/60 dark:border-emerald-900/40 bg-emerald-50/30 dark:bg-emerald-950/20 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 transition-all shadow-sm flex items-center gap-1 cursor-pointer"
                                                             >
                                                                 <Cpu className={cn("w-3 h-3", isCompiling && "animate-spin")} /> Biên soạn MRP
                                                             </Button>
@@ -523,11 +523,11 @@ export function DocumentManagement() {
                                                     )}
                                                     <DropdownMenu>
                                                         <DropdownMenuTrigger asChild>
-                                                            <Button variant="ghost" size="icon" className="h-7 w-7 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                                                            <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md opacity-0 group-hover:opacity-100 transition-opacity">
                                                                 <MoreHorizontal className="h-3.5 w-3.5" />
                                                             </Button>
                                                         </DropdownMenuTrigger>
-                                                        <DropdownMenuContent align="end" className="rounded-lg p-1 shadow-lg border-border bg-popover text-popover-foreground">
+                                                        <DropdownMenuContent align="end" className="rounded-md p-1 shadow-lg border-border bg-popover text-popover-foreground">
                                                             {doc.status === 'PREVIEW' && (
                                                                 <DropdownMenuItem 
                                                                     onClick={() => {

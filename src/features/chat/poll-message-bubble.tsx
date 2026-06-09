@@ -138,7 +138,7 @@ export default function PollMessageBubble({ pollId, isMe }: PollMessageBubblePro
         </span>
         <h4 className={cn(
           "text-sm font-extrabold leading-snug break-words",
-          isMe ? "text-white" : "text-slate-800 dark:text-white"
+          isMe ? "text-white" : "text-foreground dark:text-white"
         )}>
           {poll.title}
         </h4>
@@ -191,7 +191,7 @@ export default function PollMessageBubble({ pollId, isMe }: PollMessageBubblePro
               onClick={() => handleVote(option.id)}
               disabled={isVoting || isExpired}
               className={cn(
-                "relative w-full text-left p-3 rounded-[4px] overflow-hidden border flex flex-col gap-1.5 select-none",
+                "relative w-full text-left p-3 rounded-md overflow-hidden border flex flex-col gap-1.5 select-none",
                 "motion-safe:transition-all motion-safe:duration-200 active:scale-[0.98] group disabled:active:scale-100 disabled:cursor-not-allowed",
                 isMe
                   ? isWinner
@@ -206,8 +206,8 @@ export default function PollMessageBubble({ pollId, isMe }: PollMessageBubblePro
                     : isSelected
                       ? "bg-blue-500/10 border-blue-500/20 text-blue-700 dark:text-blue-400 font-semibold"
                       : isExpired
-                        ? "bg-slate-50/50 dark:bg-slate-900/50 border-slate-100 dark:border-slate-800 text-slate-400 opacity-70"
-                        : "bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800 hover:border-slate-200 dark:hover:border-slate-700 hover:shadow-xs"
+                        ? "bg-muted/50 dark:bg-slate-900/50 border-border dark:border-border text-muted-foreground opacity-70"
+                        : "bg-white dark:bg-slate-900 border-border dark:border-border hover:border-border dark:hover:border-border hover:shadow-xs"
               )}
             >
               {/* Progress Background bar */}
@@ -225,7 +225,7 @@ export default function PollMessageBubble({ pollId, isMe }: PollMessageBubblePro
                       ? "bg-emerald-500/15"
                       : isSelected 
                         ? "bg-blue-500/10" 
-                        : "bg-slate-100 dark:bg-slate-800/40"
+                        : "bg-muted dark:bg-slate-800/40"
                 )}
                 style={{ width: `${percentage}%` }}
               />
@@ -241,7 +241,7 @@ export default function PollMessageBubble({ pollId, isMe }: PollMessageBubblePro
                 {isSelected && (
                   <span className={cn(
                     "flex-shrink-0 w-4 h-4 rounded-full flex items-center justify-center text-[10px]",
-                    isMe ? "bg-white text-blue-600" : "bg-blue-600 text-white"
+                    isMe ? "bg-white text-blue-600" : "bg-primary text-white"
                   )}>
                     <Check size={10} strokeWidth={3} />
                   </span>
@@ -251,7 +251,7 @@ export default function PollMessageBubble({ pollId, isMe }: PollMessageBubblePro
               {/* Progress bar and percentages */}
               {showResults && (
                 <div className="relative z-10 flex items-center justify-between w-full text-[10px] opacity-75 font-semibold mt-0.5">
-                  <span className={isMe ? "text-blue-100" : "text-slate-500"}>
+                  <span className={isMe ? "text-blue-100" : "text-muted-foreground"}>
                     {voteCount} phiếu
                   </span>
                   <span>{percentage}%</span>
@@ -280,7 +280,7 @@ export default function PollMessageBubble({ pollId, isMe }: PollMessageBubblePro
                               >
                                 <Avatar className="w-4 h-4 border-0">
                                   <AvatarImage src={voter.avatar || undefined} alt={voter.name} />
-                                  <AvatarFallback className="text-[7px] bg-slate-300 font-bold uppercase flex items-center justify-center w-full h-full text-slate-700">
+                                  <AvatarFallback className="text-[7px] bg-muted font-bold uppercase flex items-center justify-center w-full h-full text-muted-foreground">
                                     {voter.name.slice(0, 1)}
                                   </AvatarFallback>
                                 </Avatar>
@@ -292,7 +292,7 @@ export default function PollMessageBubble({ pollId, isMe }: PollMessageBubblePro
                                   "inline-flex items-center justify-center w-4 h-4 rounded-full ring-2 text-[7px] font-bold z-0",
                                   isMe
                                     ? "bg-white/30 text-white ring-blue-600"
-                                    : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 ring-white dark:ring-slate-900"
+                                    : "bg-muted text-muted-foreground dark:bg-slate-800 dark:text-muted-foreground ring-white dark:ring-slate-900"
                                 )}
                               >
                                 +{extraVotersCount}
@@ -308,14 +308,14 @@ export default function PollMessageBubble({ pollId, isMe }: PollMessageBubblePro
                             }}
                             className={cn(
                               "text-[9px] font-medium leading-none hover:underline cursor-pointer",
-                              isMe ? "text-blue-100/90" : "text-blue-600 dark:text-blue-400"
+                              isMe ? "text-blue-100/90" : "text-primary"
                             )}
                           >
                             {resolvedVoters.length} bình chọn
                           </span>
                         </div>
                       </TooltipTrigger>
-                      <TooltipContent className="text-[10px] px-2 py-1 rounded-[4px] z-50">
+                      <TooltipContent className="text-[10px] px-2 py-1 rounded-md z-50">
                         <p>{tooltipText}</p>
                       </TooltipContent>
                     </Tooltip>
@@ -330,7 +330,7 @@ export default function PollMessageBubble({ pollId, isMe }: PollMessageBubblePro
       {/* Footer Info */}
       <div className={cn(
         "flex items-center justify-between text-[10px] mt-1 border-t pt-2.5",
-        isMe ? "border-white/15 text-blue-200/70" : "border-slate-100 dark:border-slate-800 text-slate-400"
+        isMe ? "border-white/15 text-blue-200/70" : "border-border dark:border-border text-muted-foreground"
       )}>
         <div className="flex items-center gap-1 font-semibold">
           <Users size={11} />
@@ -343,7 +343,7 @@ export default function PollMessageBubble({ pollId, isMe }: PollMessageBubblePro
             {isExpired ? (
               <span className={cn(
                 "px-1.5 py-0.5 rounded font-bold text-[9px] uppercase",
-                isMe ? "bg-white/20 text-white" : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400"
+                isMe ? "bg-white/20 text-white" : "bg-muted text-muted-foreground dark:bg-slate-800 dark:text-muted-foreground"
               )}>
                 Đã kết thúc
               </span>
@@ -361,7 +361,7 @@ export default function PollMessageBubble({ pollId, isMe }: PollMessageBubblePro
         <button
           onClick={handleEndPoll}
           disabled={isEnding}
-          className="mt-2 w-full py-1.5 rounded-[4px] text-[10px] font-bold uppercase tracking-wider text-center transition-all select-none border border-red-500/30 active:scale-[0.98] cursor-pointer bg-red-500/20 hover:bg-red-500/35 text-red-100 flex items-center justify-center gap-1"
+          className="mt-2 w-full py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider text-center transition-all select-none border border-red-500/30 active:scale-[0.98] cursor-pointer bg-red-500/20 hover:bg-red-500/35 text-red-100 flex items-center justify-center gap-1"
         >
           {isEnding ? (
             <>
@@ -377,20 +377,20 @@ export default function PollMessageBubble({ pollId, isMe }: PollMessageBubblePro
 
       {/* Voters List Modal */}
       <Dialog open={votersModalOpen} onOpenChange={setVotersModalOpen}>
-        <DialogContent className="sm:max-w-md rounded-[6px] border-slate-200 dark:border-slate-800">
-          <DialogHeader className="border-b pb-3 border-slate-100 dark:border-slate-800">
-            <DialogTitle className="text-sm font-bold text-slate-800 dark:text-white flex items-center gap-1.5 leading-none">
+        <DialogContent className="sm:max-w-md rounded-md border-border dark:border-border">
+          <DialogHeader className="border-b pb-3 border-border dark:border-border">
+            <DialogTitle className="text-sm font-bold text-foreground dark:text-white flex items-center gap-1.5 leading-none">
               <Users size={16} className="text-blue-500" />
               Thành viên đã bình chọn
             </DialogTitle>
-            <p className="text-[10px] text-slate-400 mt-1.5 leading-normal italic">
+            <p className="text-[10px] text-muted-foreground mt-1.5 leading-normal italic">
               Phương án: &ldquo;{selectedOptionForVoters?.text}&rdquo;
             </p>
           </DialogHeader>
 
           <div className="max-h-60 overflow-y-auto space-y-2.5 py-2 pr-1 custom-scrollbar">
             {!selectedOptionForVoters || selectedOptionForVoters.votes?.length === 0 ? (
-              <p className="text-xs text-slate-400 text-center py-6">Chưa có lượt bình chọn nào cho phương án này.</p>
+              <p className="text-xs text-muted-foreground text-center py-6">Chưa có lượt bình chọn nào cho phương án này.</p>
             ) : (
               selectedOptionForVoters.votes.map((voterId: string) => {
                 const participant = chatParticipants.find((p: any) => p.accountId === voterId);
@@ -422,24 +422,24 @@ export default function PollMessageBubble({ pollId, isMe }: PollMessageBubblePro
                 }
 
                 return (
-                  <div key={voterId} className="flex items-center gap-3 p-1.5 rounded-[4px] hover:bg-slate-50 dark:hover:bg-slate-800/40">
-                    <Avatar className="h-7 w-7 rounded-[4px] border border-slate-200/60 shrink-0">
-                      <AvatarImage className="rounded-[4px]" src={avatar || undefined} />
-                      <AvatarFallback className="rounded-[4px] bg-slate-100 text-slate-600 text-[10px] font-bold">
+                  <div key={voterId} className="flex items-center gap-3 p-1.5 rounded-md hover:bg-muted dark:hover:bg-slate-800/40">
+                    <Avatar className="h-7 w-7 rounded-md border border-border/60 shrink-0">
+                      <AvatarImage className="rounded-md" src={avatar || undefined} />
+                      <AvatarFallback className="rounded-md bg-muted text-muted-foreground text-[10px] font-bold">
                         {name.slice(0, 2).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate">{name}</p>
-                      <p className="text-[9px] text-slate-400 font-medium leading-none mt-0.5">{roleLabel}</p>
+                      <p className="text-xs font-semibold text-foreground dark:text-foreground truncate">{name}</p>
+                      <p className="text-[9px] text-muted-foreground font-medium leading-none mt-0.5">{roleLabel}</p>
                     </div>
                   </div>
                 );
               })
             )}
           </div>
-          <div className="flex justify-end border-t pt-3 border-slate-100 dark:border-slate-800">
-            <Button onClick={() => setVotersModalOpen(false)} className="h-8 text-xs font-bold px-4 rounded-[4px]">
+          <div className="flex justify-end border-t pt-3 border-border dark:border-border">
+            <Button onClick={() => setVotersModalOpen(false)} className="h-8 text-xs font-bold px-4 rounded-md">
               Đóng
             </Button>
           </div>

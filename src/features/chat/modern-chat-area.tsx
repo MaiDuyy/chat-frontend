@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import {
   Search, Phone, Video, Info, Paperclip, Smile, Send,
-  Sparkles, Loader2, ImageIcon, File, Ban, Hash, Lock, BarChart3, Pin, Reply, X
+  Sparkles, Loader2, ImageIcon, File, Ban, Hash, Lock, BarChart3, Pin, Reply, X, ChevronLeft
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -890,11 +890,11 @@ export const ModernChatArea: React.FC<{ chatId?: string }> = ({ chatId }) => {
 
   if (isForbidden) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-white dark:bg-[#111113] p-6 animate-in fade-in duration-300">
-        <div className="text-center text-slate-450 dark:text-zinc-600 font-mono max-w-md">
+      <div className="flex-1 flex items-center justify-center bg-background text-foreground p-6 animate-in fade-in duration-300">
+        <div className="text-center text-muted-foreground font-mono max-w-md">
           <Ban className="w-12 h-12 mx-auto mb-4 text-red-500 animate-pulse" />
-          <p className="text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200">Truy cập bị từ chối</p>
-          <p className="text-xs mt-3 text-slate-500 dark:text-zinc-400 leading-relaxed bg-red-50/50 dark:bg-red-955/10 border border-red-200/50 dark:border-red-900/20 px-4 py-3 rounded-[2px]">
+          <p className="text-sm font-bold uppercase tracking-wider text-foreground dark:text-foreground">Truy cập bị từ chối</p>
+          <p className="text-xs mt-3 text-muted-foreground leading-relaxed bg-destructive/10 border border-destructive/20 px-4 py-3 rounded-md text-destructive">
             Bạn không còn là thành viên của nhóm này nên không thể xem nội dung.
           </p>
         </div>
@@ -904,11 +904,11 @@ export const ModernChatArea: React.FC<{ chatId?: string }> = ({ chatId }) => {
 
   if (!chatId) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-white dark:bg-[#111113]">
-        <div className="text-center text-slate-450 dark:text-zinc-600 font-mono">
+      <div className="flex-1 flex items-center justify-center bg-background">
+        <div className="text-center text-muted-foreground font-mono">
           <Sparkles className="w-10 h-10 mx-auto mb-4 opacity-40 text-blue-500 animate-pulse" />
-          <p className="text-sm font-semibold uppercase tracking-wider text-slate-800 dark:text-slate-200">Chọn một cuộc trò chuyện</p>
-          <p className="text-xs mt-2 text-slate-400 dark:text-zinc-500">Chọn từ danh sách bên trái để bắt đầu</p>
+          <p className="text-sm font-semibold uppercase tracking-wider text-foreground dark:text-foreground">Chọn một cuộc trò chuyện</p>
+          <p className="text-xs mt-2 text-muted-foreground">Chọn từ danh sách bên trái để bắt đầu</p>
         </div>
       </div>
     );
@@ -931,11 +931,11 @@ export const ModernChatArea: React.FC<{ chatId?: string }> = ({ chatId }) => {
   const imageUrl = getAvatarUrl(chat?.avatar, chatName);
 
   return (
-    <div className="flex-1 flex h-screen bg-white dark:bg-[#111113] text-slate-800 dark:text-slate-200 relative overflow-hidden">
+    <div className="flex-1 flex h-screen bg-background text-foreground dark:text-foreground relative overflow-hidden">
       {/* Main chat column */}
       <div className="flex flex-col flex-1 min-w-0 relative">
         {isAdmin && isDirectMessage && (
-          <div className="bg-amber-100 dark:bg-amber-950/40 text-amber-800 dark:text-amber-400 text-xs font-mono font-bold px-4 py-2 text-center border-b border-amber-250 z-10 w-full">
+          <div className="bg-amber-100 dark:bg-amber-955/40 text-amber-800 dark:text-amber-400 text-xs font-mono font-bold px-4 py-2 text-center border-b border-amber-200 z-10 w-full">
             ⚠️ AUDITED ACCESS: You are viewing a direct message room under Admin privileges. Actions are logged.
           </div>
         )}
@@ -957,27 +957,33 @@ export const ModernChatArea: React.FC<{ chatId?: string }> = ({ chatId }) => {
 
         {/* Connection indicator */}
         {!isConnected && (
-          <div className="bg-red-50/50 dark:bg-red-950/20 text-red-650 dark:text-red-400 text-xs font-mono px-4 py-1.5 text-center border-b border-red-200 dark:border-red-900/30 flex items-center justify-center gap-2">
-            <div className="w-2 h-2 rounded-[2px] bg-red-500 animate-pulse" />
+          <div className="bg-red-50/50 dark:bg-red-955/20 text-red-650 dark:text-red-400 text-xs font-mono px-4 py-1.5 text-center border-b border-border flex items-center justify-center gap-2">
+            <div className="w-2 h-2 rounded-sidebar-item bg-red-500 animate-pulse" />
             Đang kết nối lại...
           </div>
         )}
 
-        {/* Header */}
-        <header className="h-14 border-b border-slate-200/80 dark:border-white/[0.06] bg-white dark:bg-[#111113] flex items-center justify-between px-6 shrink-0 select-none">
+        <header className="h-14 border-b border-border bg-background flex items-center justify-between px-6 shrink-0 select-none">
           <div className="flex items-center gap-3 min-w-0">
+            {/* Mobile Back Button */}
+            <button
+              onClick={() => router.push('/chat')}
+              className="flex md:hidden items-center justify-center h-8 w-8 rounded-sm hover:bg-muted text-muted-foreground hover:text-foreground shrink-0 border border-border mr-1"
+            >
+              <ChevronLeft size={16} />
+            </button>
             {isChannel ? (
               <div className="flex items-center gap-2.5 min-w-0">
-                <div className="h-8 w-8 rounded-[2px] bg-slate-50 dark:bg-[#19191B] border border-slate-200/60 dark:border-white/[0.04] flex items-center justify-center shrink-0">
+                <div className="h-8 w-8 rounded-md bg-muted border border-border flex items-center justify-center shrink-0">
                   {channelData?.type === 'PRIVATE' ? (
-                    <Lock size={15} className="text-slate-500 dark:text-zinc-400" />
+                    <Lock size={15} className="text-muted-foreground" />
                   ) : (
-                    <Hash size={15} className="text-slate-500 dark:text-zinc-400" />
+                    <Hash size={15} className="text-muted-foreground" />
                   )}
                 </div>
                 <div className="min-w-0 text-left">
-                  <h3 className="font-bold text-slate-900 dark:text-slate-100 text-[14px] leading-tight truncate">{channelData?.name}</h3>
-                  <p className="text-[11px] text-slate-500 dark:text-zinc-550 truncate max-w-xs mt-0.5">
+                  <h3 className="font-bold text-foreground text-[14px] leading-tight truncate">{channelData?.name}</h3>
+                  <p className="text-[11px] text-muted-foreground truncate max-w-xs mt-0.5">
                     {typingUsers.length > 0
                       ? `${typingUsers.map(u => u.userName).join(', ')} đang gõ...`
                       : channelData?.topic || `${channelData?._count?.members ?? 0} thành viên`}
@@ -987,30 +993,30 @@ export const ModernChatArea: React.FC<{ chatId?: string }> = ({ chatId }) => {
             ) : isDirectMessage ? (
               <div className="flex items-center gap-2.5">
                 <div className="relative">
-                  <Avatar className="h-8 w-8 rounded-[2px] border border-slate-200/80 dark:border-white/[0.06]">
-                    <AvatarImage className="rounded-[2px] object-cover" src={imageUrl || partner?.avatar || undefined} />
-                    <AvatarFallback className="rounded-[2px] bg-slate-100 dark:bg-zinc-800 text-slate-655 dark:text-zinc-400 text-xs font-semibold">{chatName[0]}</AvatarFallback>
+                  <Avatar className="h-8 w-8 rounded-md border border-border">
+                    <AvatarImage className="rounded-sm object-cover" src={imageUrl || partner?.avatar || undefined} />
+                    <AvatarFallback className="rounded-md bg-muted text-muted-foreground text-xs font-semibold">{chatName[0]}</AvatarFallback>
                   </Avatar>
                   {isPartnerOnline && (
-                    <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-[2px] bg-emerald-500 border border-white dark:border-zinc-900" />
+                    <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-sm bg-emerald-500 border border-background" />
                   )}
                 </div>
                 <div className="text-left">
-                  <h3 className="font-bold text-slate-900 dark:text-slate-100 text-[14px] leading-tight">{chatName}</h3>
-                  <p className={`text-[11px] font-medium mt-0.5 font-mono ${typingUsers.length > 0 ? 'text-blue-600 dark:text-blue-405' : isPartnerOnline ? 'text-emerald-600 dark:text-emerald-450' : 'text-slate-500 dark:text-zinc-500'}`}>
+                  <h3 className="font-bold text-foreground text-[14px] leading-tight">{chatName}</h3>
+                  <p className={`text-[11px] font-medium mt-0.5 font-mono ${typingUsers.length > 0 ? 'text-blue-600 dark:text-blue-405' : isPartnerOnline ? 'text-emerald-600 dark:text-emerald-450' : 'text-muted-foreground dark:text-muted-foreground'}`}>
                     {getStatusText()}
                   </p>
                 </div>
               </div>
             ) : (
               <div className="flex items-center gap-2.5">
-                <Avatar className="h-8 w-8 rounded-[2px] border border-slate-200/80 dark:border-white/[0.06]">
-                  <AvatarImage className="rounded-[2px] object-cover" src={imageUrl || undefined} />
-                  <AvatarFallback className="rounded-[2px] bg-slate-100 dark:bg-zinc-800 text-slate-655 dark:text-zinc-400 text-xs font-semibold">{chatName[0]}</AvatarFallback>
+                <Avatar className="h-8 w-8 rounded-md border border-border">
+                  <AvatarImage className="rounded-sm object-cover" src={imageUrl || undefined} />
+                  <AvatarFallback className="rounded-md bg-muted text-muted-foreground text-xs font-semibold">{chatName[0]}</AvatarFallback>
                 </Avatar>
                 <div className="text-left">
-                  <h3 className="font-bold text-slate-900 dark:text-slate-100 text-[14px] leading-tight">{chatName}</h3>
-                  <p className="text-[11px] text-slate-500 dark:text-zinc-500 mt-0.5">{getStatusText()}</p>
+                  <h3 className="font-bold text-foreground text-[14px] leading-tight">{chatName}</h3>
+                  <p className="text-[11px] text-muted-foreground dark:text-muted-foreground mt-0.5">{getStatusText()}</p>
                 </div>
               </div>
             )}
@@ -1026,15 +1032,15 @@ export const ModernChatArea: React.FC<{ chatId?: string }> = ({ chatId }) => {
                 onClick={() => {
                   window.dispatchEvent(new CustomEvent("call:rejoin", { detail: { ...activeCall, chatId } }));
                 }}
-                className="bg-emerald-600 hover:bg-emerald-700 text-white flex items-center gap-1.5 h-8 px-3 rounded-[2px] text-xs font-mono font-medium uppercase tracking-wider animate-pulse shadow-none transition-colors"
+                className="bg-emerald-600 hover:bg-emerald-700 text-white flex items-center gap-1.5 h-8 px-3 rounded-sm text-xs font-mono font-medium uppercase tracking-wider animate-pulse shadow-none transition-colors"
               >
                 <Phone size={13} fill="currentColor" /> Tham gia
               </Button>
             )}
             {isMember && (
               <>
-                <Button variant="ghost" size="icon" onClick={() => startCall(false)} className="h-8 w-8 rounded-[2px] text-slate-500 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-blue-450 hover:bg-slate-100 dark:hover:bg-white/[0.02] transition-colors" title="Bắt đầu cuộc gọi thoại"><Phone size={15} /></Button>
-                <Button variant="ghost" size="icon" onClick={() => startCall(true)} className="h-8 w-8 rounded-[2px] text-slate-500 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-blue-450 hover:bg-slate-100 dark:hover:bg-white/[0.02] transition-colors" title="Bắt đầu cuộc gọi video"><Video size={15} /></Button>
+                <Button variant="ghost" size="icon" onClick={() => startCall(false)} className="h-8 w-8 rounded-sm text-muted-foreground hover:text-blue-600 dark:hover:text-blue-450 hover:bg-muted dark:hover:bg-muted/10 transition-colors" title="Bắt đầu cuộc gọi thoại"><Phone size={15} /></Button>
+                <Button variant="ghost" size="icon" onClick={() => startCall(true)} className="h-8 w-8 rounded-sm text-muted-foreground hover:text-blue-600 dark:hover:text-blue-450 hover:bg-muted dark:hover:bg-muted/10 transition-colors" title="Bắt đầu cuộc gọi video"><Video size={15} /></Button>
               </>
             )}
             <Button 
@@ -1046,7 +1052,7 @@ export const ModernChatArea: React.FC<{ chatId?: string }> = ({ chatId }) => {
                 setShowInfoPanel(false);
                 setShowGroupSettings(false);
               }} 
-              className={`h-8 w-8 rounded-[2px] transition-colors ${showSearchPanel ? 'text-blue-600 bg-blue-50/55 dark:text-blue-400 dark:bg-blue-955/20' : 'text-slate-500 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-blue-450 hover:bg-slate-100 dark:hover:bg-white/[0.02]'}`}
+              className={`h-8 w-8 rounded-sm transition-colors ${showSearchPanel ? 'text-blue-600 bg-blue-50/55 dark:text-blue-400 dark:bg-blue-955/20' : 'text-muted-foreground hover:text-blue-600 dark:hover:text-blue-450 hover:bg-muted dark:hover:bg-muted/10'}`}
               title="Tìm kiếm tin nhắn"
             >
               <Search size={15} />
@@ -1060,12 +1066,12 @@ export const ModernChatArea: React.FC<{ chatId?: string }> = ({ chatId }) => {
                 setShowInfoPanel(false);
                 setShowGroupSettings(false);
               }} 
-              className={`h-8 w-8 rounded-[2px] transition-colors ${showPinnedPanel ? 'text-blue-600 bg-blue-50/55 dark:text-blue-400 dark:bg-blue-955/20' : 'text-slate-500 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-blue-455 hover:bg-slate-100 dark:hover:bg-white/[0.02]'}`}
+              className={`h-8 w-8 rounded-sm transition-colors ${showPinnedPanel ? 'text-blue-600 bg-blue-50/55 dark:text-blue-400 dark:bg-blue-955/20' : 'text-muted-foreground hover:text-blue-600 dark:hover:text-blue-455 hover:bg-muted dark:hover:bg-muted/10'}`}
               title="Tin nhắn đã ghim"
             >
               <Pin size={15} className={showPinnedPanel ? 'fill-current' : ''} />
             </Button>
-            <div className="h-4 w-[1px] bg-slate-200 dark:bg-white/[0.06] mx-1" />
+            <div className="h-4 w-[1px] bg-border mx-1" />
             <Button variant="ghost"
               size="icon"
               onClick={() => {
@@ -1078,7 +1084,7 @@ export const ModernChatArea: React.FC<{ chatId?: string }> = ({ chatId }) => {
                 }
               }}
               title={isChannel ? 'Thông tin kênh' : chat?.isGroup ? 'Cài đặt nhóm' : 'Thông tin cuộc trò chuyện'}
-              className="h-8 w-8 rounded-[2px] text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/[0.02] transition-colors">
+              className="h-8 w-8 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
               <Info size={15} />
             </Button>
           </div>
@@ -1087,12 +1093,12 @@ export const ModernChatArea: React.FC<{ chatId?: string }> = ({ chatId }) => {
         {/* Message Stream */}
         <div
           ref={chatContainerRef}
-          className="flex-1 overflow-y-auto px-4 py-2 custom-scrollbar bg-white dark:bg-[#111113] scroll-smooth"
+          className="flex-1 overflow-y-auto px-4 py-2 custom-scrollbar bg-background scroll-smooth"
           style={{ overflowAnchor: 'none' }}
         >
-          <div ref={messagesWrapperRef} className="flex flex-col min-h-full">
+          <div ref={messagesWrapperRef} className="flex flex-col min-h-full w-full max-w-[1200px] mx-auto">
             {isInitialLoad ? (
-              <div className="flex flex-col items-center justify-center py-20 text-slate-400">
+              <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
                 <Loader2 className="w-8 h-8 animate-spin mb-2 opacity-50" />
                 <p className="text-sm">Đang tải tin nhắn...</p>
               </div>
@@ -1107,10 +1113,10 @@ export const ModernChatArea: React.FC<{ chatId?: string }> = ({ chatId }) => {
 
                 {!hasMore && allMessages.length > 0 && (
                   <>
-                    <div className="text-center py-8 text-slate-300 dark:text-zinc-600 text-[10px] font-mono font-medium uppercase tracking-widest flex items-center justify-center gap-4">
-                      <div className="h-[1px] flex-1 bg-slate-50 dark:bg-white/[0.02]" />
+                    <div className="text-center py-8 text-muted-foreground dark:text-muted-foreground text-[10px] font-mono font-medium uppercase tracking-widest flex items-center justify-center gap-4">
+                      <div className="h-[1px] flex-1 bg-border/20" />
                       Bắt đầu cuộc hội thoại
-                      <div className="h-[1px] flex-1 bg-slate-50 dark:bg-white/[0.02]" />
+                      <div className="h-[1px] flex-1 bg-border/20" />
                     </div>
                     {!isDirectMessage && (channelData?.type === 'PUBLIC' || chat?.joinPolicy === 'PUBLIC') && (
                       <PublicChannelNotice />
@@ -1119,20 +1125,20 @@ export const ModernChatArea: React.FC<{ chatId?: string }> = ({ chatId }) => {
                 )}
 
                 {groupedMessages.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center text-slate-450 dark:text-zinc-650 py-20 font-mono">
+                  <div className="flex flex-col items-center justify-center text-slate-450 dark:text-muted-foreground py-20 font-mono">
                     <Sparkles className="w-8 h-8 mb-4 opacity-50 text-blue-500 animate-pulse" />
-                    <p className="text-xs uppercase tracking-wider text-slate-800 dark:text-slate-200">Chưa có tin nhắn nào</p>
-                    <p className="text-[10px] text-slate-400 dark:text-zinc-550 mt-1">Hãy bắt đầu cuộc trò chuyện!</p>
+                    <p className="text-xs uppercase tracking-wider text-foreground dark:text-foreground">Chưa có tin nhắn nào</p>
+                    <p className="text-[10px] text-muted-foreground mt-1">Hãy bắt đầu cuộc trò chuyện!</p>
                   </div>
                 ) : (
                   groupedMessages.map((group) => (
                     <div key={group.date} className="flex flex-col">
                       <div className="flex items-center justify-center gap-3 py-2 mt-4">
-                        <div className="h-[1px] flex-1 bg-slate-100 dark:bg-white/[0.02]" />
-                        <span className="text-[10px] font-bold text-slate-450 dark:text-zinc-550 uppercase tracking-widest bg-slate-50/50 dark:bg-zinc-950/20 px-2.5 py-0.5 rounded-[2px] border border-slate-200/80 dark:border-white/[0.04] font-mono">
+                        <div className="h-[1px] flex-1 bg-border/20" />
+                        <span className="text-[10px] font-bold text-slate-450 dark:text-zinc-550 uppercase tracking-widest bg-muted/50 dark:bg-muted/20 px-2.5 py-0.5 rounded-sm border border-border font-mono">
                           {group.date}
                         </span>
-                        <div className="h-[1px] flex-1 bg-slate-100 dark:bg-white/[0.02]" />
+                        <div className="h-[1px] flex-1 bg-border/20" />
                       </div>
 
                       {group.messages.map((msg, idx) => {
@@ -1206,11 +1212,11 @@ export const ModernChatArea: React.FC<{ chatId?: string }> = ({ chatId }) => {
 
             {/* Typing indicator */}
             {typingUsers.length > 0 && (
-              <div className="flex items-center gap-2 text-slate-400 dark:text-zinc-500 text-sm pl-2 mt-2">
+              <div className="flex items-center gap-2 text-muted-foreground text-sm pl-2 mt-2">
                 <div className="flex gap-1">
-                  <span className="w-1.5 h-1.5 bg-slate-400 dark:bg-zinc-650 rounded-[2px] animate-bounce" style={{ animationDelay: '0ms' }} />
-                  <span className="w-1.5 h-1.5 bg-slate-400 dark:bg-zinc-650 rounded-[2px] animate-bounce" style={{ animationDelay: '150ms' }} />
-                  <span className="w-1.5 h-1.5 bg-slate-400 dark:bg-zinc-650 rounded-[2px] animate-bounce" style={{ animationDelay: '300ms' }} />
+                  <span className="w-1.5 h-1.5 bg-muted-foreground rounded-sidebar-item animate-bounce" style={{ animationDelay: '0ms' }} />
+                  <span className="w-1.5 h-1.5 bg-muted-foreground rounded-sidebar-item animate-bounce" style={{ animationDelay: '150ms' }} />
+                  <span className="w-1.5 h-1.5 bg-muted-foreground rounded-sidebar-item animate-bounce" style={{ animationDelay: '300ms' }} />
                 </div>
                 <span className="text-[10px] font-mono">
                   {typingUsers.map(u => u.userName).join(', ')} đang gõ...
@@ -1223,14 +1229,14 @@ export const ModernChatArea: React.FC<{ chatId?: string }> = ({ chatId }) => {
         </div>
 
         {replyTo && (
-          <div className="px-6 py-2 bg-slate-50/50 dark:bg-[#19191B]/80 border-t border-slate-200/80 dark:border-white/[0.06] flex items-center justify-between gap-3">
+          <div className="px-6 py-2 bg-muted/50 border-t border-border flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-0 flex-1">
               <Reply className="h-3.5 w-3.5 text-blue-600 dark:text-blue-405 flex-shrink-0" />
               <div className="flex-1 min-w-0 border-l-2 border-blue-600 pl-2.5">
-                <p className="text-[11px] text-blue-600 dark:text-blue-400 font-mono font-bold uppercase tracking-wider">
+                <p className="text-[11px] text-primary font-mono font-bold uppercase tracking-wider">
                   {replyTo.isMe ? "Bạn" : replyTo.sender?.name}
                 </p>
-                <p className="text-xs text-slate-500 dark:text-zinc-400 truncate mt-0.5">
+                <p className="text-xs text-muted-foreground truncate mt-0.5">
                   {replyTo.content || `[${replyTo.type}]`}
                 </p>
               </div>
@@ -1238,7 +1244,7 @@ export const ModernChatArea: React.FC<{ chatId?: string }> = ({ chatId }) => {
             <Button
               variant="ghost"
               size="icon"
-              className="h-6 w-6 rounded-[2px] text-slate-400 dark:text-zinc-500 hover:text-slate-600 dark:hover:text-slate-255 hover:bg-slate-100 dark:hover:bg-white/[0.02] transition-colors"
+              className="h-6 w-6 rounded-sm text-muted-foreground hover:text-muted-foreground dark:hover:text-slate-255 hover:bg-muted dark:hover:bg-muted/10 transition-colors"
               onClick={() => setReplyTo(null)}
             >
               <X className="h-3.5 w-3.5" />
@@ -1248,18 +1254,18 @@ export const ModernChatArea: React.FC<{ chatId?: string }> = ({ chatId }) => {
 
         {/* File Preview */}
         {selectedFiles.length > 0 && (
-          <div className="px-6 py-2 bg-slate-50 dark:bg-[#19191B]/80 border-t border-slate-200/80 dark:border-white/[0.06]">
-            <div className="flex items-center gap-3 p-2 bg-white dark:bg-[#111113] border border-slate-200 dark:border-white/[0.06] rounded-[2px] shadow-none">
+          <div className="px-6 py-2 bg-muted/50 border-t border-border">
+            <div className="flex items-center gap-3 p-2 bg-background border border-border rounded-sm shadow-none">
               {filePreview ? (
-                <img src={filePreview} alt="Preview" className="w-12 h-12 object-cover rounded-[2px] border border-slate-100/50 dark:border-white/[0.04]" />
+                <img src={filePreview} alt="Preview" className="w-12 h-12 object-cover rounded-sm border border-border/50 dark:border-white/[0.04]" />
               ) : (
-                <div className="w-12 h-12 bg-slate-50 dark:bg-zinc-900/60 rounded-[2px] flex items-center justify-center border border-slate-200/80 dark:border-white/[0.06]">
-                  <File className="h-6 w-6 text-slate-400 dark:text-zinc-555" />
+                <div className="w-12 h-12 bg-muted rounded-md flex items-center justify-center border border-border">
+                  <File className="h-6 w-6 text-muted-foreground dark:text-zinc-555" />
                 </div>
               )}
               <div className="flex-1 min-w-0 text-left">
-                <p className="text-xs font-semibold font-mono text-slate-800 dark:text-slate-200 truncate">{selectedFiles[0].name}</p>
-                <p className="text-[10px] text-slate-400 dark:text-zinc-550 font-mono mt-0.5">
+                <p className="text-xs font-semibold font-mono text-foreground dark:text-foreground truncate">{selectedFiles[0].name}</p>
+                <p className="text-[10px] text-muted-foreground font-mono mt-0.5">
                   {(selectedFiles[0].size / 1024 / 1024).toFixed(2)} MB
                 </p>
               </div>
@@ -1268,14 +1274,14 @@ export const ModernChatArea: React.FC<{ chatId?: string }> = ({ chatId }) => {
                 size="icon"
                 onClick={clearSelectedFiles}
                 disabled={isUploading}
-                className="h-8 w-8 rounded-[2px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/[0.02]"
+                className="h-8 w-8 rounded-md text-muted-foreground hover:bg-muted"
               >
                 <X className="h-4 w-4" />
               </Button>
               <Button
                 onClick={handleSendFile}
                 disabled={isUploading}
-                className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 text-white rounded-[2px] h-8 px-3 text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-none transition-colors"
+                className="bg-primary hover:bg-primary/90 text-white rounded-md h-8 px-3 text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-none transition-colors"
               >
                 {isUploading ? (
                   <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -1293,38 +1299,39 @@ export const ModernChatArea: React.FC<{ chatId?: string }> = ({ chatId }) => {
         <ObserverIndicator observers={observers} />
 
         {/* Rich Text Composer */}
-        <div className="px-6 py-4 border-t border-slate-200/80 dark:border-white/[0.06] bg-white dark:bg-[#111113]">
+        <div className="px-6 py-4 border-t border-border bg-background">
+          <div className="w-full max-w-[1200px] mx-auto">
           {chat?.isBlocked ? (
-            <div className="bg-slate-50 dark:bg-[#19191B]/50 border border-slate-200/80 dark:border-white/[0.06] rounded-[2px] p-6 text-center">
-              <Ban className="w-8 h-8 mx-auto mb-2 text-slate-350 dark:text-zinc-700" />
-              <p className="text-xs font-mono font-semibold text-slate-500 dark:text-zinc-400">
+            <div className="bg-muted border border-border rounded-md p-6 text-center">
+              <Ban className="w-8 h-8 mx-auto mb-2 text-slate-350 dark:text-muted-foreground" />
+              <p className="text-xs font-mono font-semibold text-muted-foreground">
                 {chat.isBlockedByMe
                   ? "Bạn đã chặn người dùng này. Bỏ chặn để gửi tin nhắn."
                   : "Bạn không thể gửi tin nhắn cho người này vì trạng thái chặn."}
               </p>
             </div>
           ) : !isMember ? (
-            <div className="bg-slate-50 dark:bg-[#19191B]/50 border border-slate-200/80 dark:border-white/[0.06] rounded-[2px] p-4 flex flex-col items-center justify-center gap-1.5 text-center animate-in fade-in slide-in-from-bottom-2 duration-300">
-              <div className="h-8 w-8 rounded-[2px] bg-slate-100 dark:bg-zinc-800 border border-slate-200/60 dark:border-white/[0.04] flex items-center justify-center text-slate-500 dark:text-zinc-400">
+            <div className="bg-muted border border-border rounded-md p-4 flex flex-col items-center justify-center gap-1.5 text-center animate-in fade-in slide-in-from-bottom-2 duration-300">
+              <div className="h-8 w-8 rounded-md bg-muted border border-border flex items-center justify-center text-muted-foreground">
                 <Ban size={15} className="text-red-500" />
               </div>
               <div>
-                <p className="text-xs font-mono font-bold text-slate-800 dark:text-slate-200">Bạn không còn là thành viên của nhóm này</p>
-                <p className="text-[11px] text-slate-500 dark:text-zinc-400 mt-0.5">Không thể gửi tin nhắn hoặc tương tác trong cuộc trò chuyện này.</p>
+                <p className="text-xs font-mono font-bold text-foreground dark:text-foreground">Bạn không còn là thành viên của nhóm này</p>
+                <p className="text-[11px] text-muted-foreground mt-0.5">Không thể gửi tin nhắn hoặc tương tác trong cuộc trò chuyện này.</p>
               </div>
             </div>
           ) : !canPost ? (
-            <div className="bg-slate-50 dark:bg-[#19191B]/50 border border-slate-200/80 dark:border-white/[0.06] rounded-[2px] p-4 flex flex-col items-center justify-center gap-1.5 text-center animate-in fade-in slide-in-from-bottom-2 duration-300">
-              <div className="h-8 w-8 rounded-[2px] bg-slate-100 dark:bg-zinc-800 border border-slate-200/60 dark:border-white/[0.04] flex items-center justify-center text-slate-500 dark:text-zinc-400">
+            <div className="bg-muted border border-border rounded-md p-4 flex flex-col items-center justify-center gap-1.5 text-center animate-in fade-in slide-in-from-bottom-2 duration-300">
+              <div className="h-8 w-8 rounded-md bg-muted border border-border flex items-center justify-center text-muted-foreground">
                 <Lock size={15} />
               </div>
               <div>
-                <p className="text-xs font-mono font-bold text-slate-800 dark:text-slate-200">Kênh này đang ở chế độ chỉ đọc</p>
-                <p className="text-[11px] text-slate-500 dark:text-zinc-400 mt-0.5">Chỉ quản trị viên mới có thể gửi tin nhắn trong cuộc hội thoại này.</p>
+                <p className="text-xs font-mono font-bold text-foreground dark:text-foreground">Kênh này đang ở chế độ chỉ đọc</p>
+                <p className="text-[11px] text-muted-foreground mt-0.5">Chỉ quản trị viên mới có thể gửi tin nhắn trong cuộc hội thoại này.</p>
               </div>
             </div>
           ) : (
-            <div className="bg-slate-50/30 dark:bg-[#19191B]/40 border border-slate-200/80 dark:border-white/[0.06] focus-within:border-blue-500 dark:focus-within:border-blue-650 rounded-[2px] flex flex-col shadow-none transition-colors duration-150">
+            <div className="bg-muted/30 border border-border focus-within:border-primary rounded-md flex flex-col shadow-none transition-colors duration-150">
               {/* Input Area */}
               <div className="px-3 pt-2 pb-1.5 min-h-[44px] relative text-left">
                 <textarea
@@ -1333,7 +1340,7 @@ export const ModernChatArea: React.FC<{ chatId?: string }> = ({ chatId }) => {
                   onChange={handleInputChange}
                   onKeyDown={handleKeyDown}
                   placeholder={`Nhắn cho ${chatName}...`}
-                  className="w-full resize-none border-0 focus:ring-0 text-[14px] text-slate-850 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-zinc-550 outline-none bg-transparent py-1"
+                  className="w-full resize-none border-0 focus:ring-0 text-[14px] text-slate-850 dark:text-foreground placeholder:text-muted-foreground dark:placeholder:text-zinc-550 outline-none bg-transparent py-1"
                   rows={1}
                   style={{ minHeight: '24px', maxHeight: '200px' }}
                 />
@@ -1350,13 +1357,13 @@ export const ModernChatArea: React.FC<{ chatId?: string }> = ({ chatId }) => {
               </div>
 
               {/* Bottom Toolbar */}
-              <div className="bg-slate-50/40 dark:bg-[#19191B]/50 border-t border-slate-200/40 dark:border-white/[0.04] px-3 py-1.5 flex items-center justify-between">
+              <div className="bg-muted/50 border-t border-border px-3 py-1.5 flex items-center justify-between">
                 <div className="flex items-center gap-0.5">
                   <div className="relative">
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-7 w-7 text-slate-500 dark:text-zinc-400 hover:text-slate-850 dark:hover:text-slate-255 hover:bg-slate-200/60 dark:hover:bg-white/[0.04] rounded-[2px] transition-colors"
+                      className="h-7 w-7 text-muted-foreground hover:text-slate-850 dark:hover:text-slate-255 hover:bg-muted/60 dark:hover:bg-muted/20 rounded-sm transition-colors"
                       onClick={() => setShowEmojiPicker(!showEmojiPicker)}
                     >
                       <Smile size={15} />
@@ -1386,7 +1393,7 @@ export const ModernChatArea: React.FC<{ chatId?: string }> = ({ chatId }) => {
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-7 w-7 text-slate-500 dark:text-zinc-400 hover:text-slate-850 dark:hover:text-slate-255 hover:bg-slate-200/60 dark:hover:bg-white/[0.04] rounded-[2px] transition-colors"
+                    className="h-7 w-7 text-muted-foreground hover:text-slate-850 dark:hover:text-slate-255 hover:bg-muted/60 dark:hover:bg-muted/20 rounded-sm transition-colors"
                     onClick={() => imageInputRef.current?.click()}
                     title="Gửi ảnh"
                   >
@@ -1396,7 +1403,7 @@ export const ModernChatArea: React.FC<{ chatId?: string }> = ({ chatId }) => {
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-7 w-7 text-slate-500 dark:text-zinc-400 hover:text-slate-850 dark:hover:text-slate-255 hover:bg-slate-200/60 dark:hover:bg-white/[0.04] rounded-[2px] transition-colors"
+                    className="h-7 w-7 text-muted-foreground hover:text-slate-850 dark:hover:text-slate-255 hover:bg-muted/60 dark:hover:bg-muted/20 rounded-sm transition-colors"
                     onClick={() => fileInputRef.current?.click()}
                     title="Gửi file"
                   >
@@ -1407,7 +1414,7 @@ export const ModernChatArea: React.FC<{ chatId?: string }> = ({ chatId }) => {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-7 w-7 text-slate-500 dark:text-zinc-400 hover:text-slate-850 dark:hover:text-slate-255 hover:bg-slate-200/60 dark:hover:bg-white/[0.04] rounded-[2px] transition-colors"
+                      className="h-7 w-7 text-muted-foreground hover:text-slate-850 dark:hover:text-slate-255 hover:bg-muted/60 dark:hover:bg-muted/20 rounded-sm transition-colors"
                       onClick={() => setShowCreatePollModal(true)}
                       title="Tạo bình chọn"
                     >
@@ -1415,13 +1422,13 @@ export const ModernChatArea: React.FC<{ chatId?: string }> = ({ chatId }) => {
                     </Button>
                   )}
 
-                  <div className="h-4 w-[1px] bg-slate-200/80 dark:bg-white/[0.06] mx-2" />
+                  <div className="h-4 w-[1px] bg-border mx-2" />
 
                   <button
                     onClick={() => openAIPanel()}
-                    className={`flex items-center gap-1 px-2.5 py-1 text-[11px] font-semibold rounded-[2px] border transition-all font-mono uppercase tracking-wider ${
+                    className={`flex items-center gap-1 px-2.5 py-1 text-[11px] font-semibold rounded-sm border transition-all font-mono uppercase tracking-wider ${
                       showAIPanel
-                        ? 'bg-blue-600 text-white border-blue-600 dark:bg-blue-700 dark:border-blue-700'
+                        ? 'bg-primary text-white border-blue-600 dark:bg-primary/90 dark:border-blue-700'
                         : 'bg-blue-50/30 text-blue-600 dark:text-blue-450 border-blue-200/40 dark:border-blue-900/30 hover:bg-blue-100/30 dark:hover:bg-blue-955/20'
                     }`}
                   >
@@ -1431,13 +1438,13 @@ export const ModernChatArea: React.FC<{ chatId?: string }> = ({ chatId }) => {
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <span className="text-[10px] text-slate-400 dark:text-zinc-550 font-mono font-medium tracking-wide hidden sm:block">
+                  <span className="text-[10px] text-muted-foreground font-mono font-medium tracking-wide hidden sm:block">
                     Nhấn Enter để gửi
                   </span>
                   <button
                     onClick={handleSend}
                     disabled={!inputText.trim() || sending}
-                    className="h-7 w-7 flex items-center justify-center bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 disabled:bg-slate-100 dark:disabled:bg-zinc-800 disabled:text-slate-400 dark:disabled:text-zinc-650 text-white rounded-[2px] transition-all shadow-none"
+                    className="h-7 w-7 flex items-center justify-center bg-primary hover:bg-primary/90 dark:bg-primary/90 dark:hover:bg-primary disabled:bg-muted dark:disabled:bg-muted disabled:text-muted-foreground dark:disabled:text-muted-foreground text-white rounded-sm transition-all shadow-none"
                   >
                     <Send size={13} />
                   </button>
@@ -1445,8 +1452,9 @@ export const ModernChatArea: React.FC<{ chatId?: string }> = ({ chatId }) => {
               </div>
             </div>
           )}
-          <div className="py-2 text-center text-[9px] text-slate-400/80 dark:text-zinc-600 font-mono font-medium tracking-wider select-none bg-white dark:bg-[#111113] border-t border-slate-100/50 dark:border-white/[0.02]">
+          <div className="py-2 text-center text-[9px] text-muted-foreground/80 dark:text-muted-foreground font-mono font-medium tracking-wider select-none bg-background border-t border-border/50 dark:border-white/[0.02]">
             NEXUS Enterprise Collaboration Chat • Secure & Encrypted
+          </div>
           </div>
         </div>
       </div>

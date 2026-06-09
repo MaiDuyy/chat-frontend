@@ -46,7 +46,7 @@ const RESULT_TYPE_COLORS: Record<string, string> = {
     user: 'bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400',
     channel: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400',
     workspace: 'bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400',
-    action: 'bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300',
+    action: 'bg-zinc-100 text-muted-foreground dark:bg-muted dark:text-muted-foreground',
 }
 
 const QUICK_ACTIONS = [
@@ -153,7 +153,7 @@ export function GlobalSearch({ className }: { className?: string }) {
             <Button
                 variant="outline"
                 className={cn(
-                    "relative w-full md:w-56 lg:w-64 h-8 justify-start text-xs text-muted-foreground bg-slate-100/60 dark:bg-zinc-900/60 border border-border/40 shadow-none hover:bg-slate-100 dark:hover:bg-zinc-800/80 hover:text-foreground rounded-md",
+                    "relative w-full md:w-56 lg:w-64 h-8 justify-start text-xs text-muted-foreground bg-muted/60 dark:bg-muted/60 border border-border/40 shadow-none hover:bg-muted dark:hover:bg-muted/80 hover:text-foreground rounded-md",
                     className
                 )}
                 onClick={() => setOpen(true)}
@@ -166,7 +166,7 @@ export function GlobalSearch({ className }: { className?: string }) {
             </Button>
 
             <Dialog open={open} onOpenChange={setOpen}>
-                <DialogContent className="p-0 max-w-md overflow-hidden border border-border/60 bg-popover text-popover-foreground shadow-[1.5px_1.5px_0px_0px_rgba(0,0,0,1)] dark:shadow-[1.5px_1.5px_0px_0px_rgba(255,255,255,0.15)] rounded-lg">
+                <DialogContent className="p-0 max-w-md overflow-hidden border border-border/60 bg-popover text-popover-foreground shadow-[1.5px_1.5px_0px_0px_rgba(0,0,0,1)] dark:shadow-[1.5px_1.5px_0px_0px_rgba(255,255,255,0.15)] rounded-md">
                     <div className="flex items-center border-b border-border/60 px-3 h-10 bg-secondary/20">
                         <Search className="w-4 h-4 mr-2 text-muted-foreground" />
                         <Input

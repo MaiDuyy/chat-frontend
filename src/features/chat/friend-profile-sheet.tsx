@@ -225,7 +225,7 @@ export default function FriendProfileSheet({
                                 </AvatarFallback>
                             </Avatar>
                             {/* Online status */}
-                            <span className={`absolute bottom-2 right-2 w-5 h-5 rounded-full border-3 border-white dark:border-gray-800 ${isOnline ? "bg-green-500" : "bg-gray-400"
+                            <span className={`absolute bottom-2 right-2 w-5 h-5 rounded-full border-3 border-white dark:border-border ${isOnline ? "bg-green-500" : "bg-gray-400"
                                 }`} />
                         </div>
 
@@ -242,7 +242,7 @@ export default function FriendProfileSheet({
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="w-48">
                                 {/* Category selection */}
-                                {/* <DropdownMenuItem className="font-medium text-gray-500" disabled>
+                                {/* <DropdownMenuItem className="font-medium text-muted-foreground" disabled>
                                     <Tag className="h-4 w-4 mr-2" />
                                     Phân loại
                                 </DropdownMenuItem>
@@ -250,7 +250,7 @@ export default function FriendProfileSheet({
                                     <DropdownMenuItem
                                         key={cat.id}
                                         onClick={() => handleCategoryChange(cat.id)}
-                                        className={selectedCategory === cat.id ? "bg-gray-100 dark:bg-gray-700" : ""}
+                                        className={selectedCategory === cat.id ? "bg-muted dark:bg-muted" : ""}
                                     >
                                         <cat.icon className={`h-4 w-4 mr-2 ${cat.color.split(" ")[0]}`} />
                                         {cat.label}
@@ -307,7 +307,7 @@ export default function FriendProfileSheet({
                         {/* Name and status */}
                         <div>
                             <h2 className="text-2xl font-bold">{friend.name}</h2>
-                            <p className={`text-sm ${isOnline ? "text-green-500" : "text-gray-500"}`}>
+                            <p className={`text-sm ${isOnline ? "text-green-500" : "text-muted-foreground"}`}>
                                 {isOnline ? "Đang hoạt động" : friend.lastSeen ?
                                     `Hoạt động ${format(new Date(friend.lastSeen), "dd/MM 'lúc' HH:mm", { locale: vi })}` :
                                     "Offline"
@@ -351,8 +351,8 @@ export default function FriendProfileSheet({
 
                         {/* Bio */}
                         {friend.status && (
-                            <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                                <p className="text-sm text-gray-600 dark:text-gray-300 italic">
+                            <div className="p-4 bg-muted dark:bg-gray-800 rounded-md">
+                                <p className="text-sm text-muted-foreground italic">
                                     "{friend.status}"
                                 </p>
                             </div>
@@ -368,28 +368,28 @@ export default function FriendProfileSheet({
                             <div className="space-y-3">
                                 {friend.email && (
                                     <div className="flex items-center gap-3 text-sm">
-                                        <Mail className="h-4 w-4 text-gray-400" />
-                                        <span className="text-gray-600 dark:text-gray-300">{friend.email}</span>
+                                        <Mail className="h-4 w-4 text-muted-foreground" />
+                                        <span className="text-muted-foreground">{friend.email}</span>
                                     </div>
                                 )}
                                 {friend.number && (
                                     <div className="flex items-center gap-3 text-sm">
-                                        <Phone className="h-4 w-4 text-gray-400" />
-                                        <span className="text-gray-600 dark:text-gray-300">{friend.number}</span>
+                                        <Phone className="h-4 w-4 text-muted-foreground" />
+                                        <span className="text-muted-foreground">{friend.number}</span>
                                     </div>
                                 )}
                                 {friend.birthDate && (
                                     <div className="flex items-center gap-3 text-sm">
-                                        <Calendar className="h-4 w-4 text-gray-400" />
-                                        <span className="text-gray-600 dark:text-gray-300">
+                                        <Calendar className="h-4 w-4 text-muted-foreground" />
+                                        <span className="text-muted-foreground">
                                             {format(new Date(friend.birthDate), "dd 'tháng' MM, yyyy", { locale: vi })}
                                         </span>
                                     </div>
                                 )}
                                 {friend.location   && (
                                     <div className="flex items-center gap-3 text-sm">
-                                        <MapPin className="h-4 w-4 text-gray-400" />
-                                        <span className="text-gray-600 dark:text-gray-300">{friend.location}</span>
+                                        <MapPin className="h-4 w-4 text-muted-foreground" />
+                                        <span className="text-muted-foreground">{friend.location}</span>
                                     </div>
                                 )}
                             </div>

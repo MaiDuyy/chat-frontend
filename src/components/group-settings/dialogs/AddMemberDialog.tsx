@@ -51,21 +51,21 @@ export function AddMemberDialog({
                 </DialogHeader>
                 <div className="space-y-3 py-3">
                     <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
                         <Input
                             placeholder="Tìm theo tên hoặc email..."
                             value={directorySearch}
                             onChange={(e) => setDirectorySearch(e.target.value)}
-                            className="pl-9 h-9 text-sm rounded-lg"
+                            className="pl-9 h-9 text-sm rounded-md"
                         />
                     </div>
-                    <ScrollArea className="h-60 border border-slate-100 rounded-xl p-2">
+                    <ScrollArea className="h-60 border border-border rounded-lg p-2">
                         {directoryLoading ? (
                             <div className="flex justify-center py-8">
                                 <Loader2 className="h-5 w-5 animate-spin text-blue-500" />
                             </div>
                         ) : availableDirectoryUsers.length === 0 ? (
-                            <p className="text-center py-8 text-xs text-slate-400">
+                            <p className="text-center py-8 text-xs text-muted-foreground">
                                 {directorySearch.length < 2
                                     ? "Nhập ít nhất 2 ký tự để tìm kiếm"
                                     : "Không tìm thấy kết quả"}
@@ -76,8 +76,8 @@ export function AddMemberDialog({
                                     <div
                                         key={u.id}
                                         className={cn(
-                                            "flex items-center justify-between p-2.5 rounded-lg cursor-pointer transition-all",
-                                            selectedFriends.includes(u.id) ? "bg-blue-50" : "hover:bg-slate-50"
+                                            "flex items-center justify-between p-2.5 rounded-md cursor-pointer transition-all",
+                                            selectedFriends.includes(u.id) ? "bg-blue-50" : "hover:bg-muted"
                                         )}
                                         onClick={() =>
                                             setSelectedFriends(
@@ -88,15 +88,15 @@ export function AddMemberDialog({
                                         }
                                     >
                                         <div className="flex items-center gap-2.5">
-                                            <Avatar className="h-8 w-8 rounded-lg">
+                                            <Avatar className="h-8 w-8 rounded-md">
                                                 <AvatarImage src={getAvatarUrl(u.avatar || "", u.name)} />
-                                                <AvatarFallback className={cn("rounded-lg text-xs font-semibold", avatarColor(u.name))}>
+                                                <AvatarFallback className={cn("rounded-md text-xs font-semibold", avatarColor(u.name))}>
                                                     {getInitials(u.name)}
                                                 </AvatarFallback>
                                             </Avatar>
                                             <div>
-                                                <p className="text-[13px] font-medium text-slate-800">{u.name}</p>
-                                                {u.email && <p className="text-[11px] text-slate-400">{u.email}</p>}
+                                                <p className="text-[13px] font-medium text-foreground">{u.name}</p>
+                                                {u.email && <p className="text-[11px] text-muted-foreground">{u.email}</p>}
                                             </div>
                                         </div>
                                         <Checkbox checked={selectedFriends.includes(u.id)} className="rounded" />
@@ -112,7 +112,7 @@ export function AddMemberDialog({
                     </Button>
                     <Button
                         size="sm"
-                        className="bg-blue-600 hover:bg-blue-700"
+                        className="bg-primary hover:bg-primary/90"
                         onClick={onAddMembers}
                         disabled={isAddingMembers || selectedFriends.length === 0}
                     >

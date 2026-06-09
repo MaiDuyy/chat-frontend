@@ -222,14 +222,14 @@ export default function WikiReviewConsole({ isEmbedded = false }: { isEmbedded?:
 
   if (!canManageWiki) {
     return (
-      <div className="font-sans max-w-xl mx-auto p-6 border border-border bg-card text-center rounded-xl shadow-md my-16 flex flex-col items-center gap-3">
+      <div className="font-sans max-w-xl mx-auto p-6 border border-border bg-card text-center rounded-lg shadow-md my-16 flex flex-col items-center gap-3">
         <h2 className="text-sm font-black uppercase text-rose-600">403 - KHÔNG CÓ QUYỀN TRUY CẬP</h2>
         <p className="text-xs text-muted-foreground leading-relaxed">
           Tài khoản của bạn không có quyền kiểm duyệt hay duyệt bản thảo. Giao diện này chỉ dành riêng cho Quản trị viên và Quản lý Workspace.
         </p>
         <Link
           href="/wiki"
-          className="px-4 py-2 text-xs font-mono font-bold uppercase tracking-wide border border-transparent bg-primary hover:bg-primary/90 text-primary-foreground transition-all rounded-lg shadow-sm active:translate-y-[0.5px] cursor-pointer font-semibold"
+          className="px-4 py-2 text-xs font-mono font-bold uppercase tracking-wide border border-transparent bg-primary hover:bg-primary/90 text-primary-foreground transition-all rounded-md shadow-sm active:translate-y-[0.5px] cursor-pointer font-semibold"
         >
           Quay lại Dashboard Wiki
         </Link>
@@ -246,7 +246,7 @@ export default function WikiReviewConsole({ isEmbedded = false }: { isEmbedded?:
           <div className="flex items-center gap-2">
             <Link
               href="/wiki"
-              className="p-1.5 border border-border bg-secondary hover:bg-secondary/80 text-secondary-foreground transition-colors rounded-lg shadow-sm active:scale-[0.98]"
+              className="p-1.5 border border-border bg-secondary hover:bg-secondary/80 text-secondary-foreground transition-colors rounded-md shadow-sm active:scale-[0.98]"
               title="Quay lại"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
@@ -263,7 +263,7 @@ export default function WikiReviewConsole({ isEmbedded = false }: { isEmbedded?:
           </div>
 
           {/* Global info */}
-          <div className="flex items-center gap-1.5 font-mono text-[10px] text-muted-foreground bg-muted p-1 border border-border rounded-lg">
+          <div className="flex items-center gap-1.5 font-mono text-[10px] text-muted-foreground bg-muted p-1 border border-border rounded-md">
             <span>Phím tắt:</span>
             <span className="bg-background px-1.5 py-0.5 rounded border border-border text-foreground font-semibold">[A] Duyệt</span>
             <span className="bg-background px-1.5 py-0.5 rounded border border-border text-foreground font-semibold">[C] Yêu cầu</span>
@@ -275,7 +275,7 @@ export default function WikiReviewConsole({ isEmbedded = false }: { isEmbedded?:
 
       {message && (
         <div
-          className={`border p-3 text-xs rounded-xl shadow-md ${
+          className={`border p-3 text-xs rounded-lg shadow-md ${
             message.type === "success"
               ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-800 dark:text-emerald-400"
               : "bg-rose-500/10 border-rose-500/30 text-rose-800 dark:text-rose-400"
@@ -289,7 +289,7 @@ export default function WikiReviewConsole({ isEmbedded = false }: { isEmbedded?:
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 items-start">
         
         {/* Left Column: Draft Picker list (3 cols) */}
-        <div className="lg:col-span-3 flex flex-col gap-2.5 border border-border bg-card p-3 rounded-xl shadow-md">
+        <div className="lg:col-span-3 flex flex-col gap-2.5 border border-border bg-card p-3 rounded-lg shadow-md">
           <div className="border-b pb-1.5 flex items-center justify-between">
             <span className="font-mono text-[10px] uppercase font-extrabold text-foreground tracking-wide">
               BẢN THẢO CHỜ DUYỆT
@@ -302,7 +302,7 @@ export default function WikiReviewConsole({ isEmbedded = false }: { isEmbedded?:
           {isDraftsLoading ? (
             <div className="py-8 text-center text-[10px] font-mono text-muted-foreground">Đang tải bản thảo...</div>
           ) : !drafts || drafts.length === 0 ? (
-            <div className="py-6 text-center flex flex-col items-center justify-center gap-1 border border-dashed border-border rounded-xl bg-muted/5">
+            <div className="py-6 text-center flex flex-col items-center justify-center gap-1 border border-dashed border-border rounded-lg bg-muted/5">
               <Clock className="w-4 h-4 text-muted-foreground/60" />
               <p className="text-[10px] font-bold text-foreground">Sạch bóng bản thảo</p>
               <p className="text-[8.5px] text-muted-foreground">Tất cả tài liệu đã được duyệt.</p>
@@ -321,7 +321,7 @@ export default function WikiReviewConsole({ isEmbedded = false }: { isEmbedded?:
                         setSelectedDraftId(d.id);
                         setMessage(null);
                       }}
-                      className={`w-full text-left p-2.5 border transition-all rounded-lg flex flex-col gap-1.5 ${
+                      className={`w-full text-left p-2.5 border transition-all rounded-md flex flex-col gap-1.5 ${
                         selectedDraftId === d.id
                           ? "border-primary bg-primary/5 shadow-sm"
                           : "border-border bg-background hover:bg-muted/50"
@@ -376,7 +376,7 @@ export default function WikiReviewConsole({ isEmbedded = false }: { isEmbedded?:
             <div className="grid grid-cols-1 xl:grid-cols-12 gap-3 items-start">
               
               {/* Diff Viewer Workspace (8 cols) */}
-              <div className="xl:col-span-8 flex flex-col gap-3 border border-border bg-card p-4 rounded-xl shadow-md">
+              <div className="xl:col-span-8 flex flex-col gap-3 border border-border bg-card p-4 rounded-lg shadow-md">
                 <div className="flex items-center justify-between border-b border-border pb-1.5 select-none">
                   <div>
                     <span className="font-mono text-[8px] uppercase font-bold text-muted-foreground">Khung so sánh phiên bản (Diff View)</span>
@@ -385,7 +385,7 @@ export default function WikiReviewConsole({ isEmbedded = false }: { isEmbedded?:
                     </h2>
                   </div>
 
-                  <div className="flex items-center border border-border bg-muted p-0.5 rounded-lg font-mono text-[9px] font-semibold">
+                  <div className="flex items-center border border-border bg-muted p-0.5 rounded-md font-mono text-[9px] font-semibold">
                     <button
                       onClick={() => setDiffMode("unified")}
                       className={`px-2 py-0.75 rounded-md transition-all flex items-center gap-1 ${
@@ -407,12 +407,12 @@ export default function WikiReviewConsole({ isEmbedded = false }: { isEmbedded?:
                   </div>
                 </div>
 
-                <div className="max-h-[520px] overflow-y-auto p-2 bg-muted/10 border border-border rounded-lg">
+                <div className="max-h-[520px] overflow-y-auto p-2 bg-muted/10 border border-border rounded-md">
                   <WikiDraftDiff oldText={oldText} newText={newText} mode={diffMode} />
                 </div>
 
                 {activeDraft.note && (
-                  <div className="border border-border p-2.5 bg-muted/30 rounded-lg text-[10.5px] font-sans text-foreground/90">
+                  <div className="border border-border p-2.5 bg-muted/30 rounded-md text-[10.5px] font-sans text-foreground/90">
                     <span className="font-bold text-foreground">Ghi chú của Tác giả:</span> &quot;{activeDraft.note}&quot;
                   </div>
                 )}
@@ -430,7 +430,7 @@ export default function WikiReviewConsole({ isEmbedded = false }: { isEmbedded?:
                 />
 
                 {/* Reviewer Note & Buttons */}
-                <div className="border border-border bg-card p-3 rounded-xl shadow-md flex flex-col gap-2.5">
+                <div className="border border-border bg-card p-3 rounded-lg shadow-md flex flex-col gap-2.5">
                   <div className="border-b border-border pb-1.5">
                     <span className="font-mono text-[9px] uppercase font-extrabold text-foreground">
                       ĐIỀU PHỐI ĐỀ XUẤT (ACTIONS)
@@ -451,7 +451,7 @@ export default function WikiReviewConsole({ isEmbedded = false }: { isEmbedded?:
                       onBlur={() => {
                         if (!reviewerNote.trim()) setIsNoteExpanded(false);
                       }}
-                      className="w-full border border-border bg-background rounded-lg p-2 text-xs font-sans focus:outline-none focus:ring-0 focus:border-primary"
+                      className="w-full border border-border bg-background rounded-md p-2 text-xs font-sans focus:outline-none focus:ring-0 focus:border-primary"
                     />
                   </div>
 
@@ -459,21 +459,21 @@ export default function WikiReviewConsole({ isEmbedded = false }: { isEmbedded?:
                     <button
                       onClick={handleApprove}
                       disabled={isApproving || isRejecting || isRequesting}
-                      className="w-full py-1.5 bg-emerald-600 hover:bg-emerald-600/90 text-white transition-colors rounded-lg shadow-sm active:scale-[0.98] disabled:opacity-50 uppercase font-medium"
+                      className="w-full py-1.5 bg-emerald-600 hover:bg-emerald-600/90 text-white transition-colors rounded-md shadow-sm active:scale-[0.98] disabled:opacity-50 uppercase font-medium"
                     >
                       Duyệt & Xuất bản (A)
                     </button>
                     <button
                       onClick={handleRequestChanges}
                       disabled={isApproving || isRejecting || isRequesting}
-                      className="w-full py-1.5 bg-amber-500 hover:bg-amber-500/90 text-white transition-colors rounded-lg shadow-sm active:scale-[0.98] disabled:opacity-50 uppercase font-medium"
+                      className="w-full py-1.5 bg-amber-500 hover:bg-amber-500/90 text-white transition-colors rounded-md shadow-sm active:scale-[0.98] disabled:opacity-50 uppercase font-medium"
                     >
                       Yêu cầu sửa đổi (C)
                     </button>
                     <button
                       onClick={handleReject}
                       disabled={isApproving || isRejecting || isRequesting}
-                      className="w-full py-1.5 bg-rose-600 hover:bg-rose-600/90 text-white transition-colors rounded-lg shadow-sm active:scale-[0.98] disabled:opacity-50 uppercase font-medium"
+                      className="w-full py-1.5 bg-rose-600 hover:bg-rose-600/90 text-white transition-colors rounded-md shadow-sm active:scale-[0.98] disabled:opacity-50 uppercase font-medium"
                     >
                       Từ chối bản thảo (R)
                     </button>
@@ -484,7 +484,7 @@ export default function WikiReviewConsole({ isEmbedded = false }: { isEmbedded?:
 
             </div>
           ) : (
-            <div className="border border-dashed border-border p-8 rounded-xl text-center flex flex-col items-center justify-center min-h-[300px] bg-muted/5">
+            <div className="border border-dashed border-border p-8 rounded-lg text-center flex flex-col items-center justify-center min-h-[300px] bg-muted/5">
               <Sparkles className="w-8 h-8 text-primary/70 mb-2 shrink-0 animate-bounce" />
               <h2 className="text-xs font-semibold uppercase text-foreground">Không có bản thảo nào đang được chọn</h2>
               <p className="text-[10px] text-muted-foreground mt-1 max-w-sm leading-normal">

@@ -70,12 +70,12 @@ export function TransferLeadershipDialog({
                     <DialogTitle>Chuyển quyền Trưởng nhóm</DialogTitle>
                     <DialogDescription>
                         Bạn là Trưởng nhóm. Trước khi rời khỏi nhóm{" "}
-                        <span className="font-semibold text-gray-900">{groupName}</span>,
+                        <span className="font-semibold text-foreground">{groupName}</span>,
                         bạn cần chỉ định một người kế nhiệm.
                     </DialogDescription>
                 </DialogHeader>
                 <div className="py-4">
-                    <ScrollArea className="h-60 border rounded-2xl p-2 bg-gray-50/50">
+                    <ScrollArea className="h-60 border rounded-xl p-2 bg-muted/50">
                         <div className="space-y-2">
                             {otherMembers.map((p) => {
                                 const memberId = getMemberId(p);
@@ -84,9 +84,9 @@ export function TransferLeadershipDialog({
                                     <div
                                         key={memberId}
                                         onClick={() => setSelectedSuccessor(memberId)}
-                                        className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all border-2 ${selectedSuccessor === memberId
+                                        className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all border-2 ${selectedSuccessor === memberId
                                                 ? "bg-blue-50 border-blue-500 shadow-sm"
-                                                : "bg-white border-transparent hover:border-gray-200"
+                                                : "bg-white border-transparent hover:border-border"
                                             }`}
                                     >
                                         <Avatar className="h-10 w-10">
@@ -101,7 +101,7 @@ export function TransferLeadershipDialog({
                                             <p className="text-sm font-bold truncate">
                                                 {getMemberName(p)}
                                             </p>
-                                            <p className="text-[10px] text-gray-500 uppercase tracking-tighter">
+                                            <p className="text-[10px] text-muted-foreground uppercase tracking-tighter">
                                                 {p.role === "CHANNEL_MODERATOR" ? "Nhóm phó" : "Thành viên"}
                                             </p>
                                         </div>
@@ -119,7 +119,7 @@ export function TransferLeadershipDialog({
                         Để sau
                     </Button>
                     <Button
-                        className="bg-blue-600 hover:bg-blue-700"
+                        className="bg-primary hover:bg-primary/90"
                         disabled={!selectedSuccessor || isLoading}
                         onClick={onConfirm}
                     >

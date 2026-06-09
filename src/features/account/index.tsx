@@ -235,35 +235,35 @@ export function AccountSettingsPage() {
             <div className="max-w-5xl mx-auto py-8 px-4 md:px-8 space-y-10 animate-pulse">
                 {/* Header Skeleton */}
                 <div className="space-y-2">
-                    <div className="h-7 w-48 bg-slate-200 dark:bg-zinc-800 rounded-[2px]" />
-                    <div className="h-4 w-96 bg-slate-200 dark:bg-zinc-800 rounded-[2px]" />
+                    <div className="h-7 w-48 bg-muted dark:bg-muted rounded-sm" />
+                    <div className="h-4 w-96 bg-muted dark:bg-muted rounded-sm" />
                 </div>
-                <div className="h-[1px] w-full bg-slate-200 dark:bg-zinc-800" />
+                <div className="h-[1px] w-full bg-muted dark:bg-muted" />
                 
                 {/* Grid Skeleton */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                     {/* Left Column Skeleton */}
-                    <div className="lg:col-span-4 border border-slate-200/60 dark:border-white/[0.06] bg-white dark:bg-[#19191B] rounded-[2px] p-6 space-y-6">
+                    <div className="lg:col-span-4 border border-border/60 dark:border-white/[0.06] bg-background rounded-sm p-6 space-y-6">
                         <div className="flex flex-col items-center space-y-4">
-                            <div className="h-28 w-28 bg-slate-200 dark:bg-zinc-800 rounded-[2px]" />
-                            <div className="h-5 w-36 bg-slate-200 dark:bg-zinc-800 rounded-[2px]" />
-                            <div className="h-3 w-48 bg-slate-200 dark:bg-zinc-800 rounded-[2px]" />
-                            <div className="h-6 w-24 bg-slate-100 dark:bg-zinc-800 rounded-[2px]" />
+                            <div className="h-28 w-28 bg-muted dark:bg-muted rounded-sm" />
+                            <div className="h-5 w-36 bg-muted dark:bg-muted rounded-sm" />
+                            <div className="h-3 w-48 bg-muted dark:bg-muted rounded-sm" />
+                            <div className="h-6 w-24 bg-muted dark:bg-muted rounded-sm" />
                         </div>
-                        <div className="space-y-3 pt-4 border-t border-slate-100 dark:border-zinc-800/50">
-                            <div className="h-3 w-full bg-slate-100 dark:bg-zinc-800 rounded-[2px]" />
-                            <div className="h-3 w-5/6 bg-slate-100 dark:bg-zinc-800 rounded-[2px]" />
+                        <div className="space-y-3 pt-4 border-t border-border dark:border-border/50">
+                            <div className="h-3 w-full bg-muted dark:bg-muted rounded-sm" />
+                            <div className="h-3 w-5/6 bg-muted dark:bg-muted rounded-sm" />
                         </div>
                     </div>
                     {/* Right Column Skeleton */}
                     <div className="lg:col-span-8 space-y-6">
-                        <div className="border border-slate-200/60 dark:border-white/[0.06] bg-white dark:bg-[#19191B] rounded-[2px] p-6 space-y-6">
-                            <div className="h-5 w-40 bg-slate-200 dark:bg-zinc-800 rounded-[2px]" />
+                        <div className="border border-border/60 dark:border-white/[0.06] bg-background rounded-sm p-6 space-y-6">
+                            <div className="h-5 w-40 bg-muted dark:bg-muted rounded-sm" />
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                 {[1, 2, 3, 4].map((i) => (
                                     <div key={i} className="space-y-2">
-                                        <div className="h-3.5 w-20 bg-slate-100 dark:bg-zinc-800/80 rounded-[2px]" />
-                                        <div className="h-10 w-full bg-slate-50 dark:bg-zinc-800/50 rounded-[2px]" />
+                                        <div className="h-3.5 w-20 bg-muted dark:bg-muted/80 rounded-sm" />
+                                        <div className="h-10 w-full bg-muted dark:bg-muted/50 rounded-sm" />
                                     </div>
                                 ))}
                             </div>
@@ -277,9 +277,9 @@ export function AccountSettingsPage() {
     if (!user) {
         return (
             <div className="min-h-screen flex items-center justify-center p-4">
-                <Card className="w-full max-w-md text-center p-6 border-slate-200 dark:border-white/[0.06] rounded-[2px] bg-white dark:bg-[#19191B] shadow-sm">
-                    <p className="text-sm font-mono text-slate-500">Vui lòng đăng nhập để xem thông tin tài khoản</p>
-                    <Button className="mt-4 rounded-[2px] font-mono text-xs" onClick={() => router.push("/auth/sign-in")}>
+                <Card className="w-full max-w-md text-center p-6 border-border rounded-sm bg-background shadow-sm">
+                    <p className="text-sm font-mono text-muted-foreground">Vui lòng đăng nhập để xem thông tin tài khoản</p>
+                    <Button className="mt-4 rounded-sm font-mono text-xs" onClick={() => router.push("/auth/sign-in")}>
                         ĐĂNG NHẬP
                     </Button>
                 </Card>
@@ -300,10 +300,10 @@ export function AccountSettingsPage() {
             {/* Elegant Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div className="space-y-1">
-                    <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100 font-mono uppercase">
+                    <h1 className="text-xl font-bold tracking-tight text-foreground font-mono uppercase">
                         Quản trị hồ sơ
                     </h1>
-                    <p className="text-xs text-slate-500 font-mono">
+                    <p className="text-xs text-muted-foreground font-mono">
                         Cấu hình thông tin danh tính hệ thống của bạn.
                     </p>
                 </div>
@@ -312,7 +312,7 @@ export function AccountSettingsPage() {
                         variant={isEditingProfile ? "default" : "outline"}
                         size="sm"
                         onClick={() => setIsEditingProfile(!isEditingProfile)}
-                        className="rounded-[2px] text-xs font-mono border-slate-200 dark:border-white/[0.08] hover:bg-slate-50 dark:hover:bg-zinc-800 transition-colors shadow-none"
+                        className="rounded-sm text-xs font-mono border-border hover:bg-muted dark:hover:bg-muted transition-colors shadow-none"
                     >
                         <Edit3 className="h-3.5 w-3.5 mr-2" />
                         {isEditingProfile ? "HỦY BỎ" : "CHỈNH SỬA"}
@@ -320,17 +320,17 @@ export function AccountSettingsPage() {
                 </div>
             </div>
 
-            <Separator className="border-slate-200/80 dark:border-white/[0.06]" />
+            <Separator className="border-border" />
 
             {/* Asymmetric Technical Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                 
                 {/* LEFT SIDEBAR: Static Overview Info (col-span-4) */}
                 <div className="lg:col-span-4 space-y-6">
-                    <div className="relative border border-slate-200/80 dark:border-white/[0.06] bg-white dark:bg-[#19191B] rounded-[2px] p-6 shadow-sm overflow-hidden group">
+                    <div className="relative border border-border bg-background rounded-sm p-6 shadow-sm overflow-hidden group">
                         
                         {/* Decorative subtle visual top bar */}
-                        <div className="absolute top-0 inset-x-0 h-1 bg-slate-900 dark:bg-slate-100" />
+                        <div className="absolute top-0 inset-x-0 h-1 bg-slate-900 dark:bg-muted" />
 
                         <div className="flex flex-col items-center text-center space-y-4 pt-2">
                             {/* Avatar Section */}
@@ -342,10 +342,10 @@ export function AccountSettingsPage() {
                             />
 
                             <div className="space-y-1 w-full">
-                                <h2 className="text-base font-bold font-mono text-slate-900 dark:text-slate-100 truncate">
+                                <h2 className="text-base font-bold font-mono text-foreground truncate">
                                     {user.name}
                                 </h2>
-                                <p className="text-xs font-mono text-slate-500 truncate select-all">
+                                <p className="text-xs font-mono text-muted-foreground truncate select-all">
                                     {user.email}
                                 </p>
                             </div>
@@ -354,21 +354,21 @@ export function AccountSettingsPage() {
                             <div className="flex flex-wrap justify-center gap-1.5 pt-1">
                                 <Badge 
                                     variant="outline" 
-                                    className="font-mono text-[9px] uppercase tracking-wider px-2 py-0.5 rounded-[2px] bg-slate-50 dark:bg-zinc-900 border-slate-200 dark:border-white/[0.06] text-slate-600 dark:text-slate-400"
+                                    className="font-mono text-[9px] uppercase tracking-wider px-2 py-0.5 rounded-sm bg-muted dark:bg-muted border-border text-muted-foreground dark:text-muted-foreground"
                                 >
                                     {user.role}
                                 </Badge>
                                 {user.isVerified ? (
                                     <Badge 
                                         variant="outline" 
-                                        className="font-mono text-[9px] uppercase tracking-wider px-2 py-0.5 rounded-[2px] bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-200/60 dark:border-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center gap-1"
+                                        className="font-mono text-[9px] uppercase tracking-wider px-2 py-0.5 rounded-sm bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-200/60 dark:border-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center gap-1"
                                     >
                                         <CheckCircle className="h-2.5 w-2.5" /> Verified
                                     </Badge>
                                 ) : (
                                     <Badge 
                                         variant="outline" 
-                                        className="font-mono text-[9px] uppercase tracking-wider px-2 py-0.5 rounded-[2px] bg-amber-50 dark:bg-amber-950/20 border-amber-200/60 dark:border-amber-900/30 text-amber-600 dark:text-amber-400"
+                                        className="font-mono text-[9px] uppercase tracking-wider px-2 py-0.5 rounded-sm bg-amber-50 dark:bg-amber-950/20 border-amber-200/60 dark:border-amber-900/30 text-amber-600 dark:text-amber-400"
                                     >
                                         Pending
                                     </Badge>
@@ -377,30 +377,30 @@ export function AccountSettingsPage() {
                         </div>
 
                         {/* Monospace Technical Details Table */}
-                        <div className="mt-8 pt-6 border-t border-slate-100 dark:border-white/[0.04] space-y-3">
+                        <div className="mt-8 pt-6 border-t border-border dark:border-white/[0.04] space-y-3">
                             <div className="flex justify-between items-center text-[11px]">
-                                <span className="font-mono text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                                <span className="font-mono text-muted-foreground uppercase tracking-wider flex items-center gap-1">
                                     <Clock className="h-3 w-3" /> THAM GIA
                                 </span>
-                                <span className="font-mono font-semibold text-slate-800 dark:text-slate-300">
+                                <span className="font-mono font-semibold text-foreground dark:text-muted-foreground">
                                     {user.createdAt
                                         ? new Date(user.createdAt).toLocaleDateString("vi-VN")
                                         : "Chưa rõ"}
                                 </span>
                             </div>
                             <div className="flex justify-between items-center text-[11px]">
-                                <span className="font-mono text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                                <span className="font-mono text-muted-foreground uppercase tracking-wider flex items-center gap-1">
                                     <Shield className="h-3 w-3" /> TRẠNG THÁI
                                 </span>
-                                <span className="font-mono font-semibold flex items-center gap-1 text-slate-800 dark:text-slate-300">
+                                <span className="font-mono font-semibold flex items-center gap-1 text-foreground dark:text-muted-foreground">
                                     <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 inline-block animate-pulse" /> Active
                                 </span>
                             </div>
                             <div className="flex justify-between items-center text-[11px]">
-                                <span className="font-mono text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                                <span className="font-mono text-muted-foreground uppercase tracking-wider flex items-center gap-1">
                                     <Key className="h-3 w-3" /> ID HỆ THỐNG
                                 </span>
-                                <span className="font-mono font-semibold text-slate-500 dark:text-slate-400 text-[10px] select-all">
+                                <span className="font-mono font-semibold text-muted-foreground dark:text-muted-foreground text-[10px] select-all">
                                     {user.id.slice(0, 8)}...
                                 </span>
                             </div>
@@ -412,12 +412,12 @@ export function AccountSettingsPage() {
                 <div className="lg:col-span-8 space-y-6">
                     
                     {/* CARD 1: Detailed Profile Info */}
-                    <Card className="border-slate-200/80 dark:border-white/[0.06] rounded-[2px] bg-white dark:bg-[#19191B] shadow-sm">
-                        <CardHeader className="pb-4 border-b border-slate-100 dark:border-white/[0.04]">
-                            <CardTitle className="text-sm font-bold font-mono uppercase tracking-wider text-slate-900 dark:text-slate-100">
+                    <Card className="border-border rounded-sm bg-background shadow-sm">
+                        <CardHeader className="pb-4 border-b border-border dark:border-white/[0.04]">
+                            <CardTitle className="text-sm font-bold font-mono uppercase tracking-wider text-foreground">
                                 Thông tin tài khoản chi tiết
                             </CardTitle>
-                            <CardDescription className="text-xs font-mono text-slate-500">
+                            <CardDescription className="text-xs font-mono text-muted-foreground">
                                 Thiết lập các thuộc tính định danh cá nhân hiển thị trong tổ chức.
                             </CardDescription>
                         </CardHeader>
@@ -432,10 +432,10 @@ export function AccountSettingsPage() {
                                                 name="name"
                                                 render={({ field }) => (
                                                     <FormItem className="space-y-1.5">
-                                                        <FormLabel className="text-[10px] font-mono font-bold uppercase text-slate-400 tracking-wider">Họ và tên</FormLabel>
+                                                        <FormLabel className="text-[10px] font-mono font-bold uppercase text-muted-foreground tracking-wider">Họ và tên</FormLabel>
                                                         <FormControl>
                                                             <Input 
-                                                                className="rounded-[2px] border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-zinc-900/50 text-sm focus-visible:ring-0 focus-visible:border-slate-800 dark:focus-visible:border-slate-200 transition-colors font-mono" 
+                                                                className="rounded-sm border-border bg-muted/50 dark:bg-muted/50 text-sm focus-visible:ring-0 focus-visible:border-border dark:focus-visible:border-border transition-colors font-mono" 
                                                                 {...field} 
                                                             />
                                                         </FormControl>
@@ -449,14 +449,14 @@ export function AccountSettingsPage() {
                                                 name="gender"
                                                 render={({ field }) => (
                                                     <FormItem className="space-y-1.5">
-                                                        <FormLabel className="text-[10px] font-mono font-bold uppercase text-slate-400 tracking-wider">Giới tính</FormLabel>
+                                                        <FormLabel className="text-[10px] font-mono font-bold uppercase text-muted-foreground tracking-wider">Giới tính</FormLabel>
                                                         <Select onValueChange={field.onChange} value={field.value}>
                                                             <FormControl>
-                                                                <SelectTrigger className="rounded-[2px] border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-zinc-900/50 text-sm focus:ring-0 focus:border-slate-800 dark:focus:border-slate-200 transition-colors font-mono">
+                                                                <SelectTrigger className="rounded-sm border-border bg-muted/50 dark:bg-muted/50 text-sm focus:ring-0 focus:border-border dark:focus:border-border transition-colors font-mono">
                                                                     <SelectValue placeholder="Chọn giới tính" />
                                                                 </SelectTrigger>
                                                             </FormControl>
-                                                            <SelectContent className="rounded-[2px] border-slate-200 dark:border-white/[0.08] bg-white dark:bg-[#19191B] font-mono text-xs">
+                                                            <SelectContent className="rounded-sm border-border bg-background font-mono text-xs">
                                                                 <SelectItem value="male">Nam</SelectItem>
                                                                 <SelectItem value="female">Nữ</SelectItem>
                                                                 <SelectItem value="other">Khác</SelectItem>
@@ -472,11 +472,11 @@ export function AccountSettingsPage() {
                                                 name="birthDate"
                                                 render={({ field }) => (
                                                     <FormItem className="space-y-1.5">
-                                                        <FormLabel className="text-[10px] font-mono font-bold uppercase text-slate-400 tracking-wider">Ngày sinh</FormLabel>
+                                                        <FormLabel className="text-[10px] font-mono font-bold uppercase text-muted-foreground tracking-wider">Ngày sinh</FormLabel>
                                                         <FormControl>
                                                             <Input 
                                                                 type="date" 
-                                                                className="rounded-[2px] border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-zinc-900/50 text-sm focus-visible:ring-0 focus-visible:border-slate-800 dark:focus-visible:border-slate-200 transition-colors font-mono" 
+                                                                className="rounded-sm border-border bg-muted/50 dark:bg-muted/50 text-sm focus-visible:ring-0 focus-visible:border-border dark:focus-visible:border-border transition-colors font-mono" 
                                                                 {...field} 
                                                             />
                                                         </FormControl>
@@ -490,11 +490,11 @@ export function AccountSettingsPage() {
                                                 name="location"
                                                 render={({ field }) => (
                                                     <FormItem className="space-y-1.5">
-                                                        <FormLabel className="text-[10px] font-mono font-bold uppercase text-slate-400 tracking-wider">Địa chỉ</FormLabel>
+                                                        <FormLabel className="text-[10px] font-mono font-bold uppercase text-muted-foreground tracking-wider">Địa chỉ</FormLabel>
                                                         <FormControl>
                                                             <Input 
                                                                 placeholder="TP. Hồ Chí Minh, Việt Nam"
-                                                                className="rounded-[2px] border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-zinc-900/50 text-sm focus-visible:ring-0 focus-visible:border-slate-800 dark:focus-visible:border-slate-200 transition-colors font-mono" 
+                                                                className="rounded-sm border-border bg-muted/50 dark:bg-muted/50 text-sm focus-visible:ring-0 focus-visible:border-border dark:focus-visible:border-border transition-colors font-mono" 
                                                                 {...field} 
                                                             />
                                                         </FormControl>
@@ -506,9 +506,9 @@ export function AccountSettingsPage() {
                                         </div>
 
                                         {/* Phone number notice in Edit Mode */}
-                                        <div className="p-3 bg-slate-50 dark:bg-zinc-900/50 border border-slate-100 dark:border-white/[0.04] rounded-[2px] flex items-start gap-2.5">
-                                            <Info className="h-4 w-4 text-slate-400 dark:text-slate-500 shrink-0 mt-0.5" />
-                                            <p className="text-[10px] font-mono text-slate-500 leading-normal">
+                                        <div className="p-3 bg-muted dark:bg-muted/50 border border-border dark:border-white/[0.04] rounded-sm flex items-start gap-2.5">
+                                            <Info className="h-4 w-4 text-muted-foreground dark:text-muted-foreground shrink-0 mt-0.5" />
+                                            <p className="text-[10px] font-mono text-muted-foreground leading-normal">
                                                 Số điện thoại (<span className="font-semibold">{user.number || "Chưa đặt"}</span>) và Email là các thông tin xác thực bắt buộc và không thể tự chỉnh sửa trực tiếp để đảm bảo tính an toàn tài khoản.
                                             </p>
                                         </div>
@@ -518,7 +518,7 @@ export function AccountSettingsPage() {
                                                 type="button" 
                                                 variant="outline" 
                                                 size="sm" 
-                                                className="rounded-[2px] text-xs font-mono shadow-none"
+                                                className="rounded-sm text-xs font-mono shadow-none"
                                                 onClick={() => {
                                                     setIsEditingProfile(false);
                                                     profileForm.reset();
@@ -530,7 +530,7 @@ export function AccountSettingsPage() {
                                                 type="submit" 
                                                 disabled={isUpdating} 
                                                 size="sm"
-                                                className="rounded-[2px] text-xs font-mono bg-slate-900 hover:bg-slate-800 text-white dark:bg-slate-100 dark:hover:bg-slate-200 dark:text-slate-900 shadow-none"
+                                                className="rounded-sm text-xs font-mono bg-slate-900 hover:bg-slate-800 text-white dark:bg-muted dark:hover:bg-muted dark:text-foreground shadow-none"
                                             >
                                                 {isUpdating ? (
                                                     <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
@@ -544,35 +544,35 @@ export function AccountSettingsPage() {
                                 </Form>
                             ) : (
                                 /* Structured Monospace Layout for Viewing details */
-                                <div className="divide-y divide-slate-100 dark:divide-white/[0.04] border border-slate-200/80 dark:border-white/[0.06] rounded-[2px] bg-slate-50/20 dark:bg-zinc-900/10">
-                                    <div className="py-3 px-4 flex justify-between items-center transition-colors hover:bg-slate-50/50 dark:hover:bg-white/[0.01]">
-                                        <span className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider">Họ và tên</span>
-                                        <span className="text-xs font-semibold text-slate-800 dark:text-slate-200">{user.name}</span>
+                                <div className="divide-y divide-slate-100 dark:divide-white/[0.04] border border-border rounded-sm bg-muted/20 dark:bg-muted/10">
+                                    <div className="py-3 px-4 flex justify-between items-center transition-colors hover:bg-muted/50 dark:hover:bg-white/[0.01]">
+                                        <span className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-wider">Họ và tên</span>
+                                        <span className="text-xs font-semibold text-foreground dark:text-foreground">{user.name}</span>
                                     </div>
-                                    <div className="py-3 px-4 flex justify-between items-center transition-colors hover:bg-slate-50/50 dark:hover:bg-white/[0.01]">
-                                        <span className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider">Số điện thoại</span>
-                                        <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                                    <div className="py-3 px-4 flex justify-between items-center transition-colors hover:bg-muted/50 dark:hover:bg-white/[0.01]">
+                                        <span className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-wider">Số điện thoại</span>
+                                        <span className="text-xs font-semibold text-foreground dark:text-foreground flex items-center gap-1.5">
                                             {user.number || "Chưa cập nhật"}
                                             {user.number && (
                                                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 inline-block" title="Verified" />
                                             )}
                                         </span>
                                     </div>
-                                    <div className="py-3 px-4 flex justify-between items-center transition-colors hover:bg-slate-50/50 dark:hover:bg-white/[0.01]">
-                                        <span className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider">Giới tính</span>
-                                        <span className="text-xs font-semibold text-slate-800 dark:text-slate-200">{getGenderLabel(user.gender)}</span>
+                                    <div className="py-3 px-4 flex justify-between items-center transition-colors hover:bg-muted/50 dark:hover:bg-white/[0.01]">
+                                        <span className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-wider">Giới tính</span>
+                                        <span className="text-xs font-semibold text-foreground dark:text-foreground">{getGenderLabel(user.gender)}</span>
                                     </div>
-                                    <div className="py-3 px-4 flex justify-between items-center transition-colors hover:bg-slate-50/50 dark:hover:bg-white/[0.01]">
-                                        <span className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider">Ngày sinh</span>
-                                        <span className="text-xs font-semibold text-slate-800 dark:text-slate-200">
+                                    <div className="py-3 px-4 flex justify-between items-center transition-colors hover:bg-muted/50 dark:hover:bg-white/[0.01]">
+                                        <span className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-wider">Ngày sinh</span>
+                                        <span className="text-xs font-semibold text-foreground dark:text-foreground">
                                             {user.birthDate
                                                 ? new Date(user.birthDate).toLocaleDateString("vi-VN")
                                                 : "Chưa cập nhật"}
                                         </span>
                                     </div>
-                                    <div className="py-3 px-4 flex justify-between items-center transition-colors hover:bg-slate-50/50 dark:hover:bg-white/[0.01]">
-                                        <span className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider">Địa chỉ</span>
-                                        <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 text-right truncate max-w-[200px] sm:max-w-none">{user.location || "Chưa cập nhật"}</span>
+                                    <div className="py-3 px-4 flex justify-between items-center transition-colors hover:bg-muted/50 dark:hover:bg-white/[0.01]">
+                                        <span className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-wider">Địa chỉ</span>
+                                        <span className="text-xs font-semibold text-foreground dark:text-foreground text-right truncate max-w-[200px] sm:max-w-none">{user.location || "Chưa cập nhật"}</span>
                                     </div>
                                 </div>
                             )}
@@ -580,13 +580,13 @@ export function AccountSettingsPage() {
                     </Card>
 
                     {/* CARD 2: Active Status text */}
-                    <Card className="border-slate-200/80 dark:border-white/[0.06] rounded-[2px] bg-white dark:bg-[#19191B] shadow-sm">
-                        <CardHeader className="flex flex-row items-center justify-between pb-4 border-b border-slate-100 dark:border-white/[0.04]">
+                    <Card className="border-border rounded-sm bg-background shadow-sm">
+                        <CardHeader className="flex flex-row items-center justify-between pb-4 border-b border-border dark:border-white/[0.04]">
                             <div className="space-y-1">
-                                <CardTitle className="text-sm font-bold font-mono uppercase tracking-wider text-slate-900 dark:text-slate-100">
+                                <CardTitle className="text-sm font-bold font-mono uppercase tracking-wider text-foreground">
                                     Trạng thái hoạt động
                                 </CardTitle>
-                                <CardDescription className="text-xs font-mono text-slate-500">
+                                <CardDescription className="text-xs font-mono text-muted-foreground">
                                     Mô tả nhanh về trạng thái hiện tại hiển thị cho cộng sự.
                                 </CardDescription>
                             </div>
@@ -594,7 +594,7 @@ export function AccountSettingsPage() {
                                 variant="outline"
                                 size="sm"
                                 onClick={() => setIsEditingStatus(!isEditingStatus)}
-                                className="h-8 rounded-[2px] text-xs font-mono shadow-none border-slate-200 dark:border-white/[0.08]"
+                                className="h-8 rounded-sm text-xs font-mono shadow-none border-border"
                             >
                                 {isEditingStatus ? "HỦY" : "THAY ĐỔI"}
                             </Button>
@@ -611,7 +611,7 @@ export function AccountSettingsPage() {
                                                     <FormControl>
                                                         <Textarea
                                                             placeholder="VD: Đang họp, Đang code tính năng mới, Đi ăn trưa..."
-                                                            className="resize-none bg-slate-50/50 dark:bg-zinc-900/50 border-slate-200 dark:border-white/[0.08] rounded-[2px] min-h-[80px] font-mono text-sm focus-visible:ring-0 focus-visible:border-slate-800 dark:focus-visible:border-slate-200 transition-colors"
+                                                            className="resize-none bg-muted/50 dark:bg-muted/50 border-border rounded-sm min-h-[80px] font-mono text-sm focus-visible:ring-0 focus-visible:border-border dark:focus-visible:border-border transition-colors"
                                                             {...field}
                                                         />
                                                     </FormControl>
@@ -624,7 +624,7 @@ export function AccountSettingsPage() {
                                                 type="submit" 
                                                 disabled={isUpdatingStatus} 
                                                 size="sm"
-                                                className="rounded-[2px] text-xs font-mono bg-slate-900 hover:bg-slate-800 text-white dark:bg-slate-100 dark:hover:bg-slate-200 dark:text-slate-900 shadow-none"
+                                                className="rounded-sm text-xs font-mono bg-slate-900 hover:bg-slate-800 text-white dark:bg-muted dark:hover:bg-muted dark:text-foreground shadow-none"
                                             >
                                                 {isUpdatingStatus ? (
                                                     <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
@@ -637,8 +637,8 @@ export function AccountSettingsPage() {
                                     </form>
                                 </Form>
                             ) : (
-                                <div className="p-4 bg-slate-50/50 dark:bg-zinc-900/20 border border-slate-200/60 dark:border-white/[0.04] rounded-[2px] flex items-center min-h-[64px]">
-                                    <p className={`text-xs font-mono ${user.status ? "text-slate-800 dark:text-slate-200 font-semibold" : "text-slate-400 italic"}`}>
+                                <div className="p-4 bg-muted/50 dark:bg-muted/20 border border-border/60 dark:border-white/[0.04] rounded-sm flex items-center min-h-[64px]">
+                                    <p className={`text-xs font-mono ${user.status ? "text-foreground dark:text-foreground font-semibold" : "text-muted-foreground italic"}`}>
                                         "{user.status || "Chưa thiết lập trạng thái hoạt động"}"
                                     </p>
                                 </div>
@@ -647,38 +647,38 @@ export function AccountSettingsPage() {
                     </Card>
 
                     {/* CARD 3: Security Options & Sensitive Actions */}
-                    <Card className="border-slate-200/80 dark:border-white/[0.06] rounded-[2px] bg-white dark:bg-[#19191B] shadow-sm">
-                        <CardHeader className="pb-4 border-b border-slate-100 dark:border-white/[0.04]">
-                            <CardTitle className="text-sm font-bold font-mono uppercase tracking-wider text-slate-900 dark:text-slate-100">
+                    <Card className="border-border rounded-sm bg-background shadow-sm">
+                        <CardHeader className="pb-4 border-b border-border dark:border-white/[0.04]">
+                            <CardTitle className="text-sm font-bold font-mono uppercase tracking-wider text-foreground">
                                 Thiết lập bảo mật nâng cao
                             </CardTitle>
-                            <CardDescription className="text-xs font-mono text-slate-500">
+                            <CardDescription className="text-xs font-mono text-muted-foreground">
                                 Quản lý thông tin đăng nhập và cơ chế xác thực.
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="pt-6 space-y-4">
                             <div className="flex justify-between items-center py-1">
                                 <div className="space-y-0.5">
-                                    <p className="text-xs font-bold font-mono text-slate-800 dark:text-slate-200">MẬT KHẨU TÀI KHOẢN</p>
-                                    <p className="text-[10px] font-mono text-slate-500">Cập nhật mật khẩu định kỳ để duy trì an toàn.</p>
+                                    <p className="text-xs font-bold font-mono text-foreground dark:text-foreground">MẬT KHẨU TÀI KHOẢN</p>
+                                    <p className="text-[10px] font-mono text-muted-foreground">Cập nhật mật khẩu định kỳ để duy trì an toàn.</p>
                                 </div>
                                 
                                 {/* Right Drawer Slide-over Panel Trigger */}
                                 <Sheet open={showPasswordDrawer} onOpenChange={setShowPasswordDrawer}>
                                     <SheetTrigger asChild>
-                                        <Button variant="outline" size="sm" className="h-8 rounded-[2px] text-xs font-mono border-slate-200 dark:border-white/[0.08] hover:bg-slate-50 dark:hover:bg-zinc-800 shadow-none">
+                                        <Button variant="outline" size="sm" className="h-8 rounded-sm text-xs font-mono border-border hover:bg-muted dark:hover:bg-muted shadow-none">
                                             THAY ĐỔI
                                         </Button>
                                     </SheetTrigger>
                                     <SheetContent 
                                         side="right" 
-                                        className="w-full sm:max-w-md border-l border-slate-200 dark:border-white/[0.06] bg-white dark:bg-[#19191B] p-6 flex flex-col gap-6"
+                                        className="w-full sm:max-w-md border-l border-border bg-background p-6 flex flex-col gap-6"
                                     >
-                                        <SheetHeader className="p-0 border-b border-slate-100 dark:border-white/[0.04] pb-4">
-                                            <SheetTitle className="text-sm font-bold font-mono uppercase tracking-wider text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                                        <SheetHeader className="p-0 border-b border-border dark:border-white/[0.04] pb-4">
+                                            <SheetTitle className="text-sm font-bold font-mono uppercase tracking-wider text-foreground flex items-center gap-2">
                                                 <Lock className="h-4 w-4" /> Thay đổi mật khẩu
                                             </SheetTitle>
-                                            <SheetDescription className="text-xs font-mono text-slate-500 pt-1 leading-normal">
+                                            <SheetDescription className="text-xs font-mono text-muted-foreground pt-1 leading-normal">
                                                 Nhập mật khẩu hiện tại và thiết lập mật khẩu mới. Mật khẩu mới cần tối thiểu 6 ký tự.
                                             </SheetDescription>
                                         </SheetHeader>
@@ -691,19 +691,19 @@ export function AccountSettingsPage() {
                                                     name="currentPassword"
                                                     render={({ field }) => (
                                                         <FormItem className="space-y-1.5">
-                                                            <FormLabel className="text-[10px] font-mono font-bold uppercase text-slate-400 tracking-wider">Mật khẩu hiện tại</FormLabel>
+                                                            <FormLabel className="text-[10px] font-mono font-bold uppercase text-muted-foreground tracking-wider">Mật khẩu hiện tại</FormLabel>
                                                             <FormControl>
                                                                 <div className="relative">
                                                                     <Input
                                                                         type={showCurrentPassword ? "text" : "password"}
-                                                                        className="rounded-[2px] border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-zinc-900/50 text-sm focus-visible:ring-0 focus-visible:border-slate-800 dark:focus-visible:border-slate-200 font-mono pr-10"
+                                                                        className="rounded-sm border-border bg-muted/50 dark:bg-muted/50 text-sm focus-visible:ring-0 focus-visible:border-border dark:focus-visible:border-border font-mono pr-10"
                                                                         {...field}
                                                                     />
                                                                     <Button
                                                                         type="button"
                                                                         variant="ghost"
                                                                         size="icon"
-                                                                        className="absolute right-0 top-0 h-full px-3 hover:bg-transparent text-slate-400 hover:text-slate-600"
+                                                                        className="absolute right-0 top-0 h-full px-3 hover:bg-transparent text-muted-foreground hover:text-muted-foreground"
                                                                         onClick={() => setShowCurrentPassword(!showCurrentPassword)}
                                                                     >
                                                                         {showCurrentPassword ? (
@@ -724,19 +724,19 @@ export function AccountSettingsPage() {
                                                     name="newPassword"
                                                     render={({ field }) => (
                                                         <FormItem className="space-y-1.5">
-                                                            <FormLabel className="text-[10px] font-mono font-bold uppercase text-slate-400 tracking-wider">Mật khẩu mới</FormLabel>
+                                                            <FormLabel className="text-[10px] font-mono font-bold uppercase text-muted-foreground tracking-wider">Mật khẩu mới</FormLabel>
                                                             <FormControl>
                                                                 <div className="relative">
                                                                     <Input
                                                                         type={showNewPassword ? "text" : "password"}
-                                                                        className="rounded-[2px] border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-zinc-900/50 text-sm focus-visible:ring-0 focus-visible:border-slate-800 dark:focus-visible:border-slate-200 font-mono pr-10"
+                                                                        className="rounded-sm border-border bg-muted/50 dark:bg-muted/50 text-sm focus-visible:ring-0 focus-visible:border-border dark:focus-visible:border-border font-mono pr-10"
                                                                         {...field}
                                                                     />
                                                                     <Button
                                                                         type="button"
                                                                         variant="ghost"
                                                                         size="icon"
-                                                                        className="absolute right-0 top-0 h-full px-3 hover:bg-transparent text-slate-400 hover:text-slate-600"
+                                                                        className="absolute right-0 top-0 h-full px-3 hover:bg-transparent text-muted-foreground hover:text-muted-foreground"
                                                                         onClick={() => setShowNewPassword(!showNewPassword)}
                                                                     >
                                                                         {showNewPassword ? (
@@ -757,19 +757,19 @@ export function AccountSettingsPage() {
                                                     name="confirmPassword"
                                                     render={({ field }) => (
                                                         <FormItem className="space-y-1.5">
-                                                            <FormLabel className="text-[10px] font-mono font-bold uppercase text-slate-400 tracking-wider">Xác nhận mật khẩu mới</FormLabel>
+                                                            <FormLabel className="text-[10px] font-mono font-bold uppercase text-muted-foreground tracking-wider">Xác nhận mật khẩu mới</FormLabel>
                                                             <FormControl>
                                                                 <div className="relative">
                                                                     <Input
                                                                         type={showConfirmPassword ? "text" : "password"}
-                                                                        className="rounded-[2px] border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-zinc-900/50 text-sm focus-visible:ring-0 focus-visible:border-slate-800 dark:focus-visible:border-slate-200 font-mono pr-10"
+                                                                        className="rounded-sm border-border bg-muted/50 dark:bg-muted/50 text-sm focus-visible:ring-0 focus-visible:border-border dark:focus-visible:border-border font-mono pr-10"
                                                                         {...field}
                                                                     />
                                                                     <Button
                                                                         type="button"
                                                                         variant="ghost"
                                                                         size="icon"
-                                                                        className="absolute right-0 top-0 h-full px-3 hover:bg-transparent text-slate-400 hover:text-slate-600"
+                                                                        className="absolute right-0 top-0 h-full px-3 hover:bg-transparent text-muted-foreground hover:text-muted-foreground"
                                                                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                                                                     >
                                                                         {showConfirmPassword ? (
@@ -785,12 +785,12 @@ export function AccountSettingsPage() {
                                                     )}
                                                 />
 
-                                                <div className="pt-6 flex justify-end gap-2 border-t border-slate-100 dark:border-white/[0.04] mt-8">
+                                                <div className="pt-6 flex justify-end gap-2 border-t border-border dark:border-white/[0.04] mt-8">
                                                     <SheetClose asChild>
                                                         <Button
                                                             type="button"
                                                             variant="outline"
-                                                            className="rounded-[2px] text-xs font-mono shadow-none"
+                                                            className="rounded-sm text-xs font-mono shadow-none"
                                                             onClick={() => {
                                                                 passwordForm.reset();
                                                                 setShowCurrentPassword(false);
@@ -804,7 +804,7 @@ export function AccountSettingsPage() {
                                                     <Button 
                                                         type="submit" 
                                                         disabled={isChangingPassword}
-                                                        className="rounded-[2px] text-xs font-mono bg-slate-900 hover:bg-slate-800 text-white dark:bg-slate-100 dark:hover:bg-slate-200 dark:text-slate-900 shadow-none"
+                                                        className="rounded-sm text-xs font-mono bg-slate-900 hover:bg-slate-800 text-white dark:bg-muted dark:hover:bg-muted dark:text-foreground shadow-none"
                                                     >
                                                         {isChangingPassword ? (
                                                             <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
@@ -820,22 +820,22 @@ export function AccountSettingsPage() {
                                 </Sheet>
                             </div>
 
-                            <Separator className="border-slate-100 dark:border-white/[0.04]" />
+                            <Separator className="border-border dark:border-white/[0.04]" />
 
                             {/* Technical Log Sessions */}
                             <div className="space-y-3 pt-2">
-                                <h3 className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider">Hoạt động đăng nhập gần nhất</h3>
-                                <div className="divide-y divide-slate-100 dark:divide-white/[0.04] border border-slate-200/80 dark:border-white/[0.06] rounded-[2px] bg-slate-50/20 dark:bg-zinc-900/10">
+                                <h3 className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-wider">Hoạt động đăng nhập gần nhất</h3>
+                                <div className="divide-y divide-slate-100 dark:divide-white/[0.04] border border-border rounded-sm bg-muted/20 dark:bg-muted/10">
                                     <div className="py-2.5 px-3 flex justify-between items-center text-[11px] font-mono">
-                                        <span className="text-slate-500">Lần đăng nhập cuối cùng</span>
-                                        <span className="text-slate-800 dark:text-slate-300 font-semibold">
+                                        <span className="text-muted-foreground">Lần đăng nhập cuối cùng</span>
+                                        <span className="text-foreground dark:text-muted-foreground font-semibold">
                                             {user.lastSeen
                                                 ? new Date(user.lastSeen).toLocaleString("vi-VN")
                                                 : "Không rõ"}
                                         </span>
                                     </div>
                                     <div className="py-2.5 px-3 flex justify-between items-center text-[11px] font-mono">
-                                        <span className="text-slate-500">Thiết bị hiện tại</span>
+                                        <span className="text-muted-foreground">Thiết bị hiện tại</span>
                                         <span className="text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1.5">
                                             <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 inline-block animate-pulse" /> Desktop Browser (Active)
                                         </span>

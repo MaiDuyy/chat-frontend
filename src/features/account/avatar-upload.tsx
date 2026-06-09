@@ -140,28 +140,28 @@ export function AvatarUpload({
     return (
         <Dialog open={isOpen} onOpenChange={(open: boolean) => open ? setIsOpen(true) : handleClose()}>
             <DialogTrigger asChild>
-                <button className="relative group cursor-pointer rounded-[2px]">
-                    <Avatar className={cn(sizeClasses[size], "rounded-[2px] ring-1 ring-slate-200 dark:ring-white/[0.08] shadow-sm")}>
+                <button className="relative group cursor-pointer rounded-sm">
+                    <Avatar className={cn(sizeClasses[size], "rounded-sm ring-1 ring-slate-200 dark:ring-white/[0.08] shadow-sm")}>
                         <AvatarImage
                             src={imageUrl}
                             alt="Image"
-                            className="w-full h-auto cursor-pointer hover:opacity-90 transition-opacity rounded-[2px]"
+                            className="w-full h-auto cursor-pointer hover:opacity-90 transition-opacity rounded-sm"
                             onClick={() => window.open(imageUrl, "_blank")} // Mở ảnh gốc khi click
                         />
-                        <AvatarFallback className="text-lg font-semibold bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 rounded-[2px]">
+                        <AvatarFallback className="text-lg font-semibold bg-muted dark:bg-muted text-muted-foreground rounded-sm">
                             {getInitials(name)}
                         </AvatarFallback>
                     </Avatar>
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-[2px] opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-sm opacity-0 group-hover:opacity-100 transition-opacity">
                         <Camera className="h-5 w-5 text-white" />
                     </div>
                 </button>
             </DialogTrigger>
 
-            <DialogContent className="sm:max-w-md rounded-[2px] border-slate-200 dark:border-white/[0.06] bg-white dark:bg-[#19191B]">
+            <DialogContent className="sm:max-w-md rounded-sm border-border bg-background">
                 <DialogHeader>
-                    <DialogTitle className="font-mono text-sm font-bold uppercase tracking-wider text-slate-900 dark:text-slate-100">Cập nhật Avatar</DialogTitle>
-                    <DialogDescription className="text-xs text-slate-500 dark:text-slate-400">
+                    <DialogTitle className="font-mono text-sm font-bold uppercase tracking-wider text-foreground">Cập nhật Avatar</DialogTitle>
+                    <DialogDescription className="text-xs text-muted-foreground dark:text-muted-foreground">
                         Chọn ảnh từ thiết bị hoặc từ lịch sử avatar của bạn
                     </DialogDescription>
                 </DialogHeader>
@@ -169,13 +169,13 @@ export function AvatarUpload({
                 <div className="space-y-6">
                     {/* Preview */}
                     <div className="flex justify-center">
-                        <Avatar className="h-32 w-32 rounded-[2px] ring-1 ring-slate-200 dark:ring-white/[0.08]">
+                        <Avatar className="h-32 w-32 rounded-sm ring-1 ring-slate-200 dark:ring-white/[0.08]">
                             <AvatarImage
                                 src={previewUrl || imageUrl || undefined}
                                 alt={name}
-                                className="w-full h-auto cursor-pointer hover:opacity-90 transition-opacity rounded-[2px]"
+                                className="w-full h-auto cursor-pointer hover:opacity-90 transition-opacity rounded-sm"
                             />
-                            <AvatarFallback className="text-2xl font-semibold bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 rounded-[2px]">
+                            <AvatarFallback className="text-2xl font-semibold bg-muted dark:bg-muted text-muted-foreground rounded-sm">
                                 {getInitials(name)}
                             </AvatarFallback>
                         </Avatar>
@@ -186,7 +186,7 @@ export function AvatarUpload({
                         <div className="flex gap-2">
                             <Button
                                 variant="outline"
-                                className="flex-1 rounded-[2px] text-xs font-mono"
+                                className="flex-1 rounded-sm text-xs font-mono"
                                 onClick={() => {
                                     setPreviewUrl(null);
                                     setSelectedFile(null);
@@ -196,7 +196,7 @@ export function AvatarUpload({
                                 Hủy
                             </Button>
                             <Button
-                                className="flex-1 rounded-[2px] text-xs font-mono bg-slate-900 hover:bg-slate-800 text-white dark:bg-slate-100 dark:hover:bg-slate-200 dark:text-slate-900"
+                                className="flex-1 rounded-sm text-xs font-mono bg-slate-900 hover:bg-slate-800 text-white dark:bg-muted dark:hover:bg-muted dark:text-foreground"
                                 onClick={handleUpload}
                                 disabled={isUploading}
                             >
@@ -212,16 +212,16 @@ export function AvatarUpload({
                         <div className="flex gap-2">
                             <Button
                                 variant="outline"
-                                className="flex-1 rounded-[2px] text-xs font-mono border-slate-200 dark:border-white/[0.08]"
+                                className="flex-1 rounded-sm text-xs font-mono border-border"
                                 onClick={() => fileInputRef.current?.click()}
                             >
-                                <Upload className="mr-2 h-3.5 w-3.5 text-slate-500" />
+                                <Upload className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
                                 Chọn ảnh
                             </Button>
                             {currentAvatar && (
                                 <Button
                                     variant="destructive"
-                                    className="rounded-[2px] bg-red-600 hover:bg-red-700"
+                                    className="rounded-sm bg-red-600 hover:bg-red-700"
                                     onClick={handleDelete}
                                     disabled={isDeleting}
                                 >

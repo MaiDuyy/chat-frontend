@@ -5,7 +5,7 @@ interface StatusBadgeProps {
 }
 
 export function StatusBadge({ status }: StatusBadgeProps) {
-  let color = "bg-gray-200 text-gray-800";
+  let color = "bg-muted text-foreground";
   
   switch (status?.toUpperCase()) {
     case 'PENDING':

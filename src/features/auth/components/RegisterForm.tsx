@@ -104,16 +104,16 @@ export const RegisterForm: React.FC = () => {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col space-y-1.5 text-left">
-        <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
+        <h1 className="text-xl font-bold tracking-tight text-foreground">
           Đăng ký tài khoản
         </h1>
-        <p className="text-xs text-slate-500 dark:text-zinc-500">
+        <p className="text-xs text-muted-foreground dark:text-muted-foreground">
           Bắt đầu kết nối với cộng đồng NEXUS ngay hôm nay.
         </p>
       </div>
 
       {error && (
-        <div className="p-2.5 rounded-[2px] bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900/30 text-red-650 dark:text-red-400 text-xs font-semibold font-mono text-left animate-in fade-in slide-in-from-top-2">
+        <div className="p-2.5 rounded-sm bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900/30 text-red-650 dark:text-red-400 text-xs font-semibold font-mono text-left animate-in fade-in slide-in-from-top-2">
           {error}
         </div>
       )}
@@ -125,11 +125,11 @@ export const RegisterForm: React.FC = () => {
             name="name"
             render={({ field }) => (
               <FormItem className="space-y-1">
-                <FormLabel className="text-xs font-semibold text-slate-700 dark:text-slate-350">Họ và tên</FormLabel>
+                <FormLabel className="text-xs font-semibold text-muted-foreground dark:text-slate-350">Họ và tên</FormLabel>
                 <FormControl>
                   <div className="relative">
-                    <User className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-450 dark:text-zinc-600" />
-                    <Input placeholder="Ví dụ: Nguyễn Văn A" className="pl-9 h-9 border-slate-200 dark:border-white/[0.06] bg-slate-50/50 dark:bg-[#111113]/40 focus:border-blue-500 dark:focus:border-blue-600 focus:ring-0 rounded-[2px] text-sm text-slate-850 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-zinc-600 transition-colors" {...field} />
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-450 dark:text-muted-foreground" />
+                    <Input placeholder="Ví dụ: Nguyễn Văn A" className="pl-9 h-9 border-border bg-muted/50 dark:bg-[#111113]/40 focus:border-blue-500 dark:focus:border-blue-600 focus:ring-0 rounded-sm text-sm text-slate-850 dark:text-foreground placeholder:text-muted-foreground dark:placeholder:text-muted-foreground transition-colors" {...field} />
                   </div>
                 </FormControl>
                 <FormMessage className="text-[11px] font-mono text-red-500" />
@@ -143,11 +143,11 @@ export const RegisterForm: React.FC = () => {
               name="email"
               render={({ field }) => (
                 <FormItem className="space-y-1">
-                  <FormLabel className="text-xs font-semibold text-slate-700 dark:text-slate-350">Email</FormLabel>
+                  <FormLabel className="text-xs font-semibold text-muted-foreground dark:text-slate-350">Email</FormLabel>
                   <FormControl>
                     <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-450 dark:text-zinc-600" />
-                      <Input placeholder="admin@vi-du.com" className="pl-9 h-9 border-slate-200 dark:border-white/[0.06] bg-slate-50/50 dark:bg-[#111113]/40 focus:border-blue-500 dark:focus:border-blue-600 focus:ring-0 rounded-[2px] text-sm text-slate-850 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-zinc-600 transition-colors" {...field} />
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-450 dark:text-muted-foreground" />
+                      <Input placeholder="admin@vi-du.com" className="pl-9 h-9 border-border bg-muted/50 dark:bg-[#111113]/40 focus:border-blue-500 dark:focus:border-blue-600 focus:ring-0 rounded-sm text-sm text-slate-850 dark:text-foreground placeholder:text-muted-foreground dark:placeholder:text-muted-foreground transition-colors" {...field} />
                     </div>
                   </FormControl>
                   <FormMessage className="text-[11px] font-mono text-red-500" />
@@ -160,11 +160,11 @@ export const RegisterForm: React.FC = () => {
               name="number"
               render={({ field }) => (
                 <FormItem className="space-y-1">
-                  <FormLabel className="text-xs font-semibold text-slate-700 dark:text-slate-350">Số điện thoại</FormLabel>
+                  <FormLabel className="text-xs font-semibold text-muted-foreground dark:text-slate-350">Số điện thoại</FormLabel>
                   <FormControl>
                     <div className="relative">
-                      <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-450 dark:text-zinc-600" />
-                      <Input placeholder="0912345678" className="pl-9 h-9 border-slate-200 dark:border-white/[0.06] bg-slate-50/50 dark:bg-[#111113]/40 focus:border-blue-500 dark:focus:border-blue-600 focus:ring-0 rounded-[2px] text-sm text-slate-850 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-zinc-600 transition-colors" {...field} />
+                      <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-450 dark:text-muted-foreground" />
+                      <Input placeholder="0912345678" className="pl-9 h-9 border-border bg-muted/50 dark:bg-[#111113]/40 focus:border-blue-500 dark:focus:border-blue-600 focus:ring-0 rounded-sm text-sm text-slate-850 dark:text-foreground placeholder:text-muted-foreground dark:placeholder:text-muted-foreground transition-colors" {...field} />
                     </div>
                   </FormControl>
                   <FormMessage className="text-[11px] font-mono text-red-500" />
@@ -178,15 +178,15 @@ export const RegisterForm: React.FC = () => {
             name="gender"
             render={({ field }) => (
               <FormItem className="space-y-1">
-                <FormLabel className="text-xs font-semibold text-slate-700 dark:text-slate-350">Giới tính</FormLabel>
+                <FormLabel className="text-xs font-semibold text-muted-foreground dark:text-slate-350">Giới tính</FormLabel>
                 <FormControl>
                   <select
-                    className="flex h-9 w-full rounded-[2px] border border-slate-200 dark:border-white/[0.06] bg-slate-50/50 dark:bg-[#111113]/40 text-slate-850 dark:text-slate-200 px-3 py-1.5 text-sm focus:outline-none focus:ring-0 focus:border-blue-500 dark:focus:border-blue-600 transition-colors appearance-none cursor-pointer"
+                    className="flex h-9 w-full rounded-sm border border-border bg-muted/50 dark:bg-[#111113]/40 text-slate-850 dark:text-foreground px-3 py-1.5 text-sm focus:outline-none focus:ring-0 focus:border-blue-500 dark:focus:border-blue-600 transition-colors appearance-none cursor-pointer"
                     {...field}
                   >
-                    <option value="male" className="bg-white dark:bg-[#19191B]">Nam</option>
-                    <option value="female" className="bg-white dark:bg-[#19191B]">Nữ</option>
-                    <option value="other" className="bg-white dark:bg-[#19191B]">Khác</option>
+                    <option value="male" className="bg-background">Nam</option>
+                    <option value="female" className="bg-background">Nữ</option>
+                    <option value="other" className="bg-background">Khác</option>
                   </select>
                 </FormControl>
                 <FormMessage className="text-[11px] font-mono text-red-500" />
@@ -199,20 +199,20 @@ export const RegisterForm: React.FC = () => {
             name="password"
             render={({ field }) => (
               <FormItem className="space-y-1">
-                <FormLabel className="text-xs font-semibold text-slate-700 dark:text-slate-350">Mật khẩu</FormLabel>
+                <FormLabel className="text-xs font-semibold text-muted-foreground dark:text-slate-350">Mật khẩu</FormLabel>
                 <FormControl>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-450 dark:text-zinc-600" />
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-450 dark:text-muted-foreground" />
                     <Input
                       type={showPassword ? 'text' : 'password'}
                       placeholder="••••••••"
-                      className="pl-9 pr-9 h-9 border-slate-200 dark:border-white/[0.06] bg-slate-50/50 dark:bg-[#111113]/40 focus:border-blue-500 dark:focus:border-blue-600 focus:ring-0 rounded-[2px] text-sm text-slate-850 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-zinc-600 transition-colors"
+                      className="pl-9 pr-9 h-9 border-border bg-muted/50 dark:bg-[#111113]/40 focus:border-blue-500 dark:focus:border-blue-600 focus:ring-0 rounded-sm text-sm text-slate-850 dark:text-foreground placeholder:text-muted-foreground dark:placeholder:text-muted-foreground transition-colors"
                       {...field}
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-450 dark:text-zinc-550 hover:text-slate-700 dark:hover:text-slate-300 focus:outline-none transition-colors cursor-pointer"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-450 dark:text-zinc-550 hover:text-muted-foreground dark:hover:text-muted-foreground focus:outline-none transition-colors cursor-pointer"
                     >
                       {showPassword ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
                     </button>
@@ -229,11 +229,11 @@ export const RegisterForm: React.FC = () => {
             name="confirmPassword"
             render={({ field }) => (
               <FormItem className="space-y-1">
-                <FormLabel className="text-xs font-semibold text-slate-700 dark:text-slate-350">Xác nhận mật khẩu</FormLabel>
+                <FormLabel className="text-xs font-semibold text-muted-foreground dark:text-slate-350">Xác nhận mật khẩu</FormLabel>
                 <FormControl>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-450 dark:text-zinc-600" />
-                    <Input type="password" placeholder="••••••••" className="pl-9 h-9 border-slate-200 dark:border-white/[0.06] bg-slate-50/50 dark:bg-[#111113]/40 focus:border-blue-500 dark:focus:border-blue-600 focus:ring-0 rounded-[2px] text-sm text-slate-850 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-zinc-600 transition-colors" {...field} />
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-450 dark:text-muted-foreground" />
+                    <Input type="password" placeholder="••••••••" className="pl-9 h-9 border-border bg-muted/50 dark:bg-[#111113]/40 focus:border-blue-500 dark:focus:border-blue-600 focus:ring-0 rounded-sm text-sm text-slate-850 dark:text-foreground placeholder:text-muted-foreground dark:placeholder:text-muted-foreground transition-colors" {...field} />
                   </div>
                 </FormControl>
                 <FormMessage className="text-[11px] font-mono text-red-500" />
@@ -250,19 +250,19 @@ export const RegisterForm: React.FC = () => {
                   <Checkbox
                     checked={field.value}
                     onCheckedChange={field.onChange}
-                    className="h-3.5 w-3.5 rounded-[2px] border-slate-300 dark:border-white/[0.12] data-[state=checked]:bg-blue-600 dark:data-[state=checked]:bg-blue-700 data-[state=checked]:border-blue-600 dark:data-[state=checked]:border-blue-700"
+                    className="h-3.5 w-3.5 rounded-sm border-border dark:border-white/[0.12] data-[state=checked]:bg-primary dark:data-[state=checked]:bg-primary/90 data-[state=checked]:border-blue-600 dark:data-[state=checked]:border-blue-700"
                   />
                 </FormControl>
                 <div className="leading-none text-left">
-                  <FormLabel className="text-xs font-medium text-slate-500 dark:text-zinc-500 cursor-pointer">
-                    Tôi đồng ý với các <a href="/terms" className="text-blue-600 dark:text-blue-400 font-semibold hover:underline">Điều khoản Dịch vụ</a> và <a href="/privacy" className="text-blue-600 dark:text-blue-400 font-semibold hover:underline">Chính sách Bảo mật</a>
+                  <FormLabel className="text-xs font-medium text-muted-foreground dark:text-muted-foreground cursor-pointer">
+                    Tôi đồng ý với các <a href="/terms" className="text-primary font-semibold hover:underline">Điều khoản Dịch vụ</a> và <a href="/privacy" className="text-primary font-semibold hover:underline">Chính sách Bảo mật</a>
                   </FormLabel>
                 </div>
               </FormItem>
             )}
           />
 
-          <Button type="submit" disabled={isSpinning} className="w-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 text-white h-9 text-xs font-mono font-bold uppercase tracking-wider rounded-[2px] transition-colors duration-155 mt-2 shadow-none">
+          <Button type="submit" disabled={isSpinning} className="w-full bg-primary hover:bg-primary/90 dark:bg-primary/90 dark:hover:bg-primary text-white h-9 text-xs font-mono font-bold uppercase tracking-wider rounded-sm transition-colors duration-155 mt-2 shadow-none">
             {isSpinning ? (
               <>
                 <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />

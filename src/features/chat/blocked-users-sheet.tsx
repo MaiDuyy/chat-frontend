@@ -84,19 +84,19 @@ export default function BlockedUsersSheet({
                             </div>
                         ) : blockedUsers.length === 0 ? (
                             <div className="flex flex-col items-center justify-center py-16 text-center">
-                                <div className="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-4">
-                                    <ShieldOff className="h-8 w-8 text-gray-400" />
+                                <div className="w-16 h-16 rounded-full bg-muted dark:bg-gray-800 flex items-center justify-center mb-4">
+                                    <ShieldOff className="h-8 w-8 text-muted-foreground" />
                                 </div>
-                                <p className="text-gray-500 dark:text-gray-400 font-medium">
+                                <p className="text-muted-foreground font-medium">
                                     Không có người dùng bị chặn
                                 </p>
-                                <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">
+                                <p className="text-sm text-muted-foreground dark:text-muted-foreground mt-1">
                                     Những người bạn chặn sẽ xuất hiện ở đây
                                 </p>
                             </div>
                         ) : (
                             <div className="space-y-2">
-                                <p className="text-sm text-gray-500 mb-4">
+                                <p className="text-sm text-muted-foreground mb-4">
                                     {blockedUsers.length} người dùng bị chặn
                                 </p>
                                 {blockedUsers.map((blockedItem) => {
@@ -112,24 +112,24 @@ export default function BlockedUsersSheet({
                                     return (
                                         <div
                                             key={blockedItem.id}
-                                            className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700 transition-all hover:shadow-sm"
+                                            className="flex items-center gap-3 p-3 bg-muted dark:bg-gray-800 rounded-md border border-border transition-all hover:shadow-sm"
                                         >
-                                            <Avatar className="h-10 w-10 ring-2 ring-white dark:ring-gray-900 overflow-hidden">
+                                            <Avatar className="h-10 w-10 ring-2 ring-background overflow-hidden">
                                                 <AvatarImage 
                                                     src={getAvatarUrl(blockedItem.user.avatar, blockedItem.user.name)} 
                                                     alt={blockedItem.user.name} 
                                                     className="object-cover"
                                                 />
-                                                <AvatarFallback className="bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 text-gray-600 dark:text-gray-300 font-semibold text-xs transition-colors group-hover:from-gray-200 group-hover:to-gray-300">
+                                                <AvatarFallback className="bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 text-muted-foreground font-semibold text-xs transition-colors group-hover:from-gray-200 group-hover:to-gray-300">
                                                     {initials}
                                                 </AvatarFallback>
                                             </Avatar>
                                             <div className="flex-1 min-w-0">
-                                                <p className="font-semibold text-slate-900 dark:text-slate-100 truncate text-sm">
+                                                <p className="font-semibold text-foreground truncate text-sm">
                                                     {blockedItem.user.name}
                                                 </p>
                                                 {blockedItem.blockedAt && (
-                                                    <p className="text-[10px] text-slate-400 font-medium">
+                                                    <p className="text-[10px] text-muted-foreground font-medium">
                                                         Đã chặn {format(new Date(blockedItem.blockedAt), "HH:mm, dd MMMM yyyy", { locale: vi })}
                                                     </p>
                                                 )}

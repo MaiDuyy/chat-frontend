@@ -16,7 +16,7 @@ export function TaskStatusBadge({ task }: { task: any }) {
 
     if (status === "CANCELLED")
         return (
-            <Badge className="text-[10px] bg-slate-100 text-slate-500 border-slate-200 font-semibold shadow-sm">
+            <Badge className="text-[10px] bg-muted text-muted-foreground border-border font-semibold shadow-sm">
                 Đã hủy
             </Badge>
         );
@@ -36,7 +36,7 @@ export function TaskStatusBadge({ task }: { task: any }) {
         );
 
     return (
-        <Badge variant="outline" className="text-[10px] text-slate-400 font-medium bg-slate-50/50">
+        <Badge variant="outline" className="text-[10px] text-muted-foreground font-medium bg-muted/50">
             Chưa bắt đầu
         </Badge>
     );

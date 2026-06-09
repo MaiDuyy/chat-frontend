@@ -129,7 +129,7 @@ export function ForgotPasswordPage() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    className="pl-11 h-12 border-border focus:border-primary focus:ring-0 rounded-lg transition-colors"
+                    className="pl-11 h-12 border-border focus:border-primary focus:ring-0 rounded-md transition-colors"
                   />
                 </div>
               </div>
@@ -137,7 +137,7 @@ export function ForgotPasswordPage() {
               <Button
                 type="submit"
                 disabled={isRequesting}
-                className="w-full bg-primary hover:opacity-90 text-primary-foreground h-12 font-semibold rounded-lg shadow-sm transition-all"
+                className="w-full bg-primary hover:opacity-90 text-primary-foreground h-12 font-semibold rounded-md shadow-sm transition-all"
               >
                 {isRequesting ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -169,7 +169,7 @@ export function ForgotPasswordPage() {
                 <Button
                   type="submit"
                   disabled={otp.length !== 6 || isVerifying}
-                  className="w-full bg-primary hover:opacity-90 text-primary-foreground h-12 font-semibold rounded-lg shadow-sm transition-all"
+                  className="w-full bg-primary hover:opacity-90 text-primary-foreground h-12 font-semibold rounded-md shadow-sm transition-all"
                 >
                   {isVerifying ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -219,7 +219,7 @@ export function ForgotPasswordPage() {
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     required
-                    className="pl-11 h-12 border-border focus:border-primary focus:ring-0 rounded-lg transition-colors"
+                    className="pl-11 h-12 border-border focus:border-primary focus:ring-0 rounded-md transition-colors"
                   />
                 </div>
                 <PasswordStrengthMeter password={newPassword} />
@@ -235,7 +235,7 @@ export function ForgotPasswordPage() {
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     required
-                    className="pl-11 h-12 border-border focus:border-primary focus:ring-0 rounded-lg transition-colors"
+                    className="pl-11 h-12 border-border focus:border-primary focus:ring-0 rounded-md transition-colors"
                   />
                 </div>
               </div>
@@ -243,7 +243,7 @@ export function ForgotPasswordPage() {
               <Button
                 type="submit"
                 disabled={isResetting || !newPassword || newPassword !== confirmPassword}
-                className="w-full bg-primary hover:opacity-90 text-primary-foreground h-12 font-semibold rounded-lg shadow-sm transition-all mt-4"
+                className="w-full bg-primary hover:opacity-90 text-primary-foreground h-12 font-semibold rounded-md shadow-sm transition-all mt-4"
               >
                 {isResetting ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -270,7 +270,7 @@ export function ForgotPasswordPage() {
 
             <Button
               asChild
-              className="w-full bg-primary hover:opacity-90 text-primary-foreground h-12 font-semibold rounded-lg transition-all"
+              className="w-full bg-primary hover:opacity-90 text-primary-foreground h-12 font-semibold rounded-md transition-all"
             >
               <Link href="/login">Quay lại đăng nhập</Link>
             </Button>

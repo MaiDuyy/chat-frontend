@@ -96,8 +96,8 @@ export function ChannelManagement() {
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-wrap items-center gap-2 flex-1 min-w-0">
           <Select value={selectedWorkspaceId} onValueChange={setSelectedWorkspaceId}>
-            <SelectTrigger className="w-full sm:w-[200px] h-8 text-xs rounded-lg border-border">
-              <Building2 className="w-3.5 h-3.5 mr-1.5 text-slate-400 flex-shrink-0" />
+            <SelectTrigger className="w-full sm:w-[200px] h-8 text-xs rounded-md border-border">
+              <Building2 className="w-3.5 h-3.5 mr-1.5 text-muted-foreground flex-shrink-0" />
               <SelectValue placeholder="Chọn workspace..." />
             </SelectTrigger>
             <SelectContent className="text-xs">
@@ -107,19 +107,19 @@ export function ChannelManagement() {
             </SelectContent>
           </Select>
           <div className="relative w-full sm:w-64">
-            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
             <Input
               placeholder="Tìm kiếm kênh chat..."
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
               disabled={!selectedWorkspaceId}
-              className="pl-8 h-8 text-xs rounded-lg bg-transparent border-border focus-visible:ring-1 focus-visible:ring-primary"
+              className="pl-8 h-8 text-xs rounded-md bg-transparent border-border focus-visible:ring-1 focus-visible:ring-primary"
             />
           </div>
         </div>
         {selectedWorkspaceId && (
           <Tabs value={showArchived ? 'all' : 'active'} onValueChange={v => setShowArchived(v === 'all')}>
-            <div className="bg-slate-100/60 dark:bg-slate-800/60 p-0.5 rounded-lg w-fit">
+            <div className="bg-muted/60 dark:bg-slate-800/60 p-0.5 rounded-md w-fit">
               <TabsList className="bg-transparent h-7 gap-0.5 p-0">
                 <TabsTrigger value="active" className="rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-slate-900 data-[state=active]:shadow-sm px-3 h-6 text-[11px] font-semibold">
                   Đang hoạt động
@@ -135,9 +135,9 @@ export function ChannelManagement() {
 
       {/* Main Content Area */}
       {!selectedWorkspaceId ? (
-        <div className="flex flex-col items-center justify-center h-48 border border-dashed border-border rounded-xl bg-card text-muted-foreground">
-          <Building2 className="w-8 h-8 mb-2 text-slate-350 dark:text-slate-750" />
-          <p className="text-xs font-semibold text-slate-700 dark:text-slate-350">Chọn một Không gian làm việc</p>
+        <div className="flex flex-col items-center justify-center h-48 border border-dashed border-border rounded-lg bg-card text-muted-foreground">
+          <Building2 className="w-8 h-8 mb-2 text-slate-350 dark:text-muted-foreground" />
+          <p className="text-xs font-semibold text-muted-foreground dark:text-slate-350">Chọn một Không gian làm việc</p>
           <p className="text-[10px] text-muted-foreground mt-0.5">Vui lòng chọn workspace từ thanh bộ lọc để bắt đầu quản lý các kênh chat</p>
         </div>
       ) : loadingChannels ? (
@@ -146,9 +146,9 @@ export function ChannelManagement() {
           <p className="text-[11px] text-muted-foreground animate-pulse">Đang tải danh sách kênh chat...</p>
         </div>
       ) : (
-        <div className="rounded-xl border border-border bg-card text-card-foreground shadow-sm overflow-hidden">
+        <div className="rounded-lg border border-border bg-card text-card-foreground shadow-sm overflow-hidden">
           <Table>
-            <TableHeader className="bg-slate-50/40 dark:bg-slate-900/10 border-b border-border">
+            <TableHeader className="bg-muted/40 dark:bg-slate-900/10 border-b border-border">
               <TableRow className="hover:bg-transparent">
                 <TableHead className="w-[280px] text-[10px] uppercase font-bold text-muted-foreground py-2 px-3 h-auto">Tên Kênh</TableHead>
                 <TableHead className="text-[10px] uppercase font-bold text-muted-foreground py-2 px-3 h-auto w-[110px]">Loại kênh</TableHead>
@@ -171,14 +171,14 @@ export function ChannelManagement() {
                   const typeCfg = TYPE_CONFIG[channel.type] || TYPE_CONFIG.PUBLIC;
                   const TypeIcon = typeCfg.icon;
                   return (
-                    <TableRow key={channel.id} className={cn('hover:bg-slate-50/40 dark:hover:bg-slate-800/40 border-b border-border/50 last:border-0 transition-opacity', channel.isArchived && 'opacity-50')}>
+                    <TableRow key={channel.id} className={cn('hover:bg-muted/40 dark:hover:bg-slate-800/40 border-b border-border/50 last:border-0 transition-opacity', channel.isArchived && 'opacity-50')}>
                       <TableCell className="py-2 px-3">
                         <div className="flex items-center gap-2.5 min-w-0">
-                          <div className="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 flex-shrink-0">
-                            <TypeIcon className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
+                          <div className="p-1.5 rounded-md bg-muted dark:bg-slate-800 flex-shrink-0">
+                            <TypeIcon className="w-3.5 h-3.5 text-muted-foreground dark:text-muted-foreground" />
                           </div>
                           <div className="min-w-0">
-                            <p className="text-xs font-semibold text-slate-900 dark:text-slate-100 truncate max-w-[200px]">
+                            <p className="text-xs font-semibold text-foreground truncate max-w-[200px]">
                               {channel.name}
                             </p>
                             {channel.description && (
@@ -193,14 +193,14 @@ export function ChannelManagement() {
                         </Badge>
                       </TableCell>
                       <TableCell className="py-2 px-3">
-                        <div className="flex items-center gap-1 text-[11px] text-slate-700 dark:text-slate-300">
-                          <Users className="w-3 h-3 text-slate-400" />
+                        <div className="flex items-center gap-1 text-[11px] text-muted-foreground dark:text-muted-foreground">
+                          <Users className="w-3 h-3 text-muted-foreground" />
                           <span className="font-medium">{channel._count?.members ?? 0}</span>
                         </div>
                       </TableCell>
                       <TableCell className="py-2 px-3">
-                        <div className="flex items-center gap-1 text-[11px] text-slate-700 dark:text-slate-300">
-                          <MessageSquare className="w-3 h-3 text-slate-400" />
+                        <div className="flex items-center gap-1 text-[11px] text-muted-foreground dark:text-muted-foreground">
+                          <MessageSquare className="w-3 h-3 text-muted-foreground" />
                           <span className="font-medium">{channel._count?.messages ?? 0}</span>
                         </div>
                       </TableCell>
@@ -209,7 +209,7 @@ export function ChannelManagement() {
                       </TableCell>
                       <TableCell className="py-2 px-3">
                         {channel.isArchived ? (
-                          <Badge variant="outline" className="bg-slate-100 dark:bg-slate-800 text-slate-550 dark:text-slate-400 text-[10px] px-1.5 py-0.5 rounded-md border-border/80">
+                          <Badge variant="outline" className="bg-muted dark:bg-slate-800 text-slate-550 dark:text-muted-foreground text-[10px] px-1.5 py-0.5 rounded-md border-border/80">
                             Đã lưu trữ
                           </Badge>
                         ) : channel.isDefault ? (
@@ -225,7 +225,7 @@ export function ChannelManagement() {
                       <TableCell className="py-2 px-3 text-right">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800">
+                            <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md hover:bg-muted dark:hover:bg-slate-800">
                               <MoreHorizontal className="h-3.5 h-3.5" />
                             </Button>
                           </DropdownMenuTrigger>
@@ -234,9 +234,9 @@ export function ChannelManagement() {
                             <DropdownMenuSeparator className="bg-border/60" />
                             <DropdownMenuItem className="cursor-pointer" onClick={() => handleArchiveToggle(channel)}>
                               {channel.isArchived ? (
-                                <><ArchiveRestore className="w-3.5 h-3.5 mr-2 text-slate-400" /> Khôi phục kênh</>
+                                <><ArchiveRestore className="w-3.5 h-3.5 mr-2 text-muted-foreground" /> Khôi phục kênh</>
                               ) : (
-                                <><Archive className="w-3.5 h-3.5 mr-2 text-slate-400" /> Lưu trữ kênh</>
+                                <><Archive className="w-3.5 h-3.5 mr-2 text-muted-foreground" /> Lưu trữ kênh</>
                               )}
                             </DropdownMenuItem>
                             <DropdownMenuSeparator className="bg-border/60" />
@@ -260,7 +260,7 @@ export function ChannelManagement() {
 
       {/* Delete Dialog */}
       <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <DialogContent className="rounded-xl max-w-sm border-border bg-card text-xs">
+        <DialogContent className="rounded-lg max-w-sm border-border bg-card text-xs">
           <DialogHeader className="space-y-1">
             <DialogTitle className="text-sm font-semibold flex items-center gap-1.5 text-red-600">
               <AlertTriangle className="w-4 h-4" />
@@ -272,13 +272,13 @@ export function ChannelManagement() {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="gap-2 sm:gap-0">
-            <Button variant="outline" size="sm" onClick={() => setShowDeleteDialog(false)} className="h-8 text-xs rounded-lg">Hủy</Button>
+            <Button variant="outline" size="sm" onClick={() => setShowDeleteDialog(false)} className="h-8 text-xs rounded-md">Hủy</Button>
             <Button
                 variant="destructive"
                 size="sm"
                 onClick={handleDelete}
                 disabled={isDeleting}
-                className="h-8 text-xs rounded-lg bg-rose-600 hover:bg-rose-700 text-white"
+                className="h-8 text-xs rounded-md bg-rose-600 hover:bg-rose-700 text-white"
             >
               {isDeleting && <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />}
               Xác nhận xóa

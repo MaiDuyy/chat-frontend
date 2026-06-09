@@ -41,7 +41,7 @@ export const AIOnboardingTour: React.FC = () => {
           
           <button 
             onClick={handleDismiss}
-            className="absolute top-4 right-4 text-zinc-500 hover:text-white transition-colors"
+            className="absolute top-4 right-4 text-muted-foreground hover:text-white transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -55,7 +55,7 @@ export const AIOnboardingTour: React.FC = () => {
               Chào mừng đến với Command Center
             </h2>
             
-            <p className="text-zinc-400 text-sm mb-8 leading-relaxed">
+            <p className="text-muted-foreground text-sm mb-8 leading-relaxed">
               Bạn là nhân sự mới? Dashboard này đã được thiết kế lại. 
               Bạn có muốn AI hướng dẫn nhanh sơ đồ tổ chức văn hóa công ty và cách sử dụng bảng điều khiển này không?
             </p>
@@ -69,7 +69,7 @@ export const AIOnboardingTour: React.FC = () => {
               </button>
               <button 
                 onClick={handleDismiss}
-                className="w-full bg-transparent text-zinc-500 font-medium hover:text-zinc-300 py-2 transition-colors uppercase tracking-wider text-sm"
+                className="w-full bg-transparent text-muted-foreground font-medium hover:text-muted-foreground py-2 transition-colors uppercase tracking-wider text-sm"
               >
                 Bỏ qua
               </button>

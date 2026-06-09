@@ -199,12 +199,12 @@ export function DocumentTable({ onDocumentClick, className }: DocumentTableProps
             {/* Control Bar */}
             <div className="flex flex-col md:flex-row gap-3 items-start md:items-center justify-between select-none">
                 <div className="relative w-full md:max-w-sm">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
                     <Input
                         placeholder="Tìm kiếm tài liệu..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="pl-9 h-9 text-sm bg-background border-slate-200/80 rounded-[4px] focus-visible:ring-1 focus-visible:ring-blue-600 focus-visible:border-blue-600"
+                        className="pl-9 h-9 text-sm bg-background border-border/80 rounded-md focus-visible:ring-1 focus-visible:ring-blue-600 focus-visible:border-blue-600"
                         autoComplete="off"
                     />
                 </div>
@@ -214,10 +214,10 @@ export function DocumentTable({ onDocumentClick, className }: DocumentTableProps
                         value={statusFilter}
                         onValueChange={(v) => setStatusFilter(v)}
                     >
-                        <SelectTrigger className="w-[160px] h-9 text-sm bg-background border-slate-200/80 rounded-[4px] focus:ring-0 focus:ring-offset-0">
+                        <SelectTrigger className="w-[160px] h-9 text-sm bg-background border-border/80 rounded-md focus:ring-0 focus:ring-offset-0">
                             <SelectValue placeholder="Tất cả trạng thái" />
                         </SelectTrigger>
-                        <SelectContent className="rounded-[4px] border-slate-200/80 shadow-md">
+                        <SelectContent className="rounded-md border-border/80 shadow-md">
                             <SelectItem value="ALL" className="rounded-[3px] text-xs">Tất cả tài liệu</SelectItem>
                             <SelectItem value="PENDING" className="rounded-[3px] text-xs">Đang chờ</SelectItem>
                             <SelectItem value="PROCESSING" className="rounded-[3px] text-xs">Đang xử lý</SelectItem>
@@ -227,7 +227,7 @@ export function DocumentTable({ onDocumentClick, className }: DocumentTableProps
                     </Select>
 
                     {isFetching && (
-                        <div className="flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold text-blue-600 bg-blue-50 border border-blue-100 rounded-[4px] animate-in fade-in">
+                        <div className="flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold text-blue-600 bg-blue-50 border border-blue-100 rounded-md animate-in fade-in">
                             <Loader2 className="w-3 h-3 animate-spin" />
                             Đang đồng bộ
                         </div>
@@ -236,7 +236,7 @@ export function DocumentTable({ onDocumentClick, className }: DocumentTableProps
             </div>
 
             {/* Table Section */}
-            <Card className="rounded-[4px] border-slate-200/80 shadow-none overflow-hidden bg-card">
+            <Card className="rounded-md border-border/80 shadow-none overflow-hidden bg-card">
                 {filteredDocs.length === 0 ? (
                     <EmptyState
                         icon={FileText}
@@ -246,13 +246,13 @@ export function DocumentTable({ onDocumentClick, className }: DocumentTableProps
                 ) : (
                     <div className="overflow-x-auto">
                         <Table>
-                        <TableHeader className="bg-slate-50/60 border-b border-slate-200/80">
-                            <TableRow className="hover:bg-transparent border-slate-200/80">
-                                <TableHead className="w-[45%] text-slate-500 font-bold py-2.5 px-4 text-[10px] uppercase tracking-wider">Tên tài liệu</TableHead>
-                                <TableHead className="text-slate-500 font-bold py-2.5 px-4 text-[10px] uppercase tracking-wider">Trạng thái</TableHead>
-                                <TableHead className="text-slate-500 font-bold py-2.5 px-4 text-[10px] uppercase tracking-wider">Kích thước</TableHead>
-                                <TableHead className="text-slate-500 font-bold py-2.5 px-4 text-[10px] uppercase tracking-wider">Chunks</TableHead>
-                                <TableHead className="text-right text-slate-500 font-bold py-2.5 px-4 pr-6 text-[10px] uppercase tracking-wider">Cập nhật</TableHead>
+                        <TableHeader className="bg-muted/60 border-b border-border/80">
+                            <TableRow className="hover:bg-transparent border-border/80">
+                                <TableHead className="w-[45%] text-muted-foreground font-bold py-2.5 px-4 text-[10px] uppercase tracking-wider">Tên tài liệu</TableHead>
+                                <TableHead className="text-muted-foreground font-bold py-2.5 px-4 text-[10px] uppercase tracking-wider">Trạng thái</TableHead>
+                                <TableHead className="text-muted-foreground font-bold py-2.5 px-4 text-[10px] uppercase tracking-wider">Kích thước</TableHead>
+                                <TableHead className="text-muted-foreground font-bold py-2.5 px-4 text-[10px] uppercase tracking-wider">Chunks</TableHead>
+                                <TableHead className="text-right text-muted-foreground font-bold py-2.5 px-4 pr-6 text-[10px] uppercase tracking-wider">Cập nhật</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -265,26 +265,26 @@ export function DocumentTable({ onDocumentClick, className }: DocumentTableProps
                                 return (
                                     <TableRow
                                         key={doc.id}
-                                        className="group cursor-pointer hover:bg-slate-50/50 transition-colors border-slate-200/50 last:border-0"
+                                        className="group cursor-pointer hover:bg-muted/50 transition-colors border-border/50 last:border-0"
                                         onClick={() => handleDocClick(doc)}
                                     >
                                         <TableCell className="py-2 px-4">
                                             <div className="flex items-center gap-2.5">
-                                                <div className={cn("p-1.5 rounded-[4px] bg-slate-50 transition-colors border border-slate-200/30", fileType.color)}>
+                                                <div className={cn("p-1.5 rounded-md bg-muted transition-colors border border-border/30", fileType.color)}>
                                                     <FileTypeIcon className="w-3.5 h-3.5" />
                                                 </div>
                                                 <div className="flex flex-col min-w-0">
                                                     <div className="flex items-center gap-2">
-                                                        <span className="font-semibold text-slate-800 text-[13px] truncate group-hover:text-blue-600 transition-colors">
+                                                        <span className="font-semibold text-foreground text-[13px] truncate group-hover:text-blue-600 transition-colors">
                                                             {doc.fileName}
                                                         </span>
                                                         {doc.securityClassification && doc.securityClassification !== 'PUBLIC' && (
-                                                            <Badge variant="outline" className="text-[8px] px-1 py-0 h-3.5 bg-slate-100 text-slate-655 border-slate-200 uppercase tracking-tighter rounded-[3px] font-bold">
+                                                            <Badge variant="outline" className="text-[8px] px-1 py-0 h-3.5 bg-muted text-slate-655 border-border uppercase tracking-tighter rounded-[3px] font-bold">
                                                                 {doc.securityClassification}
                                                             </Badge>
                                                         )}
                                                     </div>
-                                                    <span className="text-[9px] uppercase tracking-wider font-extrabold text-slate-400 font-mono mt-0.5">
+                                                    <span className="text-[9px] uppercase tracking-wider font-extrabold text-muted-foreground font-mono mt-0.5">
                                                         {doc.documentType}
                                                     </span>
                                                 </div>
@@ -294,7 +294,7 @@ export function DocumentTable({ onDocumentClick, className }: DocumentTableProps
                                             <Badge
                                                 variant="outline"
                                                 className={cn(
-                                                    "gap-1 px-1.5 py-0.5 font-bold border-transparent shadow-none rounded-[4px] text-[10px]",
+                                                    "gap-1 px-1.5 py-0.5 font-bold border-transparent shadow-none rounded-md text-[10px]",
                                                     status.className
                                                 )}
                                             >
@@ -303,14 +303,14 @@ export function DocumentTable({ onDocumentClick, className }: DocumentTableProps
                                             </Badge>
                                         </TableCell>
                                         <TableCell className="py-2 px-4">
-                                            <div className="flex items-center gap-1 text-slate-500 text-xs">
+                                            <div className="flex items-center gap-1 text-muted-foreground text-xs">
                                                 <Weight className="w-3 h-3 opacity-50" />
                                                 {formatSize(doc.fileSize)}
                                             </div>
                                         </TableCell>
                                         <TableCell className="py-2 px-4">
-                                            <div className="flex items-center gap-1 text-slate-800 text-xs font-semibold">
-                                                <Database className="w-3 h-3 text-slate-400" />
+                                            <div className="flex items-center gap-1 text-foreground text-xs font-semibold">
+                                                <Database className="w-3 h-3 text-muted-foreground" />
                                                 {doc.chunkCount > 0 ? doc.chunkCount : '—'}
                                             </div>
                                         </TableCell>
@@ -320,14 +320,14 @@ export function DocumentTable({ onDocumentClick, className }: DocumentTableProps
                                                     <span className="text-xs font-semibold text-slate-850">
                                                         {format(new Date(doc.createdAt), 'dd/MM/yyyy')}
                                                     </span>
-                                                    <span className="text-[9px] text-slate-400 font-mono">
+                                                    <span className="text-[9px] text-muted-foreground font-mono">
                                                         {format(new Date(doc.createdAt), 'HH:mm')}
                                                     </span>
                                                 </div>
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
-                                                    className="h-7 w-7 rounded-[4px] border border-slate-200/80 opacity-0 group-hover:opacity-100 transition-opacity bg-background hover:bg-slate-50"
+                                                    className="h-7 w-7 rounded-md border border-border/80 opacity-0 group-hover:opacity-100 transition-opacity bg-background hover:bg-muted"
                                                     onClick={async (e) => {
                                                         e.stopPropagation();
                                                         if (confirm("Bạn có chắc chắn muốn xóa tài liệu này?")) {
@@ -340,7 +340,7 @@ export function DocumentTable({ onDocumentClick, className }: DocumentTableProps
                                                         }
                                                     }}
                                                 >
-                                                    <MoreHorizontal className="w-3.5 h-3.5 text-slate-500" />
+                                                    <MoreHorizontal className="w-3.5 h-3.5 text-muted-foreground" />
                                                 </Button>
                                             </div>
                                         </TableCell>
@@ -367,10 +367,10 @@ export function DocumentTable({ onDocumentClick, className }: DocumentTableProps
 
             {/* Footer Info */}
             <div className="flex items-center justify-between px-1 mt-1 select-none">
-                <p className="text-[11px] text-slate-500 font-semibold">
-                    Tổng cộng: <span className="text-slate-800 font-bold">{totalElements}</span> tài liệu
+                <p className="text-[11px] text-muted-foreground font-semibold">
+                    Tổng cộng: <span className="text-foreground font-bold">{totalElements}</span> tài liệu
                 </p>
-                <div className="flex items-center gap-1.5 text-[10px] text-slate-400 uppercase tracking-widest font-extrabold">
+                <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground uppercase tracking-widest font-extrabold">
                     <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
                     Hệ thống ổn định
                 </div>

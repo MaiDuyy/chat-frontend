@@ -62,7 +62,7 @@ export default function AdminDashboardPage() {
         return (
           <div className="space-y-6">
             <AdminStats />
-            <div className="bg-white dark:bg-slate-900 rounded-xl p-6 border shadow-sm">
+            <div className="bg-white dark:bg-slate-900 rounded-lg p-6 border shadow-sm">
               <h3 className="text-lg font-semibold mb-4">Hoạt động mới nhất</h3>
               <AuditLogTable />
             </div>

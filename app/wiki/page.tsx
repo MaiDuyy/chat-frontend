@@ -36,6 +36,8 @@ import { useHasRole } from "@/src/lib/rbac/usePermission";
 import { WikiPagination } from "./components/WikiPagination";
 import { DocumentManagement } from "@/src/features/admin/DocumentManagement";
 import { WikiAIChatPanel, WikiAIChatButton } from "./components/WikiAIChatPanel";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Menu } from "lucide-react";
 
 export default function WikiDashboard() {
   const currentWorkspaceId = useSelector((state: any) => state.workspace.currentWorkspaceId);
@@ -78,10 +80,18 @@ export default function WikiDashboard() {
     page,
     size
   });
-  const { data: workspaceDrafts } = useGetDraftsByWorkspaceQuery(workspaceId, { skip: !canManageWiki || isSuperAdmin });
-  const { data: allPendingDrafts } = useGetPendingDraftsQuery(undefined, { skip: !isSuperAdmin });
+  const { data: workspaceDrafts, refetch: refetchWorkspaceDrafts } = useGetDraftsByWorkspaceQuery(workspaceId, { skip: !canManageWiki || isSuperAdmin });
+  const { data: allPendingDrafts, refetch: refetchPendingDrafts } = useGetPendingDraftsQuery(undefined, { skip: !isSuperAdmin });
   const { data: plans } = useGetCompilationPlansQuery({ workspaceId }, { skip: !canManageWiki });
   const [compileDocument, { isLoading: isCompiling }] = useCompileDocumentMutation();
+
+  const refetchDrafts = React.useCallback(() => {
+    if (isSuperAdmin) {
+      refetchPendingDrafts();
+    } else {
+      refetchWorkspaceDrafts();
+    }
+  }, [isSuperAdmin, refetchPendingDrafts, refetchWorkspaceDrafts]);
 
   const wikiPages = React.useMemo(() => wikiPagesMetadata || [], [wikiPagesMetadata]);
 
@@ -246,10 +256,29 @@ export default function WikiDashboard() {
   };
 
   return (
-    <div className="font-sans flex gap-3 w-full text-foreground mx-auto p-2 md:p-3 h-full overflow-y-auto text-xs md:text-sm">
+    <div className="font-sans flex gap-3 w-full text-foreground mx-auto p-2 md:p-3 h-full overflow-y-auto text-xs md:text-sm relative">
       {/* Collapsible Left Sidebar */}
       <div className="hidden md:block">
         <WikiPageTree />
+      </div>
+
+      {/* Mobile Floating Wiki Tree Toggle */}
+      <div className="md:hidden fixed bottom-20 left-4 z-40">
+        <Sheet>
+          <SheetTrigger asChild>
+            <button 
+              className="w-10 h-10 bg-primary hover:bg-primary/90 text-primary-foreground rounded-full flex items-center justify-center shadow-lg border border-primary/20 cursor-pointer active:scale-95 transition-transform"
+              aria-label="Mục lục Wiki"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+          </SheetTrigger>
+          <SheetContent side="left" className="p-0 w-72 bg-card border-r border-border">
+            <div className="h-full p-3 overflow-y-auto select-none">
+              <WikiPageTree />
+            </div>
+          </SheetContent>
+        </Sheet>
       </div>
 
       {/* Main Body */}
@@ -275,7 +304,7 @@ export default function WikiDashboard() {
 
             <button
               onClick={() => setSearchOpen(true)}
-              className="px-2.5 py-1.5 text-xs font-mono font-bold uppercase tracking-wide border border-border bg-secondary hover:bg-secondary/85 text-secondary-foreground transition-all rounded-lg shadow-sm active:translate-y-[0.5px] flex items-center gap-1.5 cursor-pointer"
+              className="px-2.5 py-1.5 text-xs font-mono font-bold uppercase tracking-wide border border-border bg-secondary hover:bg-secondary/85 text-secondary-foreground transition-all rounded-md shadow-sm active:translate-y-[0.5px] flex items-center gap-1.5 cursor-pointer"
             >
               <Search className="w-3.5 h-3.5" />
               Tìm nhanh (Ctrl+K)
@@ -283,7 +312,7 @@ export default function WikiDashboard() {
 
             <Link
               href="/wiki/queue"
-              className="px-2.5 py-1.5 text-xs font-mono font-bold uppercase tracking-wide border border-border bg-secondary hover:bg-secondary/85 text-secondary-foreground transition-all rounded-lg shadow-sm active:translate-y-[0.5px] flex items-center gap-1.5 cursor-pointer"
+              className="px-2.5 py-1.5 text-xs font-mono font-bold uppercase tracking-wide border border-border bg-secondary hover:bg-secondary/85 text-secondary-foreground transition-all rounded-md shadow-sm active:translate-y-[0.5px] flex items-center gap-1.5 cursor-pointer"
               title="Bản thảo bạn đã tạo và bản thảo đang chờ bạn kiểm duyệt"
             >
               <FileText className="w-3.5 h-3.5" />
@@ -292,7 +321,7 @@ export default function WikiDashboard() {
 
             <Link
               href="/wiki/graph"
-              className="px-2.5 py-1.5 text-xs font-mono font-bold uppercase tracking-wide border border-transparent bg-primary hover:bg-primary/90 text-primary-foreground transition-all rounded-lg shadow-sm active:translate-y-[0.5px] flex items-center gap-1.5 cursor-pointer"
+              className="px-2.5 py-1.5 text-xs font-mono font-bold uppercase tracking-wide border border-transparent bg-primary hover:bg-primary/90 text-primary-foreground transition-all rounded-md shadow-sm active:translate-y-[0.5px] flex items-center gap-1.5 cursor-pointer"
             >
               <Compass className="w-3.5 h-3.5" />
               Đồ thị tri thức
@@ -302,7 +331,7 @@ export default function WikiDashboard() {
               <>
                 <Link
                   href="/wiki/plans"
-                  className={`px-2.5 py-1.5 text-xs font-mono font-bold uppercase tracking-wide border transition-all rounded-lg shadow-sm active:translate-y-[0.5px] flex items-center gap-1.5 cursor-pointer ${
+                  className={`px-2.5 py-1.5 text-xs font-mono font-bold uppercase tracking-wide border transition-all rounded-md shadow-sm active:translate-y-[0.5px] flex items-center gap-1.5 cursor-pointer ${
                     Array.isArray(plans) && plans.filter(p => p.status === 'PENDING_REVIEW').length > 0
                       ? "border-primary bg-primary hover:bg-primary/95 text-primary-foreground font-semibold"
                       : "border-border bg-secondary hover:bg-secondary/85 text-secondary-foreground"
@@ -315,7 +344,7 @@ export default function WikiDashboard() {
                 {pendingCount > 0 && (
                   <Link
                     href="/wiki/review"
-                    className="px-2.5 py-1.5 text-xs font-mono font-bold uppercase tracking-wide border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-400 transition-all rounded-lg shadow-sm active:translate-y-[0.5px] flex items-center gap-1.5 cursor-pointer"
+                    className="px-2.5 py-1.5 text-xs font-mono font-bold uppercase tracking-wide border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-400 transition-all rounded-md shadow-sm active:translate-y-[0.5px] flex items-center gap-1.5 cursor-pointer"
                   >
                     <Clock className="w-3.5 h-3.5" />
                     Duyệt bản thảo ({pendingCount})
@@ -324,7 +353,7 @@ export default function WikiDashboard() {
                 
                 <Link
                   href="/wiki/new"
-                  className="px-2.5 py-1.5 text-xs font-mono font-bold uppercase tracking-wide border border-border bg-secondary hover:bg-secondary/85 text-secondary-foreground transition-all rounded-lg shadow-sm active:translate-y-[0.5px] flex items-center gap-1.5 cursor-pointer"
+                  className="px-2.5 py-1.5 text-xs font-mono font-bold uppercase tracking-wide border border-border bg-secondary hover:bg-secondary/85 text-secondary-foreground transition-all rounded-md shadow-sm active:translate-y-[0.5px] flex items-center gap-1.5 cursor-pointer"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   Tạo trang mới
@@ -341,7 +370,7 @@ export default function WikiDashboard() {
               onClick={() => setActiveTab("knowledge")}
               className={`px-4 py-2 text-xs font-mono font-bold uppercase tracking-wider border-b-2 transition-all cursor-pointer ${
                 activeTab === "knowledge"
-                  ? "border-slate-800 dark:border-slate-200 text-foreground font-extrabold"
+                  ? "border-border dark:border-border text-foreground font-extrabold"
                   : "border-transparent text-muted-foreground hover:text-foreground"
               }`}
             >
@@ -351,7 +380,7 @@ export default function WikiDashboard() {
               onClick={() => setActiveTab("documents")}
               className={`px-4 py-2 text-xs font-mono font-bold uppercase tracking-wider border-b-2 transition-all cursor-pointer ${
                 activeTab === "documents"
-                  ? "border-slate-800 dark:border-slate-200 text-foreground font-extrabold"
+                  ? "border-border dark:border-border text-foreground font-extrabold"
                   : "border-transparent text-muted-foreground hover:text-foreground"
               }`}
             >
@@ -378,7 +407,7 @@ export default function WikiDashboard() {
               ].map((item, idx) => (
                 <div
                   key={idx}
-                  className="border border-border bg-card p-2.5 rounded-xl shadow-sm flex flex-col gap-0.5 hover:shadow-md transition-shadow duration-200"
+                  className="border border-border bg-card p-2.5 rounded-lg shadow-sm flex flex-col gap-0.5 hover:shadow-md transition-shadow duration-200"
                 >
                   <span className="text-[9px] font-mono font-extrabold uppercase text-muted-foreground leading-normal">
                     {item.label}
@@ -390,7 +419,7 @@ export default function WikiDashboard() {
 
             {/* Interactive Visual Map Section */}
             {wikiPages && wikiPages.length > 0 && (
-              <div className="border border-border bg-card p-3 rounded-xl shadow-sm flex flex-col gap-2">
+              <div className="border border-border bg-card p-3 rounded-lg shadow-sm flex flex-col gap-2">
                 <button 
                   onClick={() => setShowMap(!showMap)}
                   className="w-full flex items-center justify-between text-left focus:outline-none select-none cursor-pointer"
@@ -410,7 +439,7 @@ export default function WikiDashboard() {
                 </button>
                 
                 {showMap && (
-                  <div className="w-full h-[240px] overflow-hidden rounded-xl border border-border bg-slate-50 dark:bg-slate-950 mt-1 transition-all">
+                  <div className="w-full h-[240px] overflow-hidden rounded-lg border border-border bg-muted dark:bg-slate-950 mt-1 transition-all">
                     <WikiGraph nodes={graphData.nodes} edges={graphData.edges} height={240} />
                   </div>
                 )}
@@ -423,7 +452,7 @@ export default function WikiDashboard() {
               {/* Left pane: Filterable wiki pages grid */}
               <div className={`${canManageWiki ? "lg:col-span-8" : "lg:col-span-12"} flex flex-col gap-3`}>
                 {/* Controls Bar */}
-                <div className="border border-border bg-card p-2.5 rounded-xl shadow-sm flex flex-col md:flex-row gap-2.5 items-center justify-between">
+                <div className="border border-border bg-card p-2.5 rounded-lg shadow-sm flex flex-col md:flex-row gap-2.5 items-center justify-between">
                   {/* Search */}
                   <div className="relative w-full md:w-64">
                     <input
@@ -431,13 +460,13 @@ export default function WikiDashboard() {
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       placeholder="Tìm kiếm tiêu đề, thẻ..."
-                      className="w-full pl-8 pr-3 py-1.5 text-xs border border-border bg-background rounded-lg focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary font-sans transition-all"
+                      className="w-full pl-8 pr-3 py-1.5 text-xs border border-border bg-background rounded-md focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary font-sans transition-all"
                     />
                     <Search className="absolute left-2.5 top-2.5 w-3.5 h-3.5 text-muted-foreground" />
                   </div>
 
                   {/* Filter Tabs */}
-                  <div className="flex flex-wrap items-center gap-1 border border-border bg-muted p-1 rounded-lg font-mono text-[9px] font-bold">
+                  <div className="flex flex-wrap items-center gap-1 border border-border bg-muted p-1 rounded-md font-mono text-[9px] font-bold">
                     {[
                       { id: "all", label: "TẤT CẢ" },
                       { id: "concept", label: "KHÁI NIỆM" },
@@ -462,12 +491,12 @@ export default function WikiDashboard() {
 
                 {/* Wiki list rendering */}
                 {isPagesLoading ? (
-                  <div className="border border-dashed border-border p-4 rounded-xl text-center flex flex-col items-center justify-center min-h-[200px]">
+                  <div className="border border-dashed border-border p-4 rounded-lg text-center flex flex-col items-center justify-center min-h-[200px]">
                     <div className="w-5 h-5 border-2 border-primary border-t-transparent animate-spin rounded-full mb-1.5" />
                     <p className="text-[10px] font-mono uppercase text-muted-foreground">Đang tải cơ sở tri thức...</p>
                   </div>
                 ) : filteredPages.length === 0 ? (
-                  <div className="border border-dashed border-border p-4 rounded-xl text-center flex flex-col items-center justify-center min-h-[200px] bg-muted/5">
+                  <div className="border border-dashed border-border p-4 rounded-lg text-center flex flex-col items-center justify-center min-h-[200px] bg-muted/5">
                     <HelpCircle className="w-6 h-6 text-muted-foreground/60 mb-1.5" />
                     <p className="text-xs font-bold text-foreground">Không tìm thấy bài viết nào</p>
                     <p className="text-[10px] text-muted-foreground mt-0.5">Hãy nhập từ khóa khác hoặc bấm tạo trang Wiki mới.</p>
@@ -493,7 +522,7 @@ export default function WikiDashboard() {
                           <Link
                             key={page.id}
                             href={`/wiki/${page.slug}`}
-                            className="border border-border bg-card hover:bg-muted/30 p-3 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between min-h-[110px] group"
+                            className="border border-border bg-card hover:bg-muted/30 p-3 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between min-h-[110px] group"
                           >
                             <div>
                               <div className="flex items-start justify-between gap-2 mb-1.5">
@@ -545,7 +574,7 @@ export default function WikiDashboard() {
               {canManageWiki && (
                 <div className="lg:col-span-4 flex flex-col gap-3">
                   {/* Compile document tool box */}
-                  <div className="border border-border bg-card p-3 rounded-xl shadow-sm flex flex-col gap-2.5">
+                  <div className="border border-border bg-card p-3 rounded-lg shadow-sm flex flex-col gap-2.5">
                     <div className="border-b border-border pb-1.5 flex items-center gap-1.5">
                       <Activity className="w-4 h-4 text-primary shrink-0" />
                       <span className="font-mono text-[10px] uppercase font-extrabold text-foreground">
@@ -566,18 +595,18 @@ export default function WikiDashboard() {
                           onChange={(e) => setDocIdInput(e.target.value)}
                           placeholder="Ví dụ: 1, 2, 45..."
                           required
-                          className="px-2.5 py-1.5 text-xs border border-border bg-background rounded-lg focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary font-mono transition-all"
+                          className="px-2.5 py-1.5 text-xs border border-border bg-background rounded-md focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary font-mono transition-all"
                         />
                       </div>
 
                       {compileError && (
-                        <div className="text-[9px] font-mono p-1.5 border border-rose-500/20 bg-rose-500/5 text-rose-600 rounded-lg">
+                        <div className="text-[9px] font-mono p-1.5 border border-rose-500/20 bg-rose-500/5 text-rose-600 rounded-md">
                           Lỗi: {compileError}
                         </div>
                       )}
 
                       {compileSuccess && (
-                        <div className="text-[9px] font-mono p-1.5 border border-emerald-500/20 bg-emerald-500/5 text-emerald-600 rounded-lg flex items-center gap-1">
+                        <div className="text-[9px] font-mono p-1.5 border border-emerald-500/20 bg-emerald-500/5 text-emerald-600 rounded-md flex items-center gap-1">
                           <CheckCircle className="w-3 h-3 text-emerald-600" />
                           Kích hoạt quy trình MRP thành công!
                         </div>
@@ -586,7 +615,7 @@ export default function WikiDashboard() {
                       <button
                         type="submit"
                         disabled={isCompiling || !docIdInput}
-                        className="w-full px-2.5 py-2 text-xs font-mono font-bold uppercase border border-transparent bg-primary hover:bg-primary/90 text-primary-foreground transition-all rounded-lg shadow-sm active:translate-y-[0.5px] disabled:opacity-50 cursor-pointer font-semibold"
+                        className="w-full px-2.5 py-2 text-xs font-mono font-bold uppercase border border-transparent bg-primary hover:bg-primary/90 text-primary-foreground transition-all rounded-md shadow-sm active:translate-y-[0.5px] disabled:opacity-50 cursor-pointer font-semibold"
                       >
                         {isCompiling ? "Đang xử lý..." : "Khởi chạy biên soạn"}
                       </button>
@@ -594,7 +623,7 @@ export default function WikiDashboard() {
                   </div>
 
                   {/* Quick Guide Wiki Links */}
-                  <div className="border border-border bg-card p-3 rounded-xl shadow-sm flex flex-col gap-2">
+                  <div className="border border-border bg-card p-3 rounded-lg shadow-sm flex flex-col gap-2">
                     <div className="border-b border-border pb-1.5 flex items-center gap-1.5">
                       <Compass className="w-4 h-4 text-primary shrink-0" />
                       <span className="font-mono text-[10px] uppercase font-extrabold text-foreground">

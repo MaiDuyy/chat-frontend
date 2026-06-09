@@ -23,15 +23,15 @@ export const WidgetWrapper: React.FC<WidgetWrapperProps> = ({
   statusBadge
 }) => {
   return (
-    <div className={`relative border border-zinc-800 bg-zinc-950/50 backdrop-blur-md rounded-sm overflow-hidden flex flex-col transition-all duration-300 hover:border-zinc-700 group ${className}`}>
+    <div className={`relative border border-border bg-zinc-950/50 backdrop-blur-md rounded-sm overflow-hidden flex flex-col transition-all duration-300 hover:border-border group ${className}`}>
       {/* Tech-inspired decorative corner */}
       <div className="absolute top-0 right-0 w-4 h-4 border-t border-r border-[#ccff00] opacity-0 group-hover:opacity-100 transition-opacity"></div>
       
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-800/50 bg-zinc-900/30">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-border/50 bg-muted/30">
         <div className="flex items-center gap-2">
-          {icon && <span className="text-zinc-400">{icon}</span>}
-          <h3 className="font-medium text-sm tracking-wide text-zinc-100 uppercase translate-y-[1px]">{title}</h3>
+          {icon && <span className="text-muted-foreground">{icon}</span>}
+          <h3 className="font-medium text-sm tracking-wide text-foreground uppercase translate-y-[1px]">{title}</h3>
         </div>
         
         {statusBadge && (
@@ -41,7 +41,7 @@ export const WidgetWrapper: React.FC<WidgetWrapperProps> = ({
               statusBadge === 'degraded' ? 'bg-orange-500 shadow-[0_0_8px_#f9731680]' : 
               'bg-red-500 shadow-[0_0_8px_#ef444480]'
             }`}></span>
-            <span className="text-[10px] text-zinc-500 uppercase font-mono tracking-wider">
+            <span className="text-[10px] text-muted-foreground uppercase font-mono tracking-wider">
               {statusBadge}
             </span>
           </div>
@@ -57,7 +57,7 @@ export const WidgetWrapper: React.FC<WidgetWrapperProps> = ({
             </div>
             <div>
               <p className="text-sm font-medium text-red-400">Connection Failed</p>
-              <p className="text-xs text-zinc-500 mt-1 max-w-[200px]">Microservice unresponsive. Please check network logs.</p>
+              <p className="text-xs text-muted-foreground mt-1 max-w-[200px]">Microservice unresponsive. Please check network logs.</p>
             </div>
             {onRetry && (
               <button 
@@ -71,9 +71,9 @@ export const WidgetWrapper: React.FC<WidgetWrapperProps> = ({
           </div>
         ) : loading ? (
           <div className="flex flex-col flex-1 gap-3 animate-pulse">
-            <div className="h-4 bg-zinc-800/50 rounded-sm w-3/4"></div>
-            <div className="h-4 bg-zinc-800/50 rounded-sm w-1/2"></div>
-            <div className="h-20 bg-zinc-800/30 rounded-sm w-full mt-2"></div>
+            <div className="h-4 bg-muted/50 rounded-sm w-3/4"></div>
+            <div className="h-4 bg-muted/50 rounded-sm w-1/2"></div>
+            <div className="h-20 bg-muted/30 rounded-sm w-full mt-2"></div>
           </div>
         ) : (
           <div className="flex-1 overflow-y-auto custom-scrollbar">

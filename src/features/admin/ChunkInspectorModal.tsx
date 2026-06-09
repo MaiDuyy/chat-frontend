@@ -117,11 +117,11 @@ export function ChunkInspectorModal({
 
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-            <DialogContent className="w-full sm:max-w-[95vw] md:max-w-[90vw] lg:max-w-7xl h-[90vh] p-0 flex flex-col gap-0 overflow-hidden bg-background text-foreground border border-border shadow-lg rounded-xl">
+            <DialogContent className="w-full sm:max-w-[95vw] md:max-w-[90vw] lg:max-w-7xl h-[90vh] p-0 flex flex-col gap-0 overflow-hidden bg-background text-foreground border border-border shadow-lg rounded-lg">
                 {/* Header */}
-                <DialogHeader className="px-4 py-2.5 border-b border-border bg-slate-50/60 dark:bg-slate-900/40 flex flex-row items-center justify-between space-y-0">
+                <DialogHeader className="px-4 py-2.5 border-b border-border bg-muted/60 dark:bg-slate-900/40 flex flex-row items-center justify-between space-y-0">
                     <div className="flex items-center gap-2.5">
-                        <div className="p-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 border border-emerald-200/50 dark:border-emerald-900/30 shadow-sm">
+                        <div className="p-2 rounded-md bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 border border-emerald-200/50 dark:border-emerald-900/30 shadow-sm">
                             <Layers className="w-4 h-4" />
                         </div>
                         <div>
@@ -136,7 +136,7 @@ export function ChunkInspectorModal({
 
                     <div className="flex items-center gap-2">
                         {/* Tab Switcher */}
-                        <div className="flex items-center bg-slate-100/60 dark:bg-slate-800/40 p-0.5 rounded-lg border border-border">
+                        <div className="flex items-center bg-muted/60 dark:bg-slate-800/40 p-0.5 rounded-md border border-border">
                             <Button
                                 variant="ghost"
                                 size="sm"
@@ -171,7 +171,7 @@ export function ChunkInspectorModal({
                             variant="ghost" 
                             size="icon" 
                             onClick={onClose}
-                            className="rounded-lg h-7 w-7 border border-border hover:bg-slate-100 dark:hover:bg-slate-800 text-muted-foreground hover:text-foreground transition-colors"
+                            className="rounded-md h-7 w-7 border border-border hover:bg-muted dark:hover:bg-slate-800 text-muted-foreground hover:text-foreground transition-colors"
                         >
                             <X className="w-3.5 h-3.5" />
                         </Button>
@@ -184,9 +184,9 @@ export function ChunkInspectorModal({
                         /* ================== TAB 1: CHUNK INSPECTOR ================== */
                         <div className="flex-1 flex flex-col overflow-hidden">
                             {/* Summary Stats Strip */}
-                            <div className="px-4 py-2.5 border-b border-border bg-slate-50/20 dark:bg-slate-900/10 grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                                <div className="bg-card border border-border rounded-xl p-2.5 flex items-center gap-2.5 shadow-sm">
-                                    <div className="p-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/20">
+                            <div className="px-4 py-2.5 border-b border-border bg-muted/20 dark:bg-slate-900/10 grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                                <div className="bg-card border border-border rounded-lg p-2.5 flex items-center gap-2.5 shadow-sm">
+                                    <div className="p-2 rounded-md bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/20">
                                         <Layers className="w-3.5 h-3.5" />
                                     </div>
                                     <div>
@@ -194,8 +194,8 @@ export function ChunkInspectorModal({
                                         <p className="text-base font-bold text-foreground mt-0.5">{statsData?.totalChunks ?? '-'}</p>
                                     </div>
                                 </div>
-                                <div className="bg-card border border-border rounded-xl p-2.5 flex items-center gap-2.5 shadow-sm">
-                                    <div className="p-2 rounded-lg bg-indigo-50 dark:bg-indigo-950/20 text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-900/20">
+                                <div className="bg-card border border-border rounded-lg p-2.5 flex items-center gap-2.5 shadow-sm">
+                                    <div className="p-2 rounded-md bg-indigo-50 dark:bg-indigo-950/20 text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-900/20">
                                         <Cpu className="w-3.5 h-3.5" />
                                     </div>
                                     <div>
@@ -205,8 +205,8 @@ export function ChunkInspectorModal({
                                         </p>
                                     </div>
                                 </div>
-                                <div className="bg-card border border-border rounded-xl p-2.5 flex items-center gap-2.5 shadow-sm">
-                                    <div className="p-2 rounded-lg bg-amber-50 dark:bg-amber-950/20 text-amber-600 dark:text-amber-400 border border-amber-100 dark:border-amber-900/20">
+                                <div className="bg-card border border-border rounded-lg p-2.5 flex items-center gap-2.5 shadow-sm">
+                                    <div className="p-2 rounded-md bg-amber-50 dark:bg-amber-950/20 text-amber-600 dark:text-amber-400 border border-amber-100 dark:border-amber-900/20">
                                         <FileText className="w-3.5 h-3.5" />
                                     </div>
                                     <div>
@@ -216,8 +216,8 @@ export function ChunkInspectorModal({
                                         </p>
                                     </div>
                                 </div>
-                                <div className="bg-card border border-border rounded-xl p-2.5 flex items-center gap-2.5 shadow-sm">
-                                    <div className="p-2 rounded-lg bg-sky-50 dark:bg-sky-950/20 text-sky-600 dark:text-sky-400 border border-sky-100 dark:border-sky-900/20">
+                                <div className="bg-card border border-border rounded-lg p-2.5 flex items-center gap-2.5 shadow-sm">
+                                    <div className="p-2 rounded-md bg-sky-50 dark:bg-sky-950/20 text-sky-600 dark:text-sky-400 border border-sky-100 dark:border-sky-900/20">
                                         <Activity className="w-3.5 h-3.5" />
                                     </div>
                                     <div>
@@ -230,8 +230,8 @@ export function ChunkInspectorModal({
                             {/* Split View */}
                             <div className="flex-1 grid grid-cols-1 md:grid-cols-12 overflow-hidden">
                                 {/* Left Side: Chunks List */}
-                                <div className="md:col-span-4 border-r border-border h-full flex flex-col bg-slate-50/10 dark:bg-slate-900/5">
-                                    <div className="px-3 py-1.5 border-b border-border bg-slate-50/40 dark:bg-slate-900/20 text-[9px] text-muted-foreground font-bold uppercase tracking-wider flex items-center justify-between">
+                                <div className="md:col-span-4 border-r border-border h-full flex flex-col bg-muted/10 dark:bg-slate-900/5">
+                                    <div className="px-3 py-1.5 border-b border-border bg-muted/40 dark:bg-slate-900/20 text-[9px] text-muted-foreground font-bold uppercase tracking-wider flex items-center justify-between">
                                         <span>Danh sách Phân mảnh ({chunks.length})</span>
                                         <span className="font-mono text-emerald-600 dark:text-emerald-400">Auto-Chunked</span>
                                     </div>
@@ -268,12 +268,12 @@ export function ChunkInspectorModal({
                                                         className={cn(
                                                             "w-full text-left p-2.5 transition-all flex flex-col gap-1 border-l-2 cursor-pointer",
                                                             isSelected 
-                                                                ? "bg-slate-100 dark:bg-slate-800/60 border-l-emerald-500 text-foreground font-medium" 
-                                                                : "border-l-transparent text-muted-foreground hover:bg-slate-50/60 dark:hover:bg-slate-850/20 hover:text-foreground"
+                                                                ? "bg-muted dark:bg-slate-800/60 border-l-emerald-500 text-foreground font-medium" 
+                                                                : "border-l-transparent text-muted-foreground hover:bg-muted/60 dark:hover:bg-slate-850/20 hover:text-foreground"
                                                         )}
                                                     >
                                                         <div className="flex items-center justify-between w-full">
-                                                            <span className="text-[9px] font-bold font-mono px-1 rounded bg-slate-100 dark:bg-slate-800 border border-border text-muted-foreground">
+                                                            <span className="text-[9px] font-bold font-mono px-1 rounded bg-muted dark:bg-slate-800 border border-border text-muted-foreground">
                                                                 # {chunk.chunkIndex + 1}
                                                             </span>
                                                             <div className="flex items-center gap-1">
@@ -293,11 +293,11 @@ export function ChunkInspectorModal({
                                 </div>
 
                                 {/* Right Side: Chunk Content Viewer */}
-                                <div className="md:col-span-8 h-full flex flex-col bg-slate-50/10 dark:bg-slate-900/5 overflow-hidden">
+                                <div className="md:col-span-8 h-full flex flex-col bg-muted/10 dark:bg-slate-900/5 overflow-hidden">
                                     {selectedChunk ? (
                                         <div className="flex-1 flex flex-col overflow-hidden">
                                             {/* Chunk Toolbar */}
-                                            <div className="px-4 py-2 border-b border-border bg-slate-50/30 dark:bg-slate-900/20 flex items-center justify-between">
+                                            <div className="px-4 py-2 border-b border-border bg-muted/30 dark:bg-slate-900/20 flex items-center justify-between">
                                                 <div className="flex items-center gap-1.5 text-xs font-bold">
                                                     <span className="text-muted-foreground">Phân mảnh:</span>
                                                     <span className="text-foreground">{selectedChunk.chunkTitle || 'N/A'}</span>
@@ -307,7 +307,7 @@ export function ChunkInspectorModal({
                                                         variant="outline"
                                                         size="sm"
                                                         onClick={() => handleCopyText(selectedChunk.text, selectedChunk.chunkIndex)}
-                                                        className="rounded-lg border-border bg-background hover:bg-slate-50 dark:hover:bg-slate-800 text-foreground h-7 text-[10px] px-2.5 flex items-center gap-1.5 cursor-pointer shadow-sm"
+                                                        className="rounded-md border-border bg-background hover:bg-muted dark:hover:bg-slate-800 text-foreground h-7 text-[10px] px-2.5 flex items-center gap-1.5 cursor-pointer shadow-sm"
                                                     >
                                                         {copiedChunkId === selectedChunk.chunkIndex ? (
                                                             <>
@@ -326,12 +326,12 @@ export function ChunkInspectorModal({
 
                                             {/* Chunk Reading Space */}
                                             <div className="flex-1 p-4 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-slate-800 scrollbar-track-transparent">
-                                                <div className="bg-slate-50/30 dark:bg-slate-950/40 border border-border rounded-xl p-4 shadow-sm select-text selection:bg-primary/20">
+                                                <div className="bg-muted/30 dark:bg-slate-950/40 border border-border rounded-lg p-4 shadow-sm select-text selection:bg-primary/20">
                                                     <MarkdownContent content={selectedChunk.text} />
                                                 </div>
 
                                                 {/* Meta details footer */}
-                                                <div className="mt-3 bg-slate-50/40 dark:bg-slate-900/20 border border-border rounded-xl p-3 flex flex-col gap-2">
+                                                <div className="mt-3 bg-muted/40 dark:bg-slate-900/20 border border-border rounded-lg p-3 flex flex-col gap-2">
                                                     <div className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-wider text-muted-foreground">
                                                         <Info className="w-3 h-3 text-muted-foreground" />
                                                         Thông tin vector embedding
@@ -366,7 +366,7 @@ export function ChunkInspectorModal({
                         /* ================== TAB 2: RAG PLAYGROUND ================== */
                         <div className="flex-1 flex flex-col overflow-hidden">
                             {/* Search Options Panel */}
-                            <div className="px-4 py-3 border-b border-border bg-slate-50/30 dark:bg-slate-900/20">
+                            <div className="px-4 py-3 border-b border-border bg-muted/30 dark:bg-slate-900/20">
                                 <form onSubmit={handleSearch} className="flex flex-col gap-3">
                                     <div className="flex flex-wrap md:flex-nowrap gap-3 items-end">
                                         <div className="flex-1 min-w-[280px] space-y-1">
@@ -379,7 +379,7 @@ export function ChunkInspectorModal({
                                                     placeholder="Nhập câu hỏi thử nghiệm ngữ nghĩa với Vector DB... (ví dụ: các yêu cầu kỹ thuật là gì?)"
                                                     value={searchQuery}
                                                     onChange={(e) => setSearchQuery(e.target.value)}
-                                                    className="pl-8 h-8 bg-background border-border text-foreground rounded-lg text-xs focus-visible:ring-1 focus-visible:ring-emerald-500 shadow-sm"
+                                                    className="pl-8 h-8 bg-background border-border text-foreground rounded-md text-xs focus-visible:ring-1 focus-visible:ring-emerald-500 shadow-sm"
                                                 />
                                             </div>
                                         </div>
@@ -393,7 +393,7 @@ export function ChunkInspectorModal({
                                                 <select
                                                     value={topK}
                                                     onChange={(e) => setTopK(Number(e.target.value))}
-                                                    className="w-full h-8 bg-background border border-border rounded-lg px-2 text-xs font-semibold text-foreground focus:outline-none focus:border-emerald-500"
+                                                    className="w-full h-8 bg-background border border-border rounded-md px-2 text-xs font-semibold text-foreground focus:outline-none focus:border-emerald-500"
                                                 >
                                                     <option value={3}>3 Chunks</option>
                                                     <option value={5}>5 Chunks</option>
@@ -421,7 +421,7 @@ export function ChunkInspectorModal({
                                             <Button
                                                 type="submit"
                                                 disabled={isSearching}
-                                                className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold h-8 rounded-lg shadow-sm px-4 flex items-center gap-1.5 cursor-pointer text-xs"
+                                                className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold h-8 rounded-md shadow-sm px-4 flex items-center gap-1.5 cursor-pointer text-xs"
                                             >
                                                 {isSearching ? (
                                                     <Cpu className="w-3.5 h-3.5 animate-spin" />
@@ -438,8 +438,8 @@ export function ChunkInspectorModal({
                             {/* Search Results Split Area */}
                             <div className="flex-1 grid grid-cols-1 md:grid-cols-12 overflow-hidden">
                                 {/* Left: Search Match Cards */}
-                                <div className="md:col-span-5 border-r border-border h-full flex flex-col bg-slate-50/10 dark:bg-slate-900/5">
-                                    <div className="px-3 py-1.5 border-b border-border bg-slate-50/40 dark:bg-slate-900/20 text-[9px] text-muted-foreground font-bold uppercase tracking-wider">
+                                <div className="md:col-span-5 border-r border-border h-full flex flex-col bg-muted/10 dark:bg-slate-900/5">
+                                    <div className="px-3 py-1.5 border-b border-border bg-muted/40 dark:bg-slate-900/20 text-[9px] text-muted-foreground font-bold uppercase tracking-wider">
                                         Kết quả khớp tương đồng ({searchResults.length})
                                     </div>
 
@@ -479,12 +479,12 @@ export function ChunkInspectorModal({
                                                         className={cn(
                                                             "w-full text-left p-2.5 transition-all flex flex-col gap-1 border-l-2 cursor-pointer",
                                                             isSelected 
-                                                                ? "bg-slate-100 dark:bg-slate-800/60 border-l-emerald-500 text-foreground" 
-                                                                : "border-l-transparent text-muted-foreground hover:bg-slate-50/60 dark:hover:bg-slate-850/20 hover:text-foreground"
+                                                                ? "bg-muted dark:bg-slate-800/60 border-l-emerald-500 text-foreground" 
+                                                                : "border-l-transparent text-muted-foreground hover:bg-muted/60 dark:hover:bg-slate-850/20 hover:text-foreground"
                                                         )}
                                                     >
                                                         <div className="flex items-center justify-between w-full">
-                                                            <span className="text-[9px] font-bold font-mono px-1 rounded bg-slate-100 dark:bg-slate-800 text-muted-foreground">
+                                                            <span className="text-[9px] font-bold font-mono px-1 rounded bg-muted dark:bg-slate-800 text-muted-foreground">
                                                                 Rank #{idx + 1}
                                                             </span>
                                                             <span className={cn("text-[9px] font-bold px-1.5 py-0.2 rounded border uppercase tracking-wider", badgeColor)}>
@@ -508,11 +508,11 @@ export function ChunkInspectorModal({
                                 </div>
 
                                 {/* Right: Detailed Result Reader */}
-                                <div className="md:col-span-7 h-full flex flex-col bg-slate-50/10 dark:bg-slate-900/5 overflow-hidden">
+                                <div className="md:col-span-7 h-full flex flex-col bg-muted/10 dark:bg-slate-900/5 overflow-hidden">
                                     {selectedSearchResultIndex !== null && searchResults[selectedSearchResultIndex] ? (
                                         <div className="flex-1 flex flex-col overflow-hidden">
                                             {/* Result Header */}
-                                            <div className="px-4 py-2 border-b border-border bg-slate-50/30 dark:bg-slate-900/20 flex items-center justify-between">
+                                            <div className="px-4 py-2 border-b border-border bg-muted/30 dark:bg-slate-900/20 flex items-center justify-between">
                                                 <span className="text-[11px] font-bold text-muted-foreground flex items-center gap-1">
                                                     <FileText className="w-3.5 h-3.5 text-emerald-500" />
                                                     Chi tiết phân mảnh khớp:
@@ -521,7 +521,7 @@ export function ChunkInspectorModal({
                                                     variant="outline"
                                                     size="sm"
                                                     onClick={() => handleCopyText(searchResults[selectedSearchResultIndex].text, selectedSearchResultIndex)}
-                                                    className="rounded-lg border-border bg-background hover:bg-slate-50 dark:hover:bg-slate-800 text-foreground h-7 text-[10px] px-2.5 flex items-center gap-1.5 cursor-pointer shadow-sm"
+                                                    className="rounded-md border-border bg-background hover:bg-muted dark:hover:bg-slate-800 text-foreground h-7 text-[10px] px-2.5 flex items-center gap-1.5 cursor-pointer shadow-sm"
                                                 >
                                                     {copiedChunkId === selectedSearchResultIndex ? (
                                                         <>
@@ -539,12 +539,12 @@ export function ChunkInspectorModal({
 
                                             {/* Result Body Text */}
                                             <div className="flex-1 p-4 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-slate-800 scrollbar-track-transparent">
-                                                <div className="bg-slate-50/30 dark:bg-slate-950/40 border border-border rounded-xl p-4 shadow-sm select-text selection:bg-primary/20">
+                                                <div className="bg-muted/30 dark:bg-slate-950/40 border border-border rounded-lg p-4 shadow-sm select-text selection:bg-primary/20">
                                                     <MarkdownContent content={searchResults[selectedSearchResultIndex].text} />
                                                 </div>
 
                                                 {/* Meta Details Info */}
-                                                <div className="mt-3 bg-slate-50/40 dark:bg-slate-900/20 border border-border rounded-xl p-3 flex flex-col gap-2">
+                                                <div className="mt-3 bg-muted/40 dark:bg-slate-900/20 border border-border rounded-lg p-3 flex flex-col gap-2">
                                                     <div className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-wider text-muted-foreground">
                                                         <Info className="w-3 h-3 text-muted-foreground" />
                                                         Thông tin RAG Match
@@ -585,7 +585,7 @@ export function ChunkInspectorModal({
                 </div>
 
                 {/* Footer */}
-                <div className="px-4 py-2.5 border-t border-border bg-slate-50/50 dark:bg-slate-900/40 flex items-center justify-between text-xs text-muted-foreground font-medium">
+                <div className="px-4 py-2.5 border-t border-border bg-muted/50 dark:bg-slate-900/40 flex items-center justify-between text-xs text-muted-foreground font-medium">
                     <div className="flex items-center gap-1.5 text-[10px] text-emerald-700 dark:text-emerald-400 bg-emerald-50/40 dark:bg-emerald-950/10 border border-emerald-200/50 dark:border-emerald-900/20 px-2.5 py-1 rounded-md">
                         <Info className="w-3.5 h-3.5" />
                         <span>Mô hình nhúng (Embeddings): <b>text-embedding-004</b> của Google (1536 dimensions).</span>
@@ -593,7 +593,7 @@ export function ChunkInspectorModal({
 
                     <Button
                         onClick={onClose}
-                        className="rounded-lg bg-secondary text-secondary-foreground hover:bg-secondary/80 h-7 text-xs px-3 border border-border cursor-pointer shadow-sm"
+                        className="rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/80 h-7 text-xs px-3 border border-border cursor-pointer shadow-sm"
                     >
                         Đóng
                     </Button>

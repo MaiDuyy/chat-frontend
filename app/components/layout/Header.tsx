@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { Button } from '@/components/ui/button';
+import { HubNodeBrand } from '@/components/ui/hub-node-logo';
 
 interface HeaderProps {
     darkMode: boolean;
@@ -51,14 +52,11 @@ const Header: React.FC<HeaderProps> = ({ darkMode, toggleDarkMode }) => {
     };
 
     return (
-        <header className="bg-white dark:bg-[#111111] border-b border-border sticky top-0 z-50 transition-colors duration-300">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        <header className="bg-background border-b border-border sticky top-0 z-50 transition-colors duration-300">
+            <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
                 {/* Logo */}
-                <Link href="/" className="flex items-center gap-2 group">
-                    <div className="w-9 h-9 bg-primary rounded-lg flex items-center justify-center shadow-lg shadow-primary/20 transition-transform group-hover:scale-105">
-                        <MessageSquare className="w-5 h-5 text-white" />
-                    </div>
-                    <span className="text-xl font-bold text-foreground tracking-tight">NEXUS</span>
+                <Link href="/">
+                    <HubNodeBrand size={22} />
                 </Link>
 
                 {/* Desktop Navigation */}
@@ -83,7 +81,7 @@ const Header: React.FC<HeaderProps> = ({ darkMode, toggleDarkMode }) => {
                 <div className="flex items-center space-x-3">
                     <button
                         onClick={toggleDarkMode}
-                        className="p-2 text-muted-foreground hover:text-foreground hover:bg-accent rounded-lg transition-colors"
+                        className="p-2 text-muted-foreground hover:text-foreground hover:bg-accent rounded-md transition-colors"
                         aria-label="Toggle theme"
                     >
                         {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
@@ -111,24 +109,24 @@ const Header: React.FC<HeaderProps> = ({ darkMode, toggleDarkMode }) => {
                             {isProfileOpen && (
                                 <>
                                     <div className="fixed inset-0 z-40" onClick={() => setIsProfileOpen(false)}></div>
-                                    <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-[#1c1c1c] rounded-xl shadow-2xl border border-border p-1.5 z-50 animate-in fade-in zoom-in duration-200 origin-top-right">
+                                    <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-[#1c1c1c] rounded-lg shadow-2xl border border-border p-1.5 z-50 animate-in fade-in zoom-in duration-200 origin-top-right">
                                         <div className="px-3 py-2.5 mb-1">
                                             <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Tài khoản</p>
                                             <p className="text-sm font-semibold text-foreground truncate">{user?.email}</p>
                                         </div>
                                         <div className="h-px bg-border my-1 mx-1.5" />
-                                        <button className="flex w-full items-center gap-2.5 px-3 py-2 text-sm font-medium text-foreground hover:bg-accent rounded-lg transition-colors">
+                                        <button className="flex w-full items-center gap-2.5 px-3 py-2 text-sm font-medium text-foreground hover:bg-accent rounded-md transition-colors">
                                             <Settings className="w-4 h-4 text-muted-foreground" />
                                             Cài đặt
                                         </button>
-                                        <button className="flex w-full items-center gap-2.5 px-3 py-2 text-sm font-medium text-foreground hover:bg-accent rounded-lg transition-colors">
+                                        <button className="flex w-full items-center gap-2.5 px-3 py-2 text-sm font-medium text-foreground hover:bg-accent rounded-md transition-colors">
                                             <HelpCircle className="w-4 h-4 text-muted-foreground" />
                                             Trợ giúp
                                         </button>
                                         <div className="h-px bg-border my-1 mx-1.5" />
                                         <button 
                                             onClick={handleLogout}
-                                            className="flex w-full items-center gap-2.5 px-3 py-2 text-sm font-bold text-destructive hover:bg-destructive/10 rounded-lg transition-colors"
+                                            className="flex w-full items-center gap-2.5 px-3 py-2 text-sm font-bold text-destructive hover:bg-destructive/10 rounded-md transition-colors"
                                         >
                                             <LogOut className="w-4 h-4" />
                                             Đăng xuất
@@ -154,7 +152,7 @@ const Header: React.FC<HeaderProps> = ({ darkMode, toggleDarkMode }) => {
 
                     {/* Mobile Menu Button */}
                     <button
-                        className="lg:hidden p-2 text-muted-foreground hover:bg-accent rounded-lg transition-colors"
+                        className="lg:hidden p-2 text-muted-foreground hover:bg-accent rounded-md transition-colors"
                         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                     >
                         {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -164,14 +162,14 @@ const Header: React.FC<HeaderProps> = ({ darkMode, toggleDarkMode }) => {
 
             {/* Mobile Menu Dropdown */}
             {isMobileMenuOpen && (
-                <div className="lg:hidden border-t border-border bg-white dark:bg-[#111111] animate-in slide-in-from-top-4 duration-300">
+                <div className="lg:hidden border-t border-border bg-background animate-in slide-in-from-top-4 duration-300">
                     <nav className="flex flex-col p-4 space-y-1">
                         {NAV_ITEMS.map((item, index) => (
                             <Link
                                 key={index}
                                 href={item.href}
                                 className={cn(
-                                    "px-4 py-3 text-sm font-bold rounded-xl transition-colors",
+                                    "px-4 py-3 text-sm font-bold rounded-lg transition-colors",
                                     index === 0 ? "bg-primary/10 text-primary" : "text-foreground hover:bg-accent"
                                 )}
                                 onClick={() => setIsMobileMenuOpen(false)}

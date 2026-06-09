@@ -78,7 +78,7 @@ export function SystemHealth() {
           <Button 
             variant="outline" 
             size="sm" 
-            className="h-8 text-xs rounded-lg border border-border bg-secondary text-secondary-foreground hover:bg-secondary/80" 
+            className="h-8 text-xs rounded-md border border-border bg-secondary text-secondary-foreground hover:bg-secondary/80" 
             onClick={() => refetch()} 
             disabled={isFetching}
           >
@@ -101,7 +101,7 @@ export function SystemHealth() {
               <Card
                 key={service.name}
                 className={cn(
-                  'rounded-xl border bg-card text-card-foreground shadow-sm hover:shadow-md transition-all flex flex-col justify-between',
+                  'rounded-lg border bg-card text-card-foreground shadow-sm hover:shadow-md transition-all flex flex-col justify-between',
                   service.status === 'healthy' 
                     ? 'border-green-200/50 dark:border-green-900/20' 
                     : 'border-rose-200/50 dark:border-rose-900/20'
@@ -111,7 +111,7 @@ export function SystemHealth() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <div className={cn(
-                        'p-1.5 rounded-lg flex items-center justify-center',
+                        'p-1.5 rounded-md flex items-center justify-center',
                         service.status === 'healthy' 
                           ? 'bg-green-50 dark:bg-green-950/40 text-green-600 dark:text-green-400' 
                           : 'bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400'
@@ -157,7 +157,7 @@ export function SystemHealth() {
 
       {/* Summary */}
       {services.length > 0 && (
-        <Card className="rounded-xl border border-border bg-card text-card-foreground shadow-sm">
+        <Card className="rounded-lg border border-border bg-card text-card-foreground shadow-sm">
           <CardHeader className="p-3.5 pb-2">
             <CardTitle className="text-xs flex items-center gap-2 font-bold text-foreground uppercase tracking-wider">
               <Activity className="w-3.5 h-3.5 text-primary" />

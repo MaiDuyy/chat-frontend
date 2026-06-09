@@ -12,11 +12,11 @@ export default function RegisterPage() {
   return (
     <AuthLayout>
       {/* Switcher */}
-      <div className="flex p-1 bg-muted rounded-xl mb-10">
+      <div className="flex p-1 bg-muted rounded-lg mb-10">
         <button
           onClick={() => setMode("personal")}
           className={cn(
-            "flex-1 py-2.5 text-sm font-bold rounded-lg transition-all duration-300",
+            "flex-1 py-2.5 text-sm font-bold rounded-md transition-all duration-300",
             mode === "personal"
               ? "bg-white text-primary shadow-sm"
               : "text-muted-foreground hover:text-foreground"
@@ -27,7 +27,7 @@ export default function RegisterPage() {
         <button
           onClick={() => setMode("org")}
           className={cn(
-            "flex-1 py-2.5 text-sm font-bold rounded-lg transition-all duration-300",
+            "flex-1 py-2.5 text-sm font-bold rounded-md transition-all duration-300",
             mode === "org"
               ? "bg-white text-primary shadow-sm"
               : "text-muted-foreground hover:text-foreground"

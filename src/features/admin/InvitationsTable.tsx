@@ -59,7 +59,7 @@ import { useEffect } from 'react';
 const statusConfig = {
     PENDING: { icon: Clock, color: 'bg-amber-100 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400 border-amber-200 dark:border-amber-900/30', label: 'Pending' },
     ACCEPTED: { icon: CheckCircle, color: 'bg-green-100 text-green-700 dark:bg-green-950/30 dark:text-green-400 border-green-200 dark:border-green-900/30', label: 'Accepted' },
-    EXPIRED: { icon: AlertCircle, color: 'bg-slate-100 text-slate-700 dark:bg-slate-800/40 dark:text-slate-400 border-slate-200 dark:border-slate-700/30', label: 'Expired' },
+    EXPIRED: { icon: AlertCircle, color: 'bg-muted text-muted-foreground dark:bg-slate-800/40 dark:text-muted-foreground border-border dark:border-border/30', label: 'Expired' },
     CANCELLED: { icon: XCircle, color: 'bg-red-100 text-red-700 dark:bg-red-950/30 dark:text-red-400 border-red-200 dark:border-red-900/30', label: 'Cancelled' },
 };
 
@@ -77,8 +77,8 @@ const ROLE_COLORS: Record<string, string> = {
     ADMIN: 'bg-indigo-100 text-indigo-700 border-indigo-200 dark:bg-indigo-950/30 dark:text-indigo-400 dark:border-indigo-900/30',
     WORKSPACE_OWNER: 'bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-900/30',
     WORKSPACE_ADMIN: 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-950/30 dark:text-blue-400 dark:border-blue-900/30',
-    WORKSPACE_MEMBER: 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800/40 dark:text-slate-300 dark:border-slate-700/50',
-    WORKSPACE_GUEST: 'bg-gray-100 text-gray-700 border-gray-200 dark:bg-gray-800/30 dark:text-gray-400 dark:border-gray-700/50',
+    WORKSPACE_MEMBER: 'bg-muted text-muted-foreground border-border dark:bg-slate-800/40 dark:text-muted-foreground dark:border-border/50',
+    WORKSPACE_GUEST: 'bg-muted text-muted-foreground border-border dark:bg-gray-800/30 dark:text-muted-foreground dark:border-border/50',
 };
 
 export function InvitationsTable() {
@@ -170,11 +170,11 @@ export function InvitationsTable() {
                             placeholder="Tìm kiếm email..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="pl-7 h-8 text-xs rounded-lg bg-background border border-border"
+                            className="pl-7 h-8 text-xs rounded-md bg-background border border-border"
                         />
                     </div>
                     <Select value={statusFilter} onValueChange={(val) => { setStatusFilter(val); setPage(0); }}>
-                        <SelectTrigger className="w-32 h-8 text-xs rounded-lg">
+                        <SelectTrigger className="w-32 h-8 text-xs rounded-md">
                             <SelectValue placeholder="Filter status" />
                         </SelectTrigger>
                         <SelectContent className="bg-card border border-border">
@@ -189,9 +189,9 @@ export function InvitationsTable() {
             </div>
 
             {/* Table */}
-            <div className="border border-border rounded-xl overflow-hidden bg-background shadow-sm">
+            <div className="border border-border rounded-lg overflow-hidden bg-background shadow-sm">
                 <Table>
-                    <TableHeader className="bg-slate-50/50 dark:bg-slate-800/30 border-b border-border">
+                    <TableHeader className="bg-muted/50 dark:bg-slate-800/30 border-b border-border">
                         <TableRow>
                             <TableHead className="h-8 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Email</TableHead>
                             <TableHead className="h-8 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Role</TableHead>
@@ -216,20 +216,20 @@ export function InvitationsTable() {
                                 const canAction = invitation.status === 'PENDING' && !isExpired;
 
                                 return (
-                                    <TableRow key={invitation.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/40 transition-colors border-b border-border">
+                                    <TableRow key={invitation.id} className="hover:bg-muted/50 dark:hover:bg-slate-800/40 transition-colors border-b border-border">
                                         <TableCell className="py-2">
                                             <span className="font-semibold text-xs text-foreground">{invitation.email}</span>
                                         </TableCell>
                                         <TableCell className="py-2">
                                             <Badge 
                                                 variant="outline"
-                                                className={cn("font-medium text-[10px] py-0 px-1.5 rounded-md", invitation.role && ROLE_COLORS[invitation.role] || "bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400")}
+                                                className={cn("font-medium text-[10px] py-0 px-1.5 rounded-md", invitation.role && ROLE_COLORS[invitation.role] || "bg-muted dark:bg-slate-800 text-muted-foreground dark:text-muted-foreground")}
                                             >
                                                 {invitation.role ? (ROLE_LABELS[invitation.role] || invitation.role) : 'Default'}
                                             </Badge>
                                         </TableCell>
                                         <TableCell className="py-2">
-                                            <span className="text-[10px] font-medium text-slate-500 dark:text-slate-400">
+                                            <span className="text-[10px] font-medium text-muted-foreground dark:text-muted-foreground">
                                                 {invitation.inviterName || invitation.invitedBy}
                                             </span>
                                         </TableCell>
@@ -241,13 +241,13 @@ export function InvitationsTable() {
                                         </TableCell>
                                         <TableCell className="py-2">
                                             {invitation.status === 'ACCEPTED' ? (
-                                                <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">
+                                                <span className="text-[10px] text-muted-foreground dark:text-muted-foreground font-medium">
                                                     {format(new Date(invitation.acceptedAt!), 'MMM d, yyyy')}
                                                 </span>
                                             ) : (
                                                 <span className={cn(
                                                     'text-[10px] font-medium',
-                                                    isExpired ? 'text-red-600 dark:text-red-400' : 'text-slate-500 dark:text-slate-400'
+                                                    isExpired ? 'text-red-600 dark:text-red-400' : 'text-muted-foreground dark:text-muted-foreground'
                                                 )}>
                                                     {isExpired
                                                         ? 'Expired'
@@ -260,7 +260,7 @@ export function InvitationsTable() {
                                             {canAction && (
                                                 <DropdownMenu>
                                                     <DropdownMenuTrigger asChild>
-                                                        <Button variant="ghost" size="icon" className="h-7 w-7 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg">
+                                                        <Button variant="ghost" size="icon" className="h-7 w-7 hover:bg-muted dark:hover:bg-slate-800 rounded-md">
                                                             <MoreHorizontal className="h-3.5 w-3.5" />
                                                         </Button>
                                                     </DropdownMenuTrigger>

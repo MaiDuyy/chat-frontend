@@ -90,7 +90,7 @@ export function WikiPagination({
   return (
     <div className={cn(
       "flex flex-col sm:flex-row items-center justify-between gap-3 mt-3 select-none",
-      "bg-card border border-border rounded-lg px-4 py-2.5 shadow-none"
+      "bg-card border border-border rounded-md px-4 py-2.5 shadow-none"
     )}>
       {/* Rows per page */}
       <div className="flex items-center gap-2.5">

@@ -201,14 +201,14 @@ export default function CompilationPlansPage({ isEmbedded = false }: { isEmbedde
 
   if (!canManageWiki) {
     return (
-      <div className="font-sans max-w-xl mx-auto p-6 border border-border bg-card text-center rounded-xl shadow-md my-16 flex flex-col items-center gap-3">
+      <div className="font-sans max-w-xl mx-auto p-6 border border-border bg-card text-center rounded-lg shadow-md my-16 flex flex-col items-center gap-3">
         <h2 className="text-sm font-black uppercase text-rose-600">403 - KHÔNG CÓ QUYỀN TRUY CẬP</h2>
         <p className="text-xs text-muted-foreground leading-relaxed">
           Tài khoản của bạn không có quyền truy cập Kế hoạch Biên soạn. Giao diện này chỉ dành riêng cho Quản trị viên và Quản lý Workspace.
         </p>
         <Link
           href="/wiki"
-          className="px-4 py-2 text-xs font-mono font-bold uppercase tracking-wide border border-transparent bg-primary hover:bg-primary/90 text-primary-foreground transition-all rounded-lg shadow-sm active:translate-y-[0.5px] cursor-pointer font-semibold"
+          className="px-4 py-2 text-xs font-mono font-bold uppercase tracking-wide border border-transparent bg-primary hover:bg-primary/90 text-primary-foreground transition-all rounded-md shadow-sm active:translate-y-[0.5px] cursor-pointer font-semibold"
         >
           Quay lại Dashboard Wiki
         </Link>
@@ -225,7 +225,7 @@ export default function CompilationPlansPage({ isEmbedded = false }: { isEmbedde
           <div className="flex items-center gap-3">
             <Link
               href="/wiki"
-              className="p-1.5 border border-border bg-secondary hover:bg-secondary/80 text-secondary-foreground transition-colors rounded-lg shadow-sm active:scale-[0.98]"
+              className="p-1.5 border border-border bg-secondary hover:bg-secondary/80 text-secondary-foreground transition-colors rounded-md shadow-sm active:scale-[0.98]"
               title="Quay lại Dashboard"
             >
               <ArrowLeft className="w-4 h-4" />
@@ -244,13 +244,13 @@ export default function CompilationPlansPage({ isEmbedded = false }: { isEmbedde
           <div className="flex items-center gap-2">
             <button
               onClick={() => refetchPlans()}
-              className="p-2 border border-border bg-secondary hover:bg-secondary/80 text-secondary-foreground transition-colors rounded-lg shadow-sm active:scale-[0.98]"
+              className="p-2 border border-border bg-secondary hover:bg-secondary/80 text-secondary-foreground transition-colors rounded-md shadow-sm active:scale-[0.98]"
               title="Làm mới danh sách"
             >
               <RotateCw className="w-3.5 h-3.5" />
             </button>
             
-            <div className="hidden md:flex items-center gap-2 font-mono text-[11px] text-muted-foreground bg-muted p-1 border border-border rounded-lg">
+            <div className="hidden md:flex items-center gap-2 font-mono text-[11px] text-muted-foreground bg-muted p-1 border border-border rounded-md">
               <span>Phím tắt:</span>
               <span className="bg-background px-1.5 py-0.5 rounded border border-border text-foreground font-bold">[D] Phê duyệt nhanh</span>
             </div>
@@ -260,7 +260,7 @@ export default function CompilationPlansPage({ isEmbedded = false }: { isEmbedde
 
       {message && (
         <div
-          className={`border p-3 text-xs rounded-xl shadow-md ${
+          className={`border p-3 text-xs rounded-lg shadow-md ${
             message.type === "success"
               ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-800 dark:text-emerald-400"
               : "bg-rose-500/10 border-rose-500/30 text-rose-800 dark:text-rose-400"
@@ -274,7 +274,7 @@ export default function CompilationPlansPage({ isEmbedded = false }: { isEmbedde
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 items-start">
         
         {/* Left Column: Plan list picker (4 cols) */}
-        <div className="lg:col-span-4 flex flex-col gap-2.5 border border-border bg-card p-3 rounded-xl shadow-md">
+        <div className="lg:col-span-4 flex flex-col gap-2.5 border border-border bg-card p-3 rounded-lg shadow-md">
           <div className="border-b pb-1.5 flex items-center justify-between">
             <span className="font-mono text-xs uppercase font-extrabold text-foreground">
               DANH SÁCH ({plans?.length || 0})
@@ -300,7 +300,7 @@ export default function CompilationPlansPage({ isEmbedded = false }: { isEmbedde
               <p className="text-[11px] font-mono text-muted-foreground uppercase">Đang lấy dữ liệu kế hoạch...</p>
             </div>
           ) : !plans || plans.length === 0 ? (
-            <div className="py-8 text-center flex flex-col items-center justify-center gap-2 border border-dashed border-border rounded-xl bg-muted/5">
+            <div className="py-8 text-center flex flex-col items-center justify-center gap-2 border border-dashed border-border rounded-lg bg-muted/5">
               <Clock className="w-6 h-6 text-muted-foreground/60" />
               <p className="text-xs font-bold text-foreground">Không tìm thấy Kế hoạch nào</p>
               <p className="text-[10px] text-muted-foreground max-w-[200px] leading-relaxed mx-auto">
@@ -324,7 +324,7 @@ export default function CompilationPlansPage({ isEmbedded = false }: { isEmbedde
                         setSelectedPlanId(plan.id);
                         setMessage(null);
                       }}
-                      className={`w-full text-left p-2.5 border transition-all rounded-lg flex flex-col gap-1.5 ${
+                      className={`w-full text-left p-2.5 border transition-all rounded-md flex flex-col gap-1.5 ${
                         selectedPlanId === plan.id
                           ? "border-primary bg-primary/5 shadow-sm"
                           : "border-border bg-background hover:bg-muted/50"
@@ -373,7 +373,7 @@ export default function CompilationPlansPage({ isEmbedded = false }: { isEmbedde
             <div className="flex flex-col gap-3">
               
               {/* Main Panel Board */}
-              <div className="border border-border bg-card p-4 rounded-xl shadow-md flex flex-col gap-3">
+              <div className="border border-border bg-card p-4 rounded-lg shadow-md flex flex-col gap-3">
                 
                 {/* Meta details header */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-border pb-2 gap-2">
@@ -393,17 +393,17 @@ export default function CompilationPlansPage({ isEmbedded = false }: { isEmbedde
 
                 {/* Audit summary panel */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-2 font-mono text-xs">
-                  <div className="border border-border bg-muted/30 p-2.5 rounded-lg flex flex-col gap-0.5 overflow-hidden">
+                  <div className="border border-border bg-muted/30 p-2.5 rounded-md flex flex-col gap-0.5 overflow-hidden">
                     <span className="text-[9px] uppercase font-extrabold text-muted-foreground">Tài liệu nguồn</span>
                     <span className="font-bold text-foreground truncate" title={activePlan.sourceDocumentName || `ID: ${activePlan.sourceDocumentId}`}>
                       {activePlan.sourceDocumentName || `Document ID #${activePlan.sourceDocumentId}`}
                     </span>
                   </div>
-                  <div className="border border-border bg-muted/30 p-2.5 rounded-lg flex flex-col gap-0.5">
+                  <div className="border border-border bg-muted/30 p-2.5 rounded-md flex flex-col gap-0.5">
                     <span className="text-[9px] uppercase font-extrabold text-muted-foreground">Ngày khởi tạo</span>
                     <span className="font-bold text-foreground">{new Date(activePlan.createdAt).toLocaleString("vi-VN")}</span>
                   </div>
-                  <div className="border border-border bg-muted/30 p-2.5 rounded-lg flex flex-col gap-0.5">
+                  <div className="border border-border bg-muted/30 p-2.5 rounded-md flex flex-col gap-0.5">
                     <span className="text-[9px] uppercase font-extrabold text-muted-foreground">Tổng số đề xuất</span>
                     <span className="font-bold text-primary">{parsedPlanItems.length} Thực thể tri thức</span>
                   </div>
@@ -416,7 +416,7 @@ export default function CompilationPlansPage({ isEmbedded = false }: { isEmbedde
                   </span>
 
                   {parsedPlanItems.length === 0 ? (
-                    <div className="border border-dashed border-border p-4 rounded-xl text-center font-sans text-xs text-muted-foreground bg-muted/5">
+                    <div className="border border-dashed border-border p-4 rounded-lg text-center font-sans text-xs text-muted-foreground bg-muted/5">
                       Kế hoạch này không chứa dữ liệu thực thể tri thức đề xuất hợp lệ hoặc định dạng JSON trống.
                     </div>
                   ) : (
@@ -444,7 +444,7 @@ export default function CompilationPlansPage({ isEmbedded = false }: { isEmbedde
                         return (
                           <div
                             key={idx}
-                            className="border border-border p-2.5 bg-background hover:bg-muted/5 rounded-lg transition-colors flex flex-col gap-1.5"
+                            className="border border-border p-2.5 bg-background hover:bg-muted/5 rounded-md transition-colors flex flex-col gap-1.5"
                           >
                             <div className="flex flex-wrap items-center justify-between gap-2 border-b border-dashed border-border pb-1.5">
                               <div className="flex flex-wrap items-center gap-2">
@@ -501,7 +501,7 @@ export default function CompilationPlansPage({ isEmbedded = false }: { isEmbedde
 
                 {/* Audit Action Footer Box */}
                 {activePlan.status === "PENDING_REVIEW" ? (
-                  <div className="border border-border bg-muted/40 p-3 rounded-lg mt-1 flex flex-col gap-2">
+                  <div className="border border-border bg-muted/40 p-3 rounded-md mt-1 flex flex-col gap-2">
                     <div className="flex items-center justify-between">
                       <span className="font-mono text-xs uppercase font-extrabold text-foreground">
                         PHÊ DUYỆT THỰC THI (PLAN APPROVAL)
@@ -528,7 +528,7 @@ export default function CompilationPlansPage({ isEmbedded = false }: { isEmbedde
                       <button
                         onClick={handleApprovePlan}
                         disabled={isApproving}
-                        className="w-full sm:w-auto px-4 py-2 text-xs font-medium bg-emerald-600 hover:bg-emerald-600/90 text-white transition-colors rounded-lg shadow-sm active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-1.5"
+                        className="w-full sm:w-auto px-4 py-2 text-xs font-medium bg-emerald-600 hover:bg-emerald-600/90 text-white transition-colors rounded-md shadow-sm active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-1.5"
                       >
                         <Play className="w-3.5 h-3.5" />
                         {isApproving ? "Đang thực thi..." : "Phê duyệt & Chạy (D)"}
@@ -536,7 +536,7 @@ export default function CompilationPlansPage({ isEmbedded = false }: { isEmbedde
                     </div>
                   </div>
                 ) : (
-                  <div className="border border-emerald-500/30 bg-emerald-500/5 p-3 rounded-lg mt-1 flex items-start gap-3 select-none text-emerald-800 dark:text-emerald-400">
+                  <div className="border border-emerald-500/30 bg-emerald-500/5 p-3 rounded-md mt-1 flex items-start gap-3 select-none text-emerald-800 dark:text-emerald-400">
                     <ShieldCheck className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5 animate-pulse" />
                     <div className="flex flex-col gap-0.5">
                       <span className="font-mono text-xs uppercase font-extrabold leading-none">Kế hoạch đã được phê duyệt</span>
@@ -551,7 +551,7 @@ export default function CompilationPlansPage({ isEmbedded = false }: { isEmbedde
 
             </div>
           ) : (
-            <div className="border border-dashed border-border p-6 rounded-xl text-center flex flex-col items-center justify-center min-h-[400px] bg-muted/5">
+            <div className="border border-dashed border-border p-6 rounded-lg text-center flex flex-col items-center justify-center min-h-[400px] bg-muted/5">
               <Sparkles className="w-10 h-10 text-primary/70 mb-3 shrink-0 animate-pulse" />
               <h2 className="text-sm font-semibold uppercase text-foreground">Không có kế hoạch nào được chọn</h2>
               <p className="text-xs text-muted-foreground mt-1.5 max-w-sm leading-normal">

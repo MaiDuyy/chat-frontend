@@ -15,12 +15,12 @@ const FEATURES: FeatureItem[] = [
 
 const HeroSection: React.FC = () => {
     return (
-        <section className="relative w-full overflow-hidden bg-white dark:bg-[#111111] py-20 lg:py-32">
+        <section className="relative w-full overflow-hidden bg-background py-20 lg:py-32">
             {/* Background decorative elements */}
             <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-3xl pointer-events-none"></div>
             <div className="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/2 w-[400px] h-[400px] bg-primary/10 rounded-full blur-3xl pointer-events-none"></div>
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                 <div className="flex flex-col lg:flex-row items-center gap-16 lg:gap-24">
                     {/* Left Content */}
                     <div className="flex-1 flex flex-col items-start text-left space-y-8 max-w-2xl">
@@ -30,7 +30,7 @@ const HeroSection: React.FC = () => {
                         </div>
 
                         <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
-                            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-foreground tracking-tight leading-[1.1]">
+                            <h1 className="text-[32px] md:text-5xl lg:text-[64px] font-extrabold text-foreground tracking-tight leading-[1.1]">
                                 Kết nối mọi người <br />
                                 <span className="text-primary">An toàn & Nhanh chóng</span>
                             </h1>
@@ -53,12 +53,12 @@ const HeroSection: React.FC = () => {
                         </ul>
 
                         <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto pt-4 animate-in fade-in slide-in-from-bottom-8 duration-1000">
-                            <Button className="w-full sm:w-auto bg-primary hover:opacity-90 text-primary-foreground h-14 px-10 rounded-2xl font-bold text-base shadow-xl shadow-primary/20 flex items-center gap-2 group">
+                            <Button className="w-full sm:w-auto bg-primary hover:opacity-90 text-primary-foreground h-14 px-10 rounded-xl font-bold text-base shadow-xl shadow-primary/20 flex items-center gap-2 group">
                                 <Download className="w-5 h-5 group-hover:-translate-y-1 transition-transform" />
                                 Tải NEXUS ngay
                             </Button>
                             <Link href="/register" className="w-full sm:w-auto">
-                                <Button variant="outline" className="w-full sm:w-auto h-14 px-10 rounded-2xl font-bold text-base border-border hover:bg-accent flex items-center gap-2">
+                                <Button variant="outline" className="w-full sm:w-auto h-14 px-10 rounded-xl font-bold text-base border-border hover:bg-accent flex items-center gap-2">
                                     <Globe className="w-5 h-5" />
                                     Dùng trên web
                                 </Button>
@@ -83,15 +83,15 @@ const HeroSection: React.FC = () => {
                         <div className="relative z-10 p-4 bg-white dark:bg-[#1c1c1c] rounded-[2rem] shadow-2xl border border-border overflow-hidden">
                             <img
                                 alt="NEXUS Interface"
-                                className="w-full rounded-2xl shadow-inner"
+                                className="w-full rounded-xl shadow-inner"
                                 src="/assets/img_pc_zalo.png"
                             />
                             
                             {/* Floating device indicators */}
-                            <div className="absolute top-1/4 -left-8 bg-white dark:bg-[#2a2a2a] p-4 rounded-2xl shadow-xl border border-border animate-bounce duration-[3000ms]">
+                            <div className="absolute top-1/4 -left-8 bg-white dark:bg-[#2a2a2a] p-4 rounded-xl shadow-xl border border-border animate-bounce duration-[3000ms]">
                                 <Monitor className="w-6 h-6 text-primary" />
                             </div>
-                            <div className="absolute bottom-1/4 -right-8 bg-white dark:bg-[#2a2a2a] p-4 rounded-2xl shadow-xl border border-border animate-bounce duration-[2500ms] delay-500">
+                            <div className="absolute bottom-1/4 -right-8 bg-white dark:bg-[#2a2a2a] p-4 rounded-xl shadow-xl border border-border animate-bounce duration-[2500ms] delay-500">
                                 <Smartphone className="w-6 h-6 text-emerald-500" />
                             </div>
                         </div>
@@ -105,4 +105,4 @@ const HeroSection: React.FC = () => {
     );
 };
 
-export default HeroSection;
+export default HeroSection;

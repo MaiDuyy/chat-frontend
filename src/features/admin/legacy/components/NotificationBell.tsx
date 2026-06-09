@@ -103,7 +103,7 @@ export function NotificationBell() {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative hover:bg-secondary rounded-md h-8 w-8 border border-border/40 bg-slate-100/60 dark:bg-zinc-900/60">
+        <Button variant="ghost" size="icon" className="relative hover:bg-secondary rounded-md h-8 w-8 border border-border/40 bg-muted/60 dark:bg-muted/60">
           <Bell className="h-4 w-4 text-muted-foreground hover:text-foreground" />
           {unreadCount > 0 && (
             <span className="absolute top-1 right-1 h-3.5 min-w-3.5 px-0.5 rounded-full bg-red-600 text-white text-[8px] flex items-center justify-center border border-background font-bold shadow-sm">
@@ -114,7 +114,7 @@ export function NotificationBell() {
       </PopoverTrigger>
 
       <PopoverContent
-        className="w-80 md:w-90 p-0 border border-border/60 shadow-[1.5px_1.5px_0px_0px_rgba(0,0,0,1)] dark:shadow-[1.5px_1.5px_0px_0px_rgba(255,255,255,0.15)] rounded-lg overflow-hidden bg-popover"
+        className="w-80 md:w-90 p-0 border border-border/60 shadow-[1.5px_1.5px_0px_0px_rgba(0,0,0,1)] dark:shadow-[1.5px_1.5px_0px_0px_rgba(255,255,255,0.15)] rounded-md overflow-hidden bg-popover"
         align="end"
         sideOffset={8}
       >

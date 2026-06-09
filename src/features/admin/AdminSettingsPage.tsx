@@ -187,7 +187,7 @@ export function AdminSettingsPage() {
                     </p>
                 </div>
                 <div className="flex gap-2">
-                    <Button variant="outline" size="sm" onClick={handleReset} className="rounded-lg h-8 text-xs">
+                    <Button variant="outline" size="sm" onClick={handleReset} className="rounded-md h-8 text-xs">
                         <RefreshCw className="w-3.5 h-3.5 mr-1.5" />
                         Làm mới
                     </Button>
@@ -195,7 +195,7 @@ export function AdminSettingsPage() {
                         size="sm"
                         onClick={activeTab === 'ai' ? handleSaveAi : handleSaveOrg}
                         disabled={activeTab === 'ai' ? isUpdatingAi : isUpdatingOrg}
-                        className="rounded-lg h-8 text-xs font-medium bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm active:scale-[0.98]"
+                        className="rounded-md h-8 text-xs font-medium bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm active:scale-[0.98]"
                     >
                         {(activeTab === 'ai' ? isUpdatingAi : isUpdatingOrg) ? (
                             <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
@@ -208,7 +208,7 @@ export function AdminSettingsPage() {
             </div>
 
             <Tabs defaultValue="general" value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-                <div className="bg-slate-100/60 dark:bg-slate-800/60 p-0.5 rounded-lg w-fit border border-border/40">
+                <div className="bg-muted/60 dark:bg-slate-800/60 p-0.5 rounded-md w-fit border border-border/40">
                     <TabsList className="bg-transparent h-8 gap-0.5 p-0">
                         <TabsTrigger value="general" className="rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-slate-900 data-[state=active]:shadow-sm px-4 h-7 text-xs font-medium">
                             <Globe className="w-3.5 h-3.5 mr-1.5" />

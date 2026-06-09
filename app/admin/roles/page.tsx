@@ -19,7 +19,7 @@ export default function AdminRolesPage() {
                     </p>
                 </div>
 
-                <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100">
+                <div className="bg-white rounded-3xl p-8 shadow-sm border border-border">
                     <RoleEditor />
                 </div>
             </div>

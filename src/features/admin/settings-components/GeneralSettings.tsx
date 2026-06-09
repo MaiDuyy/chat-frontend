@@ -18,8 +18,8 @@ interface GeneralSettingsProps {
 
 export function GeneralSettings({ orgSettings, handleOrgChange }: GeneralSettingsProps) {
     return (
-        <Card className="rounded-xl border border-border shadow-sm bg-card text-card-foreground overflow-hidden">
-            <CardHeader className="bg-slate-50/40 dark:bg-slate-900/10 border-b border-border py-3 px-4">
+        <Card className="rounded-lg border border-border shadow-sm bg-card text-card-foreground overflow-hidden">
+            <CardHeader className="bg-muted/40 dark:bg-slate-900/10 border-b border-border py-3 px-4">
                 <CardTitle className="text-sm font-semibold flex items-center gap-2">
                     <Globe className="w-4 h-4 text-primary" />
                     Cài đặt chung
@@ -37,7 +37,7 @@ export function GeneralSettings({ orgSettings, handleOrgChange }: GeneralSetting
                             value={orgSettings.siteName}
                             onChange={(e) => handleOrgChange('siteName', e.target.value)}
                             placeholder="NEXUS Enterprise"
-                            className="h-8 rounded-lg text-xs"
+                            className="h-8 rounded-md text-xs"
                         />
                     </div>
                     <div className="space-y-1.5">
@@ -47,7 +47,7 @@ export function GeneralSettings({ orgSettings, handleOrgChange }: GeneralSetting
                             value={orgSettings.siteDescription}
                             onChange={(e) => handleOrgChange('siteDescription', e.target.value)}
                             placeholder="Hệ thống giao tiếp nội bộ và quản trị tri thức doanh nghiệp"
-                            className="h-8 rounded-lg text-xs"
+                            className="h-8 rounded-md text-xs"
                         />
                     </div>
                 </div>

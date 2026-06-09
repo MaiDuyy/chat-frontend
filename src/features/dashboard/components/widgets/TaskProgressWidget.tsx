@@ -33,27 +33,27 @@ export const TaskProgressWidget: React.FC = () => {
       <div className="space-y-6">
         {/* Mentions / Unread */}
         <div>
-          <h4 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-3 flex items-center justify-between">
+          <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-3 flex items-center justify-between">
             Priority Mentions
-            <span className={`text-[10px] px-1.5 py-0.5 rounded-sm border w-fit ${unreadChats.length > 0 ? 'bg-red-500/20 text-red-500 border-red-500/30' : 'bg-zinc-800 text-zinc-400 border-zinc-700'}`}>
+            <span className={`text-[10px] px-1.5 py-0.5 rounded-sm border w-fit ${unreadChats.length > 0 ? 'bg-red-500/20 text-red-500 border-red-500/30' : 'bg-muted text-muted-foreground border-border'}`}>
               {unreadChats.length} UNREAD
             </span>
           </h4>
           <div className="space-y-2">
             {unreadChats.length === 0 && (
-              <p className="text-xs text-zinc-500 italic p-3 bg-zinc-900 border border-zinc-800 rounded-sm">All caught up!</p>
+              <p className="text-xs text-muted-foreground italic p-3 bg-muted border border-border rounded-sm">All caught up!</p>
             )}
             {unreadChats.slice(0, 3).map(chat => (
-              <div key={chat.id} className="p-3 bg-zinc-900 border border-zinc-800 rounded-sm hover:border-zinc-600 transition-colors cursor-pointer group">
+              <div key={chat.id} className="p-3 bg-muted border border-border rounded-sm hover:border-zinc-600 transition-colors cursor-pointer group">
                 <div className="flex justify-between items-start mb-1">
-                  <span className="text-xs font-bold text-zinc-300">
+                  <span className="text-xs font-bold text-muted-foreground">
                     {chat.name || 'Unknown Channel'}
                   </span>
                   <span className="text-[10px] font-bold text-red-400 bg-red-400/10 px-1 rounded-sm">
                     {chat.unreadCount}
                   </span>
                 </div>
-                <p className="text-sm text-zinc-400 line-clamp-2">
+                <p className="text-sm text-muted-foreground line-clamp-2">
                   {chat.lastMessage?.content || "New message received"}
                 </p>
               </div>
@@ -63,25 +63,25 @@ export const TaskProgressWidget: React.FC = () => {
 
         {/* Daily Tasks */}
         <div>
-          <h4 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-3 flex items-center gap-2">
+          <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-3 flex items-center gap-2">
             Today's Focus
           </h4>
           <div className="space-y-2">
-            {isTasksLoading && <p className="text-xs text-zinc-500 italic p-3">Loading tasks...</p>}
+            {isTasksLoading && <p className="text-xs text-muted-foreground italic p-3">Loading tasks...</p>}
 
             {!isTasksLoading && (!tasksData || !Array.isArray(tasksData) || tasksData.length === 0) && (
-               <p className="text-xs text-zinc-500 italic p-3 bg-zinc-900 border border-zinc-800 rounded-sm">Không có task nào trong hôm nay.</p>
+               <p className="text-xs text-muted-foreground italic p-3 bg-muted border border-border rounded-sm">Không có task nào trong hôm nay.</p>
             )}
 
             {Array.isArray(tasksData) && tasksData.slice(0, 4).map((task) => (
-              <label key={task.id} className={`flex items-start gap-3 p-2 hover:bg-zinc-900/50 rounded-sm cursor-pointer border border-transparent ${task.completed ? 'opacity-50' : 'hover:border-zinc-800'} transition-colors`}>
+              <label key={task.id} className={`flex items-start gap-3 p-2 hover:bg-muted/50 rounded-sm cursor-pointer border border-transparent ${task.completed ? 'opacity-50' : 'hover:border-border'} transition-colors`}>
                 <input
                   type="checkbox"
                   checked={task.completed}
                   onChange={() => toggleTaskStatus({ id: task.id, completed: !task.completed })}
-                  className="mt-1 flex-shrink-0 bg-transparent border-zinc-700 checked:bg-[#ccff00] checked:border-[#ccff00] focus:ring-0 focus:ring-offset-0 transition-colors"
+                  className="mt-1 flex-shrink-0 bg-transparent border-border checked:bg-[#ccff00] checked:border-[#ccff00] focus:ring-0 focus:ring-offset-0 transition-colors"
                 />
-                <span className={`text-sm ${task.completed ? 'text-zinc-500 line-through' : 'text-zinc-300'}`}>{task.title}</span>
+                <span className={`text-sm ${task.completed ? 'text-muted-foreground line-through' : 'text-muted-foreground'}`}>{task.title}</span>
                 {task.priority === 'high' && !task.completed && (
                   <span className="ml-auto w-2 h-2 rounded-none bg-red-500 mt-1.5" />
                 )}

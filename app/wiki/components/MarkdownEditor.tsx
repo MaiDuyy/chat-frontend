@@ -87,7 +87,7 @@ function ToolbarButton({
       type="button"
       title={label}
       onClick={onClick}
-      className="flex items-center justify-center w-7 h-7 border border-border bg-card hover:bg-muted hover:border-primary/30 text-foreground rounded-lg transition-all shadow-xs"
+      className="flex items-center justify-center w-7 h-7 border border-border bg-card hover:bg-muted hover:border-primary/30 text-foreground rounded-md transition-all shadow-xs"
     >
       <Icon className="w-3.5 h-3.5" />
     </button>
@@ -193,10 +193,10 @@ export function MarkdownEditor({
   };
 
   return (
-    <div className="flex flex-col gap-0 rounded-xl border border-border bg-card text-foreground overflow-hidden font-sans shadow-sm">
+    <div className="flex flex-col gap-0 rounded-lg border border-border bg-card text-foreground overflow-hidden font-sans shadow-sm">
       {/* Header tab controller */}
       <div className="flex items-center justify-between px-3 py-1.5 bg-muted border-b border-border select-none">
-        <div className="flex gap-1 border border-border p-0.5 bg-background rounded-lg">
+        <div className="flex gap-1 border border-border p-0.5 bg-background rounded-md">
           {(["edit", "preview"] as const).map((t) => (
             <button
               key={t}
@@ -231,7 +231,7 @@ export function MarkdownEditor({
               type="button"
               title="Tiêu đề H2"
               onClick={() => lp("## ")}
-              className="px-2 h-7 border border-border bg-card hover:bg-muted hover:border-primary/30 text-foreground rounded-lg transition-all duration-150 text-xs font-black font-mono shadow-xs"
+              className="px-2 h-7 border border-border bg-card hover:bg-muted hover:border-primary/30 text-foreground rounded-md transition-all duration-150 text-xs font-black font-mono shadow-xs"
             >
               H2
             </button>
@@ -239,7 +239,7 @@ export function MarkdownEditor({
               type="button"
               title="Tiêu đề H3"
               onClick={() => lp("### ")}
-              className="px-2 h-7 border border-border bg-card hover:bg-muted hover:border-primary/30 text-foreground rounded-lg transition-all duration-150 text-xs font-black font-mono shadow-xs"
+              className="px-2 h-7 border border-border bg-card hover:bg-muted hover:border-primary/30 text-foreground rounded-md transition-all duration-150 text-xs font-black font-mono shadow-xs"
             >
               H3
             </button>

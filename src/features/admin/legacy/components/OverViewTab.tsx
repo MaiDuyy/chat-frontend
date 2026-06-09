@@ -87,7 +87,7 @@ export function OverViewTab() {
     
     return statsData.recentActivity.map((activity, idx) => {
       let icon = Activity;
-      let color = "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300";
+      let color = "bg-zinc-100 text-muted-foreground dark:bg-muted dark:text-muted-foreground";
 
       if (activity.type.includes('user')) {
         icon = UserPlus;
@@ -133,7 +133,7 @@ export function OverViewTab() {
     {
       icon: SettingsIcon,
       label: "Cài đặt",
-      color: "text-zinc-500",
+      color: "text-muted-foreground",
       onClick: () => router.push('/admin/dashboard?tab=settings'),
     },
   ];
@@ -158,7 +158,7 @@ export function OverViewTab() {
           title="Tổng người dùng"
           value={stats.totalUsers}
           icon={Users}
-          color="bg-blue-600 dark:bg-blue-700"
+          color="bg-primary dark:bg-primary/90"
         />
         <StatCard
           title="Tin nhắn"
@@ -190,7 +190,7 @@ export function OverViewTab() {
           <Card className="border border-blue-200/50 bg-blue-50/40 dark:bg-blue-950/20 dark:border-blue-900/30 rounded-md">
             <CardContent className="p-2.5 flex items-center gap-3">
               <div className="p-1.5 rounded bg-blue-100 dark:bg-blue-900/40 shrink-0">
-                <Clock className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                <Clock className="h-4 w-4 text-primary" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="font-bold text-xs text-blue-900 dark:text-blue-100 truncate">

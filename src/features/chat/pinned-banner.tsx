@@ -40,7 +40,7 @@ export const PinnedBanner: React.FC<PinnedBannerProps> = ({
 
   return (
     <div 
-      className="h-12 bg-white/80 backdrop-blur-md border-b border-slate-100 px-4 flex items-center justify-between cursor-pointer hover:bg-slate-50 transition-colors z-20"
+      className="h-12 bg-white/80 backdrop-blur-md border-b border-border px-4 flex items-center justify-between cursor-pointer hover:bg-muted transition-colors z-20"
       onClick={onOpenSidebar}
     >
       <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -55,14 +55,14 @@ export const PinnedBanner: React.FC<PinnedBannerProps> = ({
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="text-sm text-slate-600 truncate max-w-md font-medium flex items-center">
-              <span className="font-bold text-slate-800 mr-1 shrink-0">{currentMessage.senderName}:</span>
+            <div className="text-sm text-muted-foreground truncate max-w-md font-medium flex items-center">
+              <span className="font-bold text-foreground mr-1 shrink-0">{currentMessage.senderName}:</span>
               <MessageSnippet 
                 type={currentMessage.type} 
                 content={currentMessage.content} 
                 file={(currentMessage as any).file}
                 className="truncate"
-                iconClassName="h-3.5 w-3.5 inline-block align-middle shrink-0 mr-1 text-slate-500"
+                iconClassName="h-3.5 w-3.5 inline-block align-middle shrink-0 mr-1 text-muted-foreground"
               />
             </div>
           </div>
@@ -71,11 +71,11 @@ export const PinnedBanner: React.FC<PinnedBannerProps> = ({
 
       <div className="flex items-center gap-1 shrink-0 ml-4">
         {total > 1 && (
-          <div className="flex items-center mr-2 border-r border-slate-200 pr-2 gap-0.5">
+          <div className="flex items-center mr-2 border-r border-border pr-2 gap-0.5">
             <Button 
               variant="ghost" 
               size="icon" 
-              className="h-7 w-7 rounded-full text-slate-400 hover:text-slate-600"
+              className="h-7 w-7 rounded-full text-muted-foreground hover:text-muted-foreground"
               onClick={prevPinned}
             >
               <ChevronLeft size={16} />
@@ -83,7 +83,7 @@ export const PinnedBanner: React.FC<PinnedBannerProps> = ({
             <Button 
               variant="ghost" 
               size="icon" 
-              className="h-7 w-7 rounded-full text-slate-400 hover:text-slate-600"
+              className="h-7 w-7 rounded-full text-muted-foreground hover:text-muted-foreground"
               onClick={nextPinned}
             >
               <ChevronRight size={16} />
@@ -94,7 +94,7 @@ export const PinnedBanner: React.FC<PinnedBannerProps> = ({
         <Button 
           variant="ghost" 
           size="sm" 
-          className="text-xs font-bold text-slate-500 hover:text-blue-600 h-8 px-2"
+          className="text-xs font-bold text-muted-foreground hover:text-blue-600 h-8 px-2"
           onClick={(e) => {
             e.stopPropagation();
             onJumpToMessage(currentMessage.id);
@@ -106,7 +106,7 @@ export const PinnedBanner: React.FC<PinnedBannerProps> = ({
         <Button 
           variant="ghost" 
           size="icon" 
-          className="h-8 w-8 text-slate-400 hover:text-slate-600"
+          className="h-8 w-8 text-muted-foreground hover:text-muted-foreground"
           onClick={onOpenSidebar}
         >
           <ChevronRight size={18} />

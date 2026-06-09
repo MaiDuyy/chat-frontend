@@ -223,7 +223,7 @@ export default function AIPage() {
                 ) : (
                     /* Empty / Welcome */
                     <div className="flex-1 flex flex-col items-center justify-center gap-5 animate-in fade-in duration-500">
-                        <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center">
+                        <div className="w-14 h-14 rounded-lg bg-primary/10 flex items-center justify-center">
                             <Bot className="w-7 h-7 text-primary" />
                         </div>
                         <div className="text-center space-y-1.5 max-w-xs">

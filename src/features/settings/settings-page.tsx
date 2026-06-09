@@ -167,7 +167,7 @@ export default function SettingsPage() {
             case "profile":
                 return (
                     // <div className="space-y-6">
-                    //     <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                    //     <h2 className="text-xl font-semibold text-foreground">
                     //         Thông tin cá nhân
                     //     </h2>
 
@@ -182,7 +182,7 @@ export default function SettingsPage() {
                     //             </Avatar>
                     //             <button
                     //                 onClick={() => fileInputRef.current?.click()}
-                    //                 className="absolute bottom-0 right-0 p-2 bg-blue-600 rounded-full text-white hover:bg-blue-700 transition-colors shadow-lg"
+                    //                 className="absolute bottom-0 right-0 p-2 bg-primary rounded-full text-white hover:bg-primary/90 transition-colors shadow-lg"
                     //             >
                     //                 <Camera className="h-4 w-4" />
                     //             </button>
@@ -195,10 +195,10 @@ export default function SettingsPage() {
                     //             />
                     //         </div>
                     //         <div>
-                    //             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    //             <h3 className="text-lg font-semibold text-foreground">
                     //                 {user?.name}
                     //             </h3>
-                    //             <p className="text-gray-500 dark:text-gray-400">{user?.email}</p>
+                    //             <p className="text-muted-foreground">{user?.email}</p>
                     //         </div>
                     //     </div>
 
@@ -220,7 +220,7 @@ export default function SettingsPage() {
                     //                 id="email"
                     //                 value={user?.email || ""}
                     //                 disabled
-                    //                 className="mt-1 bg-gray-100 dark:bg-gray-700"
+                    //                 className="mt-1 bg-muted dark:bg-muted"
                     //             />
                     //         </div>
                     //         <div>
@@ -241,7 +241,7 @@ export default function SettingsPage() {
                     //                     <Button
                     //                         onClick={handleUpdateProfile}
                     //                         disabled={isUpdating}
-                    //                         className="bg-blue-600 hover:bg-blue-700"
+                    //                         className="bg-primary hover:bg-primary/90"
                     //                     >
                     //                         <Save className="h-4 w-4 mr-2" />
                     //                         {isUpdating ? "Đang lưu..." : "Lưu thay đổi"}
@@ -268,8 +268,8 @@ export default function SettingsPage() {
                     //     </div>
 
                     //     {/* Change Password */}
-                    //     <div className="pt-6 border-t border-gray-200 dark:border-gray-700">
-                    //         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                    //     <div className="pt-6 border-t border-border">
+                    //         <h3 className="text-lg font-semibold text-foreground mb-4">
                     //             Đổi mật khẩu
                     //         </h3>
                     //         <div className="space-y-4 max-w-md">
@@ -285,7 +285,7 @@ export default function SettingsPage() {
                     //                 <button
                     //                     type="button"
                     //                     onClick={() => setShowPassword(!showPassword)}
-                    //                     className="absolute right-3 top-9 text-gray-400 hover:text-gray-600"
+                    //                     className="absolute right-3 top-9 text-muted-foreground hover:text-muted-foreground"
                     //                 >
                     //                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     //                 </button>
@@ -313,7 +313,7 @@ export default function SettingsPage() {
                     //             <Button
                     //                 onClick={handleChangePassword}
                     //                 disabled={isChangingPassword || !currentPassword || !newPassword}
-                    //                 className="bg-blue-600 hover:bg-blue-700"
+                    //                 className="bg-primary hover:bg-primary/90"
                     //             >
                     //                 <Lock className="h-4 w-4 mr-2" />
                     //                 {isChangingPassword ? "Đang xử lý..." : "Đổi mật khẩu"}
@@ -329,7 +329,7 @@ export default function SettingsPage() {
             case "notifications":
                 return (
                     <div className="space-y-6">
-                        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                        <h2 className="text-xl font-semibold text-foreground">
                             Cài đặt thông báo
                         </h2>
                         <div className="space-y-4">
@@ -340,10 +340,10 @@ export default function SettingsPage() {
                                 { key: "sounds", label: "Âm thanh", desc: "Phát âm thanh khi có thông báo" },
                                 { key: "desktop", label: "Thông báo desktop", desc: "Hiển thị thông báo trên màn hình" },
                             ].map((item) => (
-                                <div key={item.key} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/50 rounded-[4px]">
+                                <div key={item.key} className="flex items-center justify-between p-3 bg-muted dark:bg-slate-800/60 border border-border/80 dark:border-border/50 rounded-md">
                                     <div>
-                                        <p className="text-xs font-semibold text-slate-900 dark:text-slate-100">{item.label}</p>
-                                        <p className="text-[11px] text-slate-500">{item.desc}</p>
+                                        <p className="text-xs font-semibold text-foreground">{item.label}</p>
+                                        <p className="text-[11px] text-muted-foreground">{item.desc}</p>
                                     </div>
                                     <Switch
                                         checked={notifications[item.key as keyof typeof notifications]}
@@ -360,7 +360,7 @@ export default function SettingsPage() {
             case "privacy":
                 return (
                     <div className="space-y-4">
-                        <h2 className="text-sm font-bold text-slate-900 dark:text-slate-100">
+                        <h2 className="text-sm font-bold text-foreground">
                             Quyền riêng tư
                         </h2>
                         <div className="space-y-1.5">
@@ -370,10 +370,10 @@ export default function SettingsPage() {
                                 { key: "showReadReceipts", label: "Xác nhận đã đọc", desc: "Cho phép người khác thấy bạn đã đọc tin nhắn" },
                                 { key: "allowAddBynumber", label: "Cho phép tìm kiếm bằng SĐT", desc: "Người khác có thể tìm bạn bằng số điện thoại" },
                             ].map((item) => (
-                                <div key={item.key} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/50 rounded-[4px]">
+                                <div key={item.key} className="flex items-center justify-between p-3 bg-muted dark:bg-slate-800/60 border border-border/80 dark:border-border/50 rounded-md">
                                     <div>
-                                        <p className="text-xs font-semibold text-slate-900 dark:text-slate-100">{item.label}</p>
-                                        <p className="text-[11px] text-slate-500">{item.desc}</p>
+                                        <p className="text-xs font-semibold text-foreground">{item.label}</p>
+                                        <p className="text-[11px] text-muted-foreground">{item.desc}</p>
                                     </div>
                                     <Switch
                                         checked={privacy[item.key as keyof typeof privacy]}
@@ -386,19 +386,19 @@ export default function SettingsPage() {
 
                             {/* Blocked Users */}
                             <div
-                                className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/50 rounded-[4px] cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700/60 transition-colors"
+                                className="flex items-center justify-between p-3 bg-muted dark:bg-slate-800/60 border border-border/80 dark:border-border/50 rounded-md cursor-pointer hover:bg-muted dark:hover:bg-slate-700/60 transition-colors"
                                 onClick={() => setShowBlockedUsers(true)}
                             >
                                 <div className="flex items-center gap-2.5">
-                                    <div className="w-7 h-7 rounded-[4px] bg-red-50 dark:bg-red-950/30 flex items-center justify-center">
+                                    <div className="w-7 h-7 rounded-md bg-red-50 dark:bg-red-950/30 flex items-center justify-center">
                                         <Ban className="h-3.5 w-3.5 text-red-600" />
                                     </div>
                                     <div>
-                                        <p className="text-xs font-semibold text-slate-900 dark:text-slate-100">Danh sách chặn</p>
-                                        <p className="text-[11px] text-slate-500">Quản lý những người bạn đã chặn</p>
+                                        <p className="text-xs font-semibold text-foreground">Danh sách chặn</p>
+                                        <p className="text-[11px] text-muted-foreground">Quản lý những người bạn đã chặn</p>
                                     </div>
                                 </div>
-                                <ChevronRight className="h-4 w-4 text-slate-400" />
+                                <ChevronRight className="h-4 w-4 text-muted-foreground" />
                             </div>
                         </div>
 
@@ -412,16 +412,16 @@ export default function SettingsPage() {
             case "appearance":
                 return (
                     <div className="space-y-6">
-                        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                        <h2 className="text-xl font-semibold text-foreground">
                             Giao diện
                         </h2>
                         <div className="space-y-4">
-                            <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                            <div className="flex items-center justify-between p-4 bg-muted dark:bg-gray-800 rounded-md">
                                 <div className="flex items-center gap-3">
                                     {isDarkMode ? <Moon className="h-5 w-5 text-blue-500" /> : <Sun className="h-5 w-5 text-yellow-500" />}
                                     <div>
-                                        <p className="font-medium text-gray-900 dark:text-white">Chế độ tối</p>
-                                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                                        <p className="font-medium text-foreground">Chế độ tối</p>
+                                        <p className="text-sm text-muted-foreground">
                                             {isDarkMode ? "Đang bật" : "Đang tắt"}
                                         </p>
                                     </div>
@@ -429,8 +429,8 @@ export default function SettingsPage() {
                                 <Switch checked={isDarkMode} onCheckedChange={toggleDarkMode} />
                             </div>
 
-                            <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                                <p className="font-medium text-gray-900 dark:text-white mb-3">Màu chủ đề</p>
+                            <div className="p-4 bg-muted dark:bg-gray-800 rounded-md">
+                                <p className="font-medium text-foreground mb-3">Màu chủ đề</p>
                                 <div className="flex gap-3">
                                     {["bg-blue-500", "bg-purple-500", "bg-green-500", "bg-pink-500", "bg-orange-500"].map((color) => (
                                         <button
@@ -447,7 +447,7 @@ export default function SettingsPage() {
             case "language":
                 return (
                     <div className="space-y-6">
-                        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                        <h2 className="text-xl font-semibold text-foreground">
                             Ngôn ngữ
                         </h2>
                         <div className="space-y-2">
@@ -457,11 +457,11 @@ export default function SettingsPage() {
                             ].map((lang) => (
                                 <button
                                     key={lang.code}
-                                    className="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                                    className="w-full flex items-center justify-between p-4 bg-muted dark:bg-gray-800 rounded-md hover:bg-muted dark:hover:bg-muted transition-colors"
                                 >
                                     <div className="flex items-center gap-3">
                                         <span className="text-2xl">{lang.flag}</span>
-                                        <span className="font-medium text-gray-900 dark:text-white">{lang.label}</span>
+                                        <span className="font-medium text-foreground">{lang.label}</span>
                                     </div>
                                     {lang.code === "vi" && (
                                         <div className="w-4 h-4 bg-blue-500 rounded-full" />
@@ -475,7 +475,7 @@ export default function SettingsPage() {
             case "help":
                 return (
                     <div className="space-y-6">
-                        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                        <h2 className="text-xl font-semibold text-foreground">
                             Trợ giúp & Hỗ trợ
                         </h2>
                         <div className="space-y-2">
@@ -488,13 +488,13 @@ export default function SettingsPage() {
                             ].map((item) => (
                                 <button
                                     key={item.label}
-                                    className="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                                    className="w-full flex items-center justify-between p-4 bg-muted dark:bg-gray-800 rounded-md hover:bg-muted dark:hover:bg-muted transition-colors"
                                 >
                                     <div className="text-left">
-                                        <p className="font-medium text-gray-900 dark:text-white">{item.label}</p>
-                                        <p className="text-sm text-gray-500 dark:text-gray-400">{item.desc}</p>
+                                        <p className="font-medium text-foreground">{item.label}</p>
+                                        <p className="text-sm text-muted-foreground">{item.desc}</p>
                                     </div>
-                                    <ChevronRight className="h-5 w-5 text-gray-400" />
+                                    <ChevronRight className="h-5 w-5 text-muted-foreground" />
                                 </button>
                             ))}
                         </div>
@@ -506,13 +506,13 @@ export default function SettingsPage() {
     return (
         <div className="flex h-screen bg-[#F8F8F8] dark:bg-[#111113]">
             {/* Settings Sidebar */}
-            <div className="w-64 bg-white dark:bg-[#19191B] border-r border-slate-200/80 dark:border-white/[0.06] flex flex-col shrink-0">
+            <div className="w-64 bg-background border-r border-border flex flex-col shrink-0">
                 {/* Header */}
-                <div className="flex items-center gap-2.5 px-4 h-12 border-b border-slate-200/80 dark:border-white/[0.06]">
-                    <a href="/chat" className="w-7 h-7 flex items-center justify-center rounded-[2px] text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer">
+                <div className="flex items-center gap-2.5 px-4 h-12 border-b border-border">
+                    <a href="/chat" className="w-7 h-7 flex items-center justify-center rounded-sm text-muted-foreground hover:bg-muted dark:hover:bg-slate-800 transition-colors cursor-pointer">
                         <ArrowLeft className="h-4 w-4" />
                     </a>
-                    <h1 className="text-xs font-bold text-slate-900 dark:text-slate-100 font-mono uppercase tracking-wider">Cài đặt</h1>
+                    <h1 className="text-xs font-bold text-foreground font-mono uppercase tracking-wider">Cài đặt</h1>
                 </div>
 
                 {/* Menu */}
@@ -521,10 +521,10 @@ export default function SettingsPage() {
                         <button
                             key={item.id}
                             onClick={() => setActiveSection(item.id)}
-                            className={`w-full flex items-center gap-2.5 px-3 py-2 transition-all duration-150 text-xs font-mono font-medium cursor-pointer rounded-[2px] ${
+                            className={`w-full flex items-center gap-2.5 px-3 py-2 transition-all duration-150 text-xs font-mono font-medium cursor-pointer rounded-sm ${
                                 activeSection === item.id
-                                    ? 'bg-slate-100 dark:bg-zinc-800 text-slate-900 dark:text-slate-100 font-bold border-l-2 border-slate-900 dark:border-slate-100 pl-2'
-                                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-zinc-900 hover:text-slate-900 dark:hover:text-slate-200'
+                                    ? 'bg-muted dark:bg-muted text-foreground font-bold border-l-2 border-slate-900 dark:border-border pl-2'
+                                    : 'text-muted-foreground dark:text-muted-foreground hover:bg-muted dark:hover:bg-muted hover:text-foreground dark:hover:text-foreground'
                             }`}
                         >
                             <item.icon className="h-3.5 w-3.5 shrink-0" />
@@ -534,10 +534,10 @@ export default function SettingsPage() {
                 </nav>
 
                 {/* Logout */}
-                <div className="p-2 border-t border-slate-200/80 dark:border-white/[0.06]">
+                <div className="p-2 border-t border-border">
                     <button
                         onClick={handleLogout}
-                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-[2px] text-xs font-mono font-bold text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/20 transition-colors cursor-pointer"
+                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-sm text-xs font-mono font-bold text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/20 transition-colors cursor-pointer"
                     >
                         <LogOut className="h-3.5 w-3.5" />
                         <span>Đăng xuất</span>

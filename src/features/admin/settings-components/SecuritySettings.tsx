@@ -17,8 +17,8 @@ interface SecuritySettingsProps {
 
 export function SecuritySettings({ orgSettings, handleOrgChange }: SecuritySettingsProps) {
     return (
-        <Card className="rounded-xl border border-border shadow-sm bg-card text-card-foreground overflow-hidden">
-            <CardHeader className="bg-slate-50/40 dark:bg-slate-900/10 border-b border-border py-3 px-4">
+        <Card className="rounded-lg border border-border shadow-sm bg-card text-card-foreground overflow-hidden">
+            <CardHeader className="bg-muted/40 dark:bg-slate-900/10 border-b border-border py-3 px-4">
                 <CardTitle className="text-sm font-semibold flex items-center gap-2">
                     <Shield className="w-4 h-4 text-primary" />
                     Chính sách bảo mật
@@ -55,7 +55,7 @@ export function SecuritySettings({ orgSettings, handleOrgChange }: SecuritySetti
                         value={orgSettings.sessionTimeout.toString()}
                         onValueChange={(value) => handleOrgChange('sessionTimeout', parseInt(value))}
                     >
-                        <SelectTrigger className="w-36 h-8 rounded-lg text-xs">
+                        <SelectTrigger className="w-36 h-8 rounded-md text-xs">
                             <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -76,7 +76,7 @@ export function SecuritySettings({ orgSettings, handleOrgChange }: SecuritySetti
                         value={orgSettings.maxLoginAttempts.toString()}
                         onValueChange={(value) => handleOrgChange('maxLoginAttempts', parseInt(value))}
                     >
-                        <SelectTrigger className="w-36 h-8 rounded-lg text-xs">
+                        <SelectTrigger className="w-36 h-8 rounded-md text-xs">
                             <SelectValue />
                         </SelectTrigger>
                         <SelectContent>

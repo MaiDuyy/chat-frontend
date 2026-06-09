@@ -7,7 +7,7 @@ import { ModernChatArea } from './modern-chat-area';
 
 export const ModernDashboard: React.FC = () => {
   return (
-    <div className="flex w-full h-screen overflow-hidden bg-white selection:bg-blue-100 selection:text-blue-900">
+    <div className="flex w-full h-screen overflow-hidden bg-background text-foreground selection:bg-blue-100 selection:text-blue-900">
 
 
       {/* Middle Column: Sidebar */}

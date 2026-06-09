@@ -86,7 +86,7 @@ export function UserActivityBadge({
                             <Circle
                                 className={cn(
                                     "h-2 w-2",
-                                    isOnline ? "fill-green-500 text-green-500" : "fill-gray-400 text-gray-400"
+                                    isOnline ? "fill-green-500 text-green-500" : "fill-gray-400 text-muted-foreground"
                                 )}
                             />
                             {isOnline ? "Đang hoạt động" : lastSeenText || "Không hoạt động"}

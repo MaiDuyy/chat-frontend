@@ -278,31 +278,31 @@ export const ChatItem = ({
             <div
                 onClick={handleSelectChat}
                 className={`
-          group relative flex items-center gap-2.5 p-2 cursor-pointer transition-all duration-150 mx-1.5 my-0.5 rounded-[2px] border border-transparent
-          hover:bg-slate-200/40 dark:hover:bg-white/[0.02]
-          ${isSelected ? "bg-blue-600/10 dark:bg-white/[0.04] shadow-sm border-blue-200/30 dark:border-white/[0.06]" : ""}
-          ${!chat.readed ? "bg-white dark:bg-[#19191B]" : ""}
+          group relative flex items-center gap-2.5 p-2 cursor-pointer transition-all duration-150 mx-1.5 my-0.5 rounded-sm border border-transparent
+          hover:bg-muted/40 dark:hover:bg-muted/10
+          ${isSelected ? "bg-primary/10 dark:bg-white/[0.04] shadow-sm border-blue-200/30 dark:border-white/[0.06]" : ""}
+          ${!chat.readed ? "bg-background" : ""}
         `}
             >
                 {/* Active Indicator Line */}
                 {isSelected && (
-                    <div className="absolute left-0 top-2 bottom-2 w-1 bg-blue-600 dark:bg-blue-500 rounded-r-[2px]" />
+                    <div className="absolute left-0 top-2 bottom-2 w-1 bg-primary dark:bg-blue-500 rounded-r-[2px]" />
                 )}
                 {/* Avatar Section */}
                 <div className="relative flex-shrink-0">
-                    <Avatar className="h-9 w-9 rounded-[2px] ring-1 ring-slate-100 dark:ring-white/[0.04]">
-                        <AvatarImage src={imageUrl} alt={displayName} className="rounded-[2px]" />
+                    <Avatar className="h-9 w-9 rounded-sm ring-1 ring-slate-100 dark:ring-white/[0.04]">
+                        <AvatarImage src={imageUrl} alt={displayName} className="rounded-sm" />
                         <AvatarFallback
                             className={`${chat.isGroup
                                 ? "bg-gradient-to-br from-green-600 to-emerald-600"
                                 : "bg-gradient-to-br from-blue-600 to-indigo-600"
-                                } text-white font-mono font-bold rounded-[2px]`}
+                                } text-white font-mono font-bold rounded-sm`}
                         >
                             {initials}
                         </AvatarFallback>
                     </Avatar>
                     {!chat.isGroup && isOnline && (
-                        <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-white dark:border-gray-800 rounded-full" />
+                        <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-white dark:border-border rounded-full" />
                     )}
                     {chat.isGroup && (
                         <span className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
@@ -318,8 +318,8 @@ export const ChatItem = ({
                             {chat.pin && <PinIcon className="w-3 h-3 text-blue-500 flex-shrink-0" />}
                             <span
                                 className={`truncate text-[12.5px] tracking-tight ${!chat.readed
-                                    ? "text-slate-900 dark:text-white font-black"
-                                    : isSelected ? "text-blue-700 dark:text-blue-400 font-bold" : "text-slate-700 dark:text-zinc-300 font-semibold"
+                                    ? "text-foreground dark:text-white font-black"
+                                    : isSelected ? "text-blue-700 dark:text-blue-400 font-bold" : "text-muted-foreground font-semibold"
                                     }`}
                             >
                                 {displayName}
@@ -327,7 +327,7 @@ export const ChatItem = ({
 
                             {/* Hiển thị Icon category nếu có */}
                             {selectedCategory && (
-                                <Badge variant="outline" className="h-5 px-1 ml-1 hidden sm:flex rounded-[2px]">
+                                <Badge variant="outline" className="h-5 px-1 ml-1 hidden sm:flex rounded-sm">
                                     {(() => {
                                         const CatIcon = FRIEND_CATEGORIES.find(c => c.id === selectedCategory)?.icon;
                                         return CatIcon ? <CatIcon className="w-3 h-3" /> : null;
@@ -335,7 +335,7 @@ export const ChatItem = ({
                                 </Badge>
                             )}
                         </div>
-                        <span className="text-xs text-gray-400 dark:text-zinc-500 flex-shrink-0 ml-2 font-mono">
+                        <span className="text-xs text-muted-foreground dark:text-muted-foreground flex-shrink-0 ml-2 font-mono">
                             {lastMessageTime}
                         </span>
                     </div>
@@ -343,8 +343,8 @@ export const ChatItem = ({
                     <div className="flex items-center justify-between gap-2">
                         <p
                             className={`text-[12px] truncate flex-1 ${!chat.readed
-                                ? "text-gray-800 dark:text-gray-200 font-medium"
-                                : "text-gray-500 dark:text-gray-400"
+                                ? "text-foreground dark:text-foreground font-medium"
+                                : "text-muted-foreground"
                                 }`}
                         >
                             {isTyping ? (
@@ -368,8 +368,8 @@ export const ChatItem = ({
                                         type={chat.lastMessage.type} 
                                         content={chat.lastMessage.content} 
                                         file={(chat.lastMessage as any).file} 
-                                        className="text-xs text-gray-400 dark:text-gray-500 truncate align-middle max-w-[200px]"
-                                        iconClassName="h-3 w-3 inline-block align-middle shrink-0 mr-1 text-slate-400 dark:text-slate-500"
+                                        className="text-xs text-muted-foreground dark:text-muted-foreground truncate align-middle max-w-[200px]"
+                                        iconClassName="h-3 w-3 inline-block align-middle shrink-0 mr-1 text-muted-foreground dark:text-muted-foreground"
                                     />
                                 </>
                             ) : (
@@ -379,25 +379,25 @@ export const ChatItem = ({
 
                         {/* Unread Badge - Ẩn nếu đang được chọn/đang chat */}
                         {chat.unreadCount > 0 && !isSelected && (
-                            <Badge className="bg-red-500 text-white text-[9px] font-black px-1.5 py-0.5 h-4.5 min-w-[18px] flex items-center justify-center rounded-[2px] shadow-sm ring-2 ring-white dark:ring-[#111113] animate-in zoom-in duration-300">
+                            <Badge className="bg-red-500 text-white text-[9px] font-black px-1.5 py-0.5 h-4.5 min-w-[18px] flex items-center justify-center rounded-sm shadow-sm ring-2 ring-white dark:ring-[#111113] animate-in zoom-in duration-300">
                                 {chat.unreadCount > 99 ? "99+" : chat.unreadCount}
                             </Badge>
                         )}
 
                         {/* DROPDOWN MENU TRIGGER */}
-                        <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute right-2 bg-white/80 dark:bg-[#19191B]/90 border border-slate-200/50 dark:border-white/[0.04] backdrop-blur-sm rounded-[2px] shadow-sm">
+                        <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute right-2 bg-white/80 dark:bg-background/90 border border-border/50 backdrop-blur-sm rounded-sm shadow-sm">
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                                    <Button variant="ghost" size="icon" className="h-8 w-8 rounded-[2px]">
-                                        <MoreVertical className="h-4 w-4 text-gray-500 dark:text-zinc-400" />
+                                    <Button variant="ghost" size="icon" className="h-8 w-8 rounded-sm">
+                                        <MoreVertical className="h-4 w-4 text-muted-foreground dark:text-muted-foreground" />
                                     </Button>
                                 </DropdownMenuTrigger>
 
                                 {/* Menu cho chat 1-1 */}
                                 {!chat.isGroup ? (
-                                    <DropdownMenuContent align="end" className="w-52 rounded-[2px] bg-white dark:bg-[#19191B] border border-slate-200/80 dark:border-white/[0.06] p-1 shadow-md font-mono text-[11px]" onClick={(e) => e.stopPropagation()}>
+                                    <DropdownMenuContent align="end" className="w-52 rounded-sm bg-background border border-border p-1 shadow-md font-mono text-[11px]" onClick={(e) => e.stopPropagation()}>
                                         {/* Ghim/Bỏ ghim */}
-                                        <DropdownMenuItem onClick={handleTogglePin} className="rounded-[2px] cursor-pointer py-1.5">
+                                        <DropdownMenuItem onClick={handleTogglePin} className="rounded-sm cursor-pointer py-1.5">
                                             {chat.pin ? (
                                                 <>
                                                     <PinOff className="h-3.5 w-3.5 mr-2" />
@@ -412,7 +412,7 @@ export const ChatItem = ({
                                         </DropdownMenuItem>
 
                                         {/* Tắt/Bật thông báo */}
-                                        <DropdownMenuItem onClick={handleToggleNotify} className="rounded-[2px] cursor-pointer py-1.5">
+                                        <DropdownMenuItem onClick={handleToggleNotify} className="rounded-sm cursor-pointer py-1.5">
                                             {chat.notify === false ? (
                                                 <>
                                                     <Bell className="h-3.5 w-3.5 mr-2" />
@@ -432,7 +432,7 @@ export const ChatItem = ({
                                         {isFriend ? (
                                             <DropdownMenuItem
                                                 onClick={() => setShowUnfriendDialog(true)}
-                                                className="text-orange-600 focus:text-orange-700 rounded-[2px] cursor-pointer py-1.5"
+                                                className="text-orange-600 focus:text-orange-700 rounded-sm cursor-pointer py-1.5"
                                             >
                                                 <UserMinus className="h-3.5 w-3.5 mr-2" />
                                                 Hủy kết bạn
@@ -441,7 +441,7 @@ export const ChatItem = ({
                                             <DropdownMenuItem
                                                 onClick={handleSendFriendRequest}
                                                 disabled={isSendingRequest}
-                                                className="text-blue-600 focus:text-blue-700 rounded-[2px] cursor-pointer py-1.5"
+                                                className="text-blue-600 focus:text-blue-700 rounded-sm cursor-pointer py-1.5"
                                             >
                                                 {isSendingRequest ? (
                                                     <Loader2 className="h-3.5 w-3.5 mr-2 animate-spin" />
@@ -457,7 +457,7 @@ export const ChatItem = ({
                                                 <DropdownMenuItem
                                                     onClick={handleUnblock}
                                                     disabled={isUnblocking}
-                                                    className="text-emerald-600 focus:text-emerald-700 font-bold rounded-[2px] cursor-pointer py-1.5"
+                                                    className="text-emerald-600 focus:text-emerald-700 font-bold rounded-sm cursor-pointer py-1.5"
                                                 >
                                                     {isUnblocking ? (
                                                         <Loader2 className="h-3.5 w-3.5 mr-2 animate-spin" />
@@ -470,7 +470,7 @@ export const ChatItem = ({
                                         ) : (
                                             <DropdownMenuItem
                                                 onClick={() => setShowBlockDialog(true)}
-                                                className="text-red-600 focus:text-red-700 rounded-[2px] cursor-pointer py-1.5"
+                                                className="text-red-600 focus:text-red-700 rounded-sm cursor-pointer py-1.5"
                                             >
                                                 <Ban className="h-3.5 w-3.5 mr-2" />
                                                 Chặn
@@ -482,7 +482,7 @@ export const ChatItem = ({
                                         {/* Xóa cuộc hội thoại */}
                                         <DropdownMenuItem
                                             onClick={() => setShowDeleteChatDialog(true)}
-                                            className="text-red-600 focus:text-red-750 rounded-[2px] cursor-pointer py-1.5"
+                                            className="text-red-600 focus:text-red-750 rounded-sm cursor-pointer py-1.5"
                                         >
                                             <Trash2 className="h-3.5 w-3.5 mr-2" />
                                             Xóa cuộc hội thoại
@@ -490,9 +490,9 @@ export const ChatItem = ({
                                     </DropdownMenuContent>
                                 ) : (
                                     // Menu cho Group
-                                    <DropdownMenuContent align="end" className="w-52 rounded-[2px] bg-white dark:bg-[#19191B] border border-slate-200/80 dark:border-white/[0.06] p-1 shadow-md font-mono text-[11px]" onClick={(e) => e.stopPropagation()}>
+                                    <DropdownMenuContent align="end" className="w-52 rounded-sm bg-background border border-border p-1 shadow-md font-mono text-[11px]" onClick={(e) => e.stopPropagation()}>
                                         {/* Ghim/Bỏ ghim */}
-                                        <DropdownMenuItem onClick={handleTogglePin} className="rounded-[2px] cursor-pointer py-1.5">
+                                        <DropdownMenuItem onClick={handleTogglePin} className="rounded-sm cursor-pointer py-1.5">
                                             {chat.pin ? (
                                                 <>
                                                     <PinOff className="h-3.5 w-3.5 mr-2" />
@@ -507,7 +507,7 @@ export const ChatItem = ({
                                         </DropdownMenuItem>
 
                                         {/* Tắt/Bật thông báo */}
-                                        <DropdownMenuItem onClick={handleToggleNotify} className="rounded-[2px] cursor-pointer py-1.5">
+                                        <DropdownMenuItem onClick={handleToggleNotify} className="rounded-sm cursor-pointer py-1.5">
                                             {chat.notify === false ? (
                                                 <>
                                                     <Bell className="h-3.5 w-3.5 mr-2" />
@@ -526,7 +526,7 @@ export const ChatItem = ({
                                         {/* Rời nhóm */}
                                         <DropdownMenuItem
                                             onClick={() => setShowLeaveGroupDialog(true)}
-                                            className="text-orange-600 focus:text-orange-750 rounded-[2px] cursor-pointer py-1.5"
+                                            className="text-orange-600 focus:text-orange-750 rounded-sm cursor-pointer py-1.5"
                                         >
                                             <LogOut className="h-3.5 w-3.5 mr-2" />
                                             Rời nhóm
@@ -535,7 +535,7 @@ export const ChatItem = ({
                                         {/* Xóa cuộc hội thoại */}
                                         <DropdownMenuItem
                                             onClick={() => setShowDeleteChatDialog(true)}
-                                            className="text-red-600 focus:text-red-750 rounded-[2px] cursor-pointer py-1.5"
+                                            className="text-red-600 focus:text-red-750 rounded-sm cursor-pointer py-1.5"
                                         >
                                             <Trash2 className="h-3.5 w-3.5 mr-2" />
                                             Xóa cuộc hội thoại

@@ -221,10 +221,10 @@ function TreeItem({ node, activeChunkIndex, onSelectNode }: TreeItemProps) {
         <div className="space-y-1 select-none">
             <div
                 className={cn(
-                    "group flex items-center gap-1.5 py-1 px-2 rounded-[4px] cursor-pointer transition-all border border-transparent text-[11px]",
+                    "group flex items-center gap-1.5 py-1 px-2 rounded-md cursor-pointer transition-all border border-transparent text-[11px]",
                     isActive
                         ? "bg-primary/10 text-primary border-primary/20 font-semibold shadow-sm"
-                        : "hover:bg-slate-100/80 text-slate-600 hover:text-slate-900"
+                        : "hover:bg-muted/80 text-muted-foreground hover:text-foreground"
                 )}
                 style={{ paddingLeft: `${Math.max(1, node.level) * 12}px` }}
                 onClick={(e) => {
@@ -238,7 +238,7 @@ function TreeItem({ node, activeChunkIndex, onSelectNode }: TreeItemProps) {
                             e.stopPropagation();
                             setIsOpen(!isOpen);
                         }}
-                        className="p-0.5 rounded-[4px] hover:bg-slate-200 text-slate-400 group-hover:text-slate-600 transition-colors"
+                        className="p-0.5 rounded-md hover:bg-muted text-muted-foreground group-hover:text-muted-foreground transition-colors"
                     >
                         {isOpen ? (
                             <ChevronDown className="w-3 h-3" />
@@ -247,7 +247,7 @@ function TreeItem({ node, activeChunkIndex, onSelectNode }: TreeItemProps) {
                         )}
                     </button>
                 ) : (
-                    <span className="w-3 h-3 flex items-center justify-center text-slate-300 group-hover:text-slate-400">
+                    <span className="w-3 h-3 flex items-center justify-center text-muted-foreground group-hover:text-muted-foreground">
                         •
                     </span>
                 )}
@@ -446,8 +446,8 @@ export function DocumentPreview({
                     <FileText className="w-6 h-6 text-primary absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
                 </div>
                 <div className="text-center">
-                    <h3 className="font-semibold text-slate-900">Đang tải tài liệu</h3>
-                    <p className="text-sm text-slate-500">Đang chuẩn bị bản xem trước...</p>
+                    <h3 className="font-semibold text-foreground">Đang tải tài liệu</h3>
+                    <p className="text-sm text-muted-foreground">Đang chuẩn bị bản xem trước...</p>
                 </div>
             </div>
         );
@@ -472,14 +472,14 @@ export function DocumentPreview({
                     variant="ghost"
                     size="sm"
                     onClick={() => router.back()}
-                    className="text-slate-500 hover:text-slate-900 gap-1.5 pl-0 hover:bg-transparent text-xs"
+                    className="text-muted-foreground hover:text-foreground gap-1.5 pl-0 hover:bg-transparent text-xs"
                 >
                     <ChevronLeft className="w-3.5 h-3.5" />
                     Cơ sở dữ liệu tri thức
                 </Button>
                 
                 <div className="flex items-center gap-1.5">
-                    <Badge variant="outline" className="bg-slate-50 text-slate-600 border-slate-200 text-[10px] rounded-sm px-1.5 py-0">
+                    <Badge variant="outline" className="bg-muted text-muted-foreground border-border text-[10px] rounded-sm px-1.5 py-0">
                         {doc.documentType.toUpperCase()}
                     </Badge>
                     {doc.status === 'COMPLETED' && (
@@ -494,11 +494,11 @@ export function DocumentPreview({
             {/* Document Title Section */}
           {/* Document Title Section */}
 <div className="flex items-center gap-3">
-    <h1 className="text-sm font-semibold tracking-tight text-slate-900 truncate max-w-sm">
+    <h1 className="text-sm font-semibold tracking-tight text-foreground truncate max-w-sm">
         {doc.fileName}
     </h1>
-    <div className="flex items-center gap-2 text-xs text-slate-500">
-        <span className="flex items-center gap-1 font-medium text-slate-700"><Clock className="w-3 h-3" /> Đã thêm {format(new Date(doc.createdAt), 'dd/MM/yyyy')}</span>
+    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+        <span className="flex items-center gap-1 font-medium text-muted-foreground"><Clock className="w-3 h-3" /> Đã thêm {format(new Date(doc.createdAt), 'dd/MM/yyyy')}</span>
         <Separator orientation="vertical" className="h-3" />
         <span className="flex items-center gap-1"><Layers className="w-3 h-3" /> {doc.chunkCount} Đoạn</span>
         <Separator orientation="vertical" className="h-3" />
@@ -513,7 +513,7 @@ export function DocumentPreview({
                 <aside className="lg:sticky lg:top-4 space-y-3 order-2 lg:order-1 flex flex-col lg:h-full lg:overflow-hidden">
                     <div className="space-y-2 flex-1 flex flex-col min-h-0 lg:overflow-hidden">
                         <div className="flex items-center justify-between px-1">
-                            <h2 className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                            <h2 className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                                 Cấu trúc tài liệu
                             </h2>
                             <span className="text-[9px] font-mono bg-slate-900 text-white px-1.5 py-0.5 rounded-[3px]">
@@ -522,14 +522,14 @@ export function DocumentPreview({
                         </div>
 
                         {/* Navigation Tabs */}
-                        <div className="flex items-center gap-0.5 p-0.5 bg-slate-100 rounded-[4px] border border-slate-200/60">
+                        <div className="flex items-center gap-0.5 p-0.5 bg-muted rounded-md border border-border/60">
                             <button
                                 onClick={() => setSidebarTab('tree')}
                                 className={cn(
-                                    "flex-1 py-1 px-2.5 rounded-[4px] text-[11px] font-semibold flex items-center justify-center gap-1 transition-all",
+                                    "flex-1 py-1 px-2.5 rounded-md text-[11px] font-semibold flex items-center justify-center gap-1 transition-all",
                                     sidebarTab === 'tree'
-                                        ? "bg-white text-slate-900 shadow-sm"
-                                        : "text-slate-500 hover:text-slate-900"
+                                        ? "bg-white text-foreground shadow-sm"
+                                        : "text-muted-foreground hover:text-foreground"
                                 )}
                             >
                                 <BookOpen className="w-3 h-3" />
@@ -538,10 +538,10 @@ export function DocumentPreview({
                             <button
                                 onClick={() => setSidebarTab('flat')}
                                 className={cn(
-                                    "flex-1 py-1 px-2.5 rounded-[4px] text-[11px] font-semibold flex items-center justify-center gap-1 transition-all",
+                                    "flex-1 py-1 px-2.5 rounded-md text-[11px] font-semibold flex items-center justify-center gap-1 transition-all",
                                     sidebarTab === 'flat'
-                                        ? "bg-white text-slate-900 shadow-sm"
-                                        : "text-slate-500 hover:text-slate-900"
+                                        ? "bg-white text-foreground shadow-sm"
+                                        : "text-muted-foreground hover:text-foreground"
                                 )}
                             >
                                 <List className="w-3 h-3" />
@@ -550,18 +550,18 @@ export function DocumentPreview({
                         </div>
 
                         {/* Navigation Scroll Container */}
-                        <ScrollArea className="flex-1 border border-slate-200 rounded-[4px] bg-slate-50/20 shadow-sm min-h-0">
+                        <ScrollArea className="flex-1 border border-border rounded-md bg-muted/20 shadow-sm min-h-0">
                             {chunksLoading ? (
-                                <div className="flex flex-col items-center justify-center h-full py-20 gap-2 text-slate-400">
+                                <div className="flex flex-col items-center justify-center h-full py-20 gap-2 text-muted-foreground">
                                     <Loader2 className="w-5 h-5 animate-spin" />
                                     <span className="text-[9px] font-bold uppercase tracking-tighter">Đang phân tích các đoạn</span>
                                 </div>
                             ) : !chunks.length ? (
                                 <div className="p-12 text-center space-y-3">
-                                    <div className="w-10 h-10 bg-white rounded-[4px] flex items-center justify-center mx-auto shadow-sm border border-slate-100">
-                                        <Hash className="w-5 h-5 text-slate-200" />
+                                    <div className="w-10 h-10 bg-white rounded-md flex items-center justify-center mx-auto shadow-sm border border-border">
+                                        <Hash className="w-5 h-5 text-foreground" />
                                     </div>
-                                    <p className="text-[11px] text-slate-400 font-medium">
+                                    <p className="text-[11px] text-muted-foreground font-medium">
                                         Đang lập chỉ mục...
                                     </p>
                                 </div>
@@ -585,29 +585,29 @@ export function DocumentPreview({
                                             key={chunk.chunkIndex}
                                             onClick={() => handleSelectChunk(chunk.chunkIndex)}
                                             className={cn(
-                                                'w-full text-left px-3 py-2 rounded-[4px] transition-all group relative border border-transparent',
+                                                'w-full text-left px-3 py-2 rounded-md transition-all group relative border border-transparent',
                                                 activeChunk?.chunkIndex === chunk.chunkIndex 
-                                                    ? 'bg-white border-slate-200 shadow-sm ring-1 ring-slate-100/50' 
-                                                    : 'hover:bg-slate-100/80 text-slate-600'
+                                                    ? 'bg-white border-border shadow-sm ring-1 ring-slate-100/50' 
+                                                    : 'hover:bg-muted/80 text-muted-foreground'
                                             )}
                                         >
                                             <div className="flex items-start gap-2">
                                                 <div className={cn(
-                                                    "w-5 h-5 rounded-[4px] flex items-center justify-center text-[9px] font-bold transition-colors shrink-0",
+                                                    "w-5 h-5 rounded-md flex items-center justify-center text-[9px] font-bold transition-colors shrink-0",
                                                     activeChunk?.chunkIndex === chunk.chunkIndex 
                                                         ? 'bg-primary text-white' 
-                                                        : 'bg-slate-200 text-slate-500 group-hover:bg-slate-300'
+                                                        : 'bg-muted text-muted-foreground group-hover:bg-muted'
                                                 )}>
                                                     {chunk.chunkIndex + 1}
                                                 </div>
                                                 <div className="flex-1 min-w-0">
                                                     <h3 className={cn(
                                                         'text-[11px] font-semibold truncate transition-colors',
-                                                        activeChunk?.chunkIndex === chunk.chunkIndex ? 'text-slate-900' : 'text-slate-700'
+                                                        activeChunk?.chunkIndex === chunk.chunkIndex ? 'text-foreground' : 'text-muted-foreground'
                                                     )}>
                                                         {chunk.chunkTitle || `Đoạn ${chunk.chunkIndex + 1}`}
                                                     </h3>
-                                                    <p className="text-[9px] text-slate-400 line-clamp-1 mt-0.5">
+                                                    <p className="text-[9px] text-muted-foreground line-clamp-1 mt-0.5">
                                                         {chunk.text?.substring(0, 45)}...
                                                     </p>
                                                 </div>
@@ -623,31 +623,31 @@ export function DocumentPreview({
                     </div>
 
                     {/* Metadata Card */}
-                    <Card className="p-3.5 border-slate-200 shadow-none bg-slate-50 space-y-2.5 rounded-[4px]">
-                        <h3 className="text-[9px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                    <Card className="p-3.5 border-border shadow-none bg-muted space-y-2.5 rounded-md">
+                        <h3 className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
                             <Info className="w-3 h-3" />
                             Thuộc tính kỹ thuật
                         </h3>
                         <div className="space-y-2">
                             <div className="flex justify-between items-center">
-                                <span className="text-[11px] text-slate-500 flex items-center gap-1.5">
+                                <span className="text-[11px] text-muted-foreground flex items-center gap-1.5">
                                     <FileType2 className="w-3 h-3" /> Định dạng
                                 </span>
-                                <span className="text-[11px] font-bold text-slate-900 uppercase font-mono">{doc.documentType}</span>
+                                <span className="text-[11px] font-bold text-foreground uppercase font-mono">{doc.documentType}</span>
                             </div>
-                            <Separator className="bg-slate-200/50" />
+                            <Separator className="bg-muted/50" />
                             <div className="flex justify-between items-center">
-                                <span className="text-[11px] text-slate-500 flex items-center gap-1.5">
+                                <span className="text-[11px] text-muted-foreground flex items-center gap-1.5">
                                     <Type className="w-3 h-3" /> Tokenizer
                                 </span>
-                                <span className="text-[11px] font-bold text-slate-900 uppercase font-mono">Tiktoken/gpt-4</span>
+                                <span className="text-[11px] font-bold text-foreground uppercase font-mono">Tiktoken/gpt-4</span>
                             </div>
-                            <Separator className="bg-slate-200/50" />
+                            <Separator className="bg-muted/50" />
                             <div className="flex justify-between items-center">
-                                <span className="text-[11px] text-slate-500 flex items-center gap-1.5">
+                                <span className="text-[11px] text-muted-foreground flex items-center gap-1.5">
                                     <User className="w-3 h-3" /> ID Chủ sở hữu
                                 </span>
-                                <span className="text-[11px] font-bold text-slate-900 truncate max-w-[100px] font-mono">{doc.userId}</span>
+                                <span className="text-[11px] font-bold text-foreground truncate max-w-[100px] font-mono">{doc.userId}</span>
                             </div>
                         </div>
                     </Card>
@@ -656,14 +656,14 @@ export function DocumentPreview({
                 {/* Content Area */}
                 <main className="order-1 lg:order-2 space-y-4 flex flex-col lg:h-full lg:overflow-hidden">
                     {/* View Mode Controls */}
-                    <div className="flex items-center gap-1 p-0.5 bg-slate-100 rounded-[4px] border border-slate-200/60 w-fit ml-auto shrink-0">
+                    <div className="flex items-center gap-1 p-0.5 bg-muted rounded-md border border-border/60 w-fit ml-auto shrink-0">
                         <button
                             onClick={() => setViewMode('full')}
                             className={cn(
-                                "py-1 px-2.5 rounded-[4px] text-[11px] font-semibold flex items-center gap-1 transition-all shadow-none",
+                                "py-1 px-2.5 rounded-md text-[11px] font-semibold flex items-center gap-1 transition-all shadow-none",
                                 viewMode === 'full'
-                                    ? "bg-white text-slate-900 shadow-sm"
-                                    : "text-slate-500 hover:text-slate-900"
+                                    ? "bg-white text-foreground shadow-sm"
+                                    : "text-muted-foreground hover:text-foreground"
                             )}
                         >
                             <FileText className="w-3 h-3" />
@@ -672,10 +672,10 @@ export function DocumentPreview({
                         <button
                             onClick={() => setViewMode('single')}
                             className={cn(
-                                "py-1 px-2.5 rounded-[4px] text-[11px] font-semibold flex items-center gap-1 transition-all shadow-none",
+                                "py-1 px-2.5 rounded-md text-[11px] font-semibold flex items-center gap-1 transition-all shadow-none",
                                 viewMode === 'single'
-                                    ? "bg-white text-slate-900 shadow-sm"
-                                    : "text-slate-500 hover:text-slate-900"
+                                    ? "bg-white text-foreground shadow-sm"
+                                    : "text-muted-foreground hover:text-foreground"
                             )}
                         >
                             <Hash className="w-3 h-3" />
@@ -684,10 +684,10 @@ export function DocumentPreview({
                         <button
                             onClick={() => setViewMode('continuous')}
                             className={cn(
-                                "py-1 px-2.5 rounded-[4px] text-[11px] font-semibold flex items-center gap-1 transition-all shadow-none",
+                                "py-1 px-2.5 rounded-md text-[11px] font-semibold flex items-center gap-1 transition-all shadow-none",
                                 viewMode === 'continuous'
-                                    ? "bg-white text-slate-900 shadow-sm"
-                                    : "text-slate-500 hover:text-slate-900"
+                                    ? "bg-white text-foreground shadow-sm"
+                                    : "text-muted-foreground hover:text-foreground"
                             )}
                         >
                             <Layers className="w-3 h-3" />
@@ -697,22 +697,22 @@ export function DocumentPreview({
 
                     {/* View Content Logic */}
                     {viewMode === 'full' ? (
-                        <div className="bg-white border border-slate-200 rounded-[4px] shadow-sm overflow-hidden flex flex-col flex-1 min-h-0 lg:h-full animate-in fade-in duration-500">
-                            <header className="px-5 py-3.5 border-b border-slate-100 flex items-center justify-between bg-slate-50/20 shrink-0">
+                        <div className="bg-white border border-border rounded-md shadow-sm overflow-hidden flex flex-col flex-1 min-h-0 lg:h-full animate-in fade-in duration-500">
+                            <header className="px-5 py-3.5 border-b border-border flex items-center justify-between bg-muted/20 shrink-0">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 bg-primary/10 rounded-[4px] flex items-center justify-center text-primary shrink-0 border border-primary/20">
+                                    <div className="w-8 h-8 bg-primary/10 rounded-md flex items-center justify-center text-primary shrink-0 border border-primary/20">
                                         <FileText className="w-4 h-4" />
                                     </div>
                                     <div className="min-w-0">
-                                        <h2 className="text-xs font-bold text-slate-900 leading-tight truncate">
+                                        <h2 className="text-xs font-bold text-foreground leading-tight truncate">
                                             Toàn văn tài liệu
                                         </h2>
-                                        <p className="text-[9px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">
+                                        <p className="text-[9px] text-muted-foreground font-bold uppercase tracking-wider mt-0.5">
                                             Hiển thị nội dung đầy đủ liền mạch từ dữ liệu gốc
                                         </p>
                                     </div>
                                 </div>
-                                <Button variant="ghost" size="icon" className="text-slate-400 hover:text-slate-900 rounded-[4px] shrink-0 h-7 w-7 border border-slate-200">
+                                <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground rounded-md shrink-0 h-7 w-7 border border-border">
                                     <Maximize2 className="w-3.5 h-3.5" />
                                 </Button>
                             </header>
@@ -723,7 +723,7 @@ export function DocumentPreview({
                                         {doc.markdownContent ? (
                                             <MarkdownContent content={doc.markdownContent ?? ''}  />
                                         ) : (
-                                            <div className="text-center py-12 text-slate-400 text-sm">
+                                            <div className="text-center py-12 text-muted-foreground text-sm">
                                                 Tài liệu này không có nội dung văn bản toàn văn hoặc đang được xử lý.
                                             </div>
                                         )}
@@ -731,40 +731,40 @@ export function DocumentPreview({
                                 </div>
                             </div>
 
-                            <footer className="px-5 py-2.5 bg-slate-50/50 border-t border-slate-100 flex items-center justify-between text-[10px] font-bold uppercase tracking-tight text-slate-400 shrink-0">
+                            <footer className="px-5 py-2.5 bg-muted/50 border-t border-border flex items-center justify-between text-[10px] font-bold uppercase tracking-tight text-muted-foreground shrink-0">
                                 <div className="flex items-center gap-4">
                                     <span className="flex items-center gap-1.5">
-                                        Dung lượng tệp <b className="text-slate-900">{formatSize(doc.fileSize)}</b>
+                                        Dung lượng tệp <b className="text-foreground">{formatSize(doc.fileSize)}</b>
                                     </span>
                                     <span className="flex items-center gap-1.5">
-                                        Số phân đoạn RAG <b className="text-slate-900">{doc.chunkCount}</b>
+                                        Số phân đoạn RAG <b className="text-foreground">{doc.chunkCount}</b>
                                     </span>
                                 </div>
                             </footer>
                         </div>
                     ) : viewMode === 'single' ? (
                         activeChunk ? (
-                            <div className="bg-white border border-slate-200 rounded-[4px] shadow-sm overflow-hidden flex flex-col flex-1 min-h-0 lg:h-full animate-in fade-in duration-500">
-                                <header className="px-5 py-3.5 border-b border-slate-100 flex items-center justify-between bg-slate-50/20 shrink-0">
+                            <div className="bg-white border border-border rounded-md shadow-sm overflow-hidden flex flex-col flex-1 min-h-0 lg:h-full animate-in fade-in duration-500">
+                                <header className="px-5 py-3.5 border-b border-border flex items-center justify-between bg-muted/20 shrink-0">
                                     <div className="flex items-center gap-3">
-                                        <div className="w-8 h-8 bg-primary/10 rounded-[4px] flex items-center justify-center text-primary shrink-0 border border-primary/20">
+                                        <div className="w-8 h-8 bg-primary/10 rounded-md flex items-center justify-center text-primary shrink-0 border border-primary/20">
                                             <Hash className="w-4 h-4" />
                                         </div>
                                         <div className="min-w-0">
                                             {parsedActiveChunk.breadcrumb && (
-                                                <div className="flex items-center gap-1 text-[8px] font-bold text-slate-400 uppercase tracking-wider mb-0.5 bg-slate-100 px-1.5 py-0 rounded-[3px] w-fit border border-slate-200/50">
+                                                <div className="flex items-center gap-1 text-[8px] font-bold text-muted-foreground uppercase tracking-wider mb-0.5 bg-muted px-1.5 py-0 rounded-[3px] w-fit border border-border/50">
                                                     {parsedActiveChunk.breadcrumb}
                                                 </div>
                                             )}
-                                            <h2 className="text-xs font-bold text-slate-900 leading-tight truncate">
+                                            <h2 className="text-xs font-bold text-foreground leading-tight truncate">
                                                 {activeChunk.chunkTitle || `Đoạn ${activeChunk.chunkIndex + 1}`}
                                             </h2>
-                                            <p className="text-[9px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">
+                                            <p className="text-[9px] text-muted-foreground font-bold uppercase tracking-wider mt-0.5">
                                                 {activeChunk.tokenCount} Tokens • {activeChunk.charCount} Ký tự
                                             </p>
                                         </div>
                                     </div>
-                                    <Button variant="ghost" size="icon" className="text-slate-400 hover:text-slate-900 rounded-[4px] shrink-0 h-7 w-7 border border-slate-200">
+                                    <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground rounded-md shrink-0 h-7 w-7 border border-border">
                                         <Maximize2 className="w-3.5 h-3.5" />
                                     </Button>
                                 </header>
@@ -777,32 +777,32 @@ export function DocumentPreview({
                                     </div>
                                 </div>
 
-                                <footer className="px-5 py-2.5 bg-slate-50/50 border-t border-slate-100 flex items-center justify-between text-[10px] font-bold uppercase tracking-tight text-slate-400 shrink-0">
+                                <footer className="px-5 py-2.5 bg-muted/50 border-t border-border flex items-center justify-between text-[10px] font-bold uppercase tracking-tight text-muted-foreground shrink-0">
                                     <div className="flex items-center gap-4">
                                         <span className="flex items-center gap-1.5">
-                                            Index <b className="text-slate-900 bg-slate-200 px-1 py-0.5 rounded-[3px] font-mono">{activeChunk.chunkIndex}</b>
+                                            Index <b className="text-foreground bg-muted px-1 py-0.5 rounded-[3px] font-mono">{activeChunk.chunkIndex}</b>
                                         </span>
                                         <span className="flex items-center gap-1.5">
-                                            Số từ <b className="text-slate-900">{activeChunk.text.split(/\s+/).length}</b>
+                                            Số từ <b className="text-foreground">{activeChunk.text.split(/\s+/).length}</b>
                                         </span>
                                     </div>
                                     {activeChunk.similarity !== undefined && activeChunk.similarity > 0 && (
-                                        <Badge variant="outline" className="text-[9px] bg-white border-slate-200 gap-1 text-slate-600 px-1.5 py-0.5 shadow-none hover:bg-white rounded-[3px]">
-                                            <Tag className="w-2.5 h-2.5 text-slate-400" />
+                                        <Badge variant="outline" className="text-[9px] bg-white border-border gap-1 text-muted-foreground px-1.5 py-0.5 shadow-none hover:bg-white rounded-[3px]">
+                                            <Tag className="w-2.5 h-2.5 text-muted-foreground" />
                                             {(activeChunk.similarity * 100).toFixed(1)}% Độ liên quan
                                         </Badge>
                                     )}
                                 </footer>
                             </div>
                         ) : (
-                            <div className="aspect-video flex flex-col items-center justify-center border border-dashed border-slate-200 rounded-[4px] bg-slate-50/50 gap-4">
+                            <div className="aspect-video flex flex-col items-center justify-center border border-dashed border-border rounded-md bg-muted/50 gap-4">
                                 <div className="relative">
-                                    <div className="w-12 h-12 rounded-full border-4 border-slate-100 border-t-primary/20 animate-spin" />
-                                    <Layers className="w-5 h-5 text-slate-200 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+                                    <div className="w-12 h-12 rounded-full border-4 border-border border-t-primary/20 animate-spin" />
+                                    <Layers className="w-5 h-5 text-foreground absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
                                 </div>
                                 <div className="text-center space-y-0.5">
-                                    <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Đang khởi tạo bản xem trước</p>
-                                    <p className="text-xs text-slate-300">Đang đồng bộ các đoạn dữ liệu...</p>
+                                    <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Đang khởi tạo bản xem trước</p>
+                                    <p className="text-xs text-muted-foreground">Đang đồng bộ các đoạn dữ liệu...</p>
                                 </div>
                             </div>
                         )
@@ -817,36 +817,36 @@ export function DocumentPreview({
                                         key={chunk.chunkIndex}
                                         id={`doc-chunk-${chunk.chunkIndex}`}
                                         className={cn(
-                                            "bg-white border rounded-[4px] shadow-sm overflow-hidden flex flex-col transition-all duration-300 scroll-mt-4 cursor-pointer",
+                                            "bg-white border rounded-md shadow-sm overflow-hidden flex flex-col transition-all duration-300 scroll-mt-4 cursor-pointer",
                                             isActive
                                                 ? "border-primary/50 ring-1 ring-primary/5 shadow-sm"
-                                                : "border-slate-200 hover:border-slate-300"
+                                                : "border-border hover:border-border"
                                         )}
                                         onClick={() => setSelectedChunkIndex(chunk.chunkIndex)}
                                     >
-                                        <header className="px-4 py-2.5 border-b border-slate-100 flex items-center justify-between bg-slate-50/10">
+                                        <header className="px-4 py-2.5 border-b border-border flex items-center justify-between bg-muted/10">
                                             <div className="flex-1 min-w-0">
                                                 {parsed.breadcrumb && (
-                                                    <div className="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-0.5 font-mono">
+                                                    <div className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest mb-0.5 font-mono">
                                                         {parsed.breadcrumb}
                                                     </div>
                                                 )}
                                                 <div className="flex items-center gap-2">
                                                     <span className={cn(
-                                                        "w-5 h-5 rounded-[4px] flex items-center justify-center text-[9px] font-bold transition-all shrink-0",
-                                                        isActive ? "bg-primary text-white" : "bg-slate-100 text-slate-500"
+                                                        "w-5 h-5 rounded-md flex items-center justify-center text-[9px] font-bold transition-all shrink-0",
+                                                        isActive ? "bg-primary text-white" : "bg-muted text-muted-foreground"
                                                     )}>
                                                         {chunk.chunkIndex + 1}
                                                     </span>
                                                     <h3 className={cn(
                                                         "text-xs font-bold truncate max-w-[280px] sm:max-w-md",
-                                                        isActive ? "text-slate-900" : "text-slate-700"
+                                                        isActive ? "text-foreground" : "text-muted-foreground"
                                                     )}>
                                                         {chunk.chunkTitle || `Đoạn ${chunk.chunkIndex + 1}`}
                                                     </h3>
                                                 </div>
                                             </div>
-                                            <Badge variant="outline" className="text-[9px] text-slate-400 hover:bg-transparent shrink-0 rounded-[3px] py-0">
+                                            <Badge variant="outline" className="text-[9px] text-muted-foreground hover:bg-transparent shrink-0 rounded-[3px] py-0">
                                                 {chunk.tokenCount} Tokens
                                             </Badge>
                                         </header>

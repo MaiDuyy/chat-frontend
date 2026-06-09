@@ -78,7 +78,7 @@ export function GroupSettingsSidebar({
     }, [participantsCount]);
 
     return (
-        <div className="w-52 flex-shrink-0 border-r border-slate-100 flex flex-col bg-slate-50/60">
+        <div className="w-52 flex-shrink-0 border-r border-border flex flex-col bg-muted/60">
             <style>{`
                 @keyframes pulseScale {
                     0% { transform: scale(1); }
@@ -87,13 +87,13 @@ export function GroupSettingsSidebar({
                 }
             `}</style>
             {/* Group identity */}
-            <div className="p-4 border-b border-slate-100">
+            <div className="p-4 border-b border-border">
                 <div className="relative group w-fit mb-3">
-                    <Avatar className="h-12 w-12 rounded-xl">
+                    <Avatar className="h-12 w-12 rounded-lg">
                         <AvatarImage src={getAvatarUrl(chat?.avatar || "", chat?.name || "G")} />
                         <AvatarFallback
                             className={cn(
-                                "rounded-xl text-sm font-semibold",
+                                "rounded-lg text-sm font-semibold",
                                 avatarColor(chat?.name || "G")
                             )}
                         >
@@ -103,7 +103,7 @@ export function GroupSettingsSidebar({
                     {isAdmin && (
                         <button
                             onClick={() => fileInputRef.current?.click()}
-                            className="absolute inset-0 bg-black/40 rounded-xl opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity"
+                            className="absolute inset-0 bg-black/40 rounded-lg opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity"
                         >
                             {isUploadingAvatar ? (
                                 <Loader2 className="w-4 h-4 text-white animate-spin" />
@@ -137,20 +137,20 @@ export function GroupSettingsSidebar({
                         </button>
                         <button
                             onClick={() => setIsEditingName(false)}
-                            className="p-1 rounded text-slate-400 hover:bg-slate-100"
+                            className="p-1 rounded text-muted-foreground hover:bg-muted"
                         >
                             <X className="w-3.5 h-3.5" />
                         </button>
                     </div>
                 ) : (
                     <div className="flex items-start gap-1 group/name">
-                        <p className="text-[13px] font-semibold text-slate-800 leading-tight flex-1 truncate">
+                        <p className="text-[13px] font-semibold text-foreground leading-tight flex-1 truncate">
                             {chat?.name || "Nhóm chat"}
                         </p>
                         {isAdmin && (
                             <button
                                 onClick={() => setIsEditingName(true)}
-                                className="opacity-0 group-hover/name:opacity-100 p-0.5 rounded text-slate-400 hover:text-slate-600 transition-opacity flex-shrink-0 mt-0.5"
+                                className="opacity-0 group-hover/name:opacity-100 p-0.5 rounded text-muted-foreground hover:text-muted-foreground transition-opacity flex-shrink-0 mt-0.5"
                             >
                                 <Pencil className="w-3 h-3" />
                             </button>
@@ -159,7 +159,7 @@ export function GroupSettingsSidebar({
                 )}
                 <p 
                     className={cn(
-                        "text-[11px] text-slate-400 mt-0.5 transition-all duration-300 origin-left",
+                        "text-[11px] text-muted-foreground mt-0.5 transition-all duration-300 origin-left",
                         shouldAnimate && "text-blue-600 font-semibold"
                     )}
                     style={{ 
@@ -220,7 +220,7 @@ export function GroupSettingsSidebar({
             </ScrollArea>
 
             {/* Footer actions */}
-            <div className="p-2 border-t border-slate-100 space-y-0.5">
+            <div className="p-2 border-t border-border space-y-0.5">
                 <NavItem icon={LogOut} label="Rời nhóm" danger onClick={onLeaveGroup} />
                 {isLeader && (
                     <NavItem icon={Trash2} label="Giải tán nhóm" danger onClick={onDeleteGroup} />

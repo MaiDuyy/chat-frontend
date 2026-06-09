@@ -15,7 +15,7 @@ export const ObserverIndicator: React.FC<ObserverIndicatorProps> = ({ observers 
 
   return (
     <div className="w-full bg-amber-500/5 dark:bg-amber-500/[0.02] border-t border-b border-amber-500/10 dark:border-amber-500/[0.06] px-4 py-2 font-mono flex items-center gap-2.5 animate-in fade-in slide-in-from-bottom-2 duration-300">
-      <div className="h-5 w-5 rounded-[2px] bg-amber-500/10 flex items-center justify-center shrink-0">
+      <div className="h-5 w-5 rounded-sm bg-amber-500/10 flex items-center justify-center shrink-0">
         <Eye size={12} className="text-amber-600 dark:text-amber-500 animate-pulse" />
       </div>
       

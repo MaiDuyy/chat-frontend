@@ -14,7 +14,7 @@ interface PinnedTabProps {
 
 export function PinnedTab({ pinnedMessages, onMessageClick }: PinnedTabProps) {
     if (pinnedMessages.length === 0) {
-        return <div className="text-center py-16 text-sm text-slate-400">Chưa có tin nhắn ghim</div>;
+        return <div className="text-center py-16 text-sm text-muted-foreground">Chưa có tin nhắn ghim</div>;
     }
 
     return (
@@ -22,7 +22,7 @@ export function PinnedTab({ pinnedMessages, onMessageClick }: PinnedTabProps) {
             {pinnedMessages.map((msg: any, i: number) => (
                 <div
                     key={msg.id || i}
-                    className="border border-slate-100 rounded-xl p-4 hover:border-slate-200 transition-colors cursor-pointer"
+                    className="border border-border rounded-lg p-4 hover:border-border transition-colors cursor-pointer"
                     onClick={() => onMessageClick?.(msg.id)}
                 >
                     <div className="flex items-center justify-between mb-2">
@@ -32,13 +32,13 @@ export function PinnedTab({ pinnedMessages, onMessageClick }: PinnedTabProps) {
                                     {getInitials(msg.sender?.name || "")}
                                 </AvatarFallback>
                             </Avatar>
-                            <span className="text-[12px] font-medium text-slate-700">{msg.sender?.name}</span>
+                            <span className="text-[12px] font-medium text-muted-foreground">{msg.sender?.name}</span>
                         </div>
-                        <span className="text-[10px] text-slate-400">
+                        <span className="text-[10px] text-muted-foreground">
                             {msg.time && format(new Date(msg.time), "dd/MM/yyyy", { locale: vi })}
                         </span>
                     </div>
-                    <div className="text-[13px] text-slate-700 leading-relaxed line-clamp-3">
+                    <div className="text-[13px] text-muted-foreground leading-relaxed line-clamp-3">
                         <MessageSnippet type={msg.type} content={msg.content} file={(msg as any).file} />
                     </div>
                     <div className="flex items-center gap-1 mt-2">

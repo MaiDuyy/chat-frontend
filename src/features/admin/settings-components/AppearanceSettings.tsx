@@ -17,8 +17,8 @@ interface AppearanceSettingsProps {
 
 export function AppearanceSettings({ orgSettings, handleOrgChange }: AppearanceSettingsProps) {
     return (
-        <Card className="rounded-xl border border-border shadow-sm bg-card text-card-foreground overflow-hidden">
-            <CardHeader className="bg-slate-50/40 dark:bg-slate-900/10 border-b border-border py-3 px-4">
+        <Card className="rounded-lg border border-border shadow-sm bg-card text-card-foreground overflow-hidden">
+            <CardHeader className="bg-muted/40 dark:bg-slate-900/10 border-b border-border py-3 px-4">
                 <CardTitle className="text-sm font-semibold flex items-center gap-2">
                     <Palette className="w-4 h-4 text-primary" />
                     Giao diện & Địa phương
@@ -33,7 +33,7 @@ export function AppearanceSettings({ orgSettings, handleOrgChange }: AppearanceS
                     label="Chế độ hiển thị mặc định"
                     description="Thiết lập giao diện ban đầu khi người dùng mới truy cập hệ thống."
                 >
-                    <div className="flex p-0.5 bg-slate-100 dark:bg-slate-800 rounded-lg gap-0.5 border border-border/40">
+                    <div className="flex p-0.5 bg-muted dark:bg-slate-800 rounded-md gap-0.5 border border-border/40">
                         {[
                             { value: 'light', icon: Sun, label: 'Sáng' },
                             { value: 'dark', icon: Moon, label: 'Tối' },
@@ -48,7 +48,7 @@ export function AppearanceSettings({ orgSettings, handleOrgChange }: AppearanceS
                                     "gap-1 rounded-md h-7 px-3 text-xs font-semibold transition-all",
                                     orgSettings.theme === value
                                         ? "bg-white dark:bg-slate-900 shadow-sm hover:bg-white dark:hover:bg-slate-900 text-primary border border-border/20"
-                                        : "text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700/60"
+                                        : "text-muted-foreground hover:bg-muted dark:hover:bg-slate-700/60"
                                 )}
                             >
                                 <Icon className="w-3.5 h-3.5" />
@@ -67,7 +67,7 @@ export function AppearanceSettings({ orgSettings, handleOrgChange }: AppearanceS
                         value={orgSettings.language}
                         onValueChange={(value) => handleOrgChange('language', value)}
                     >
-                        <SelectTrigger className="w-44 h-8 rounded-lg text-xs">
+                        <SelectTrigger className="w-44 h-8 rounded-md text-xs">
                             <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -86,7 +86,7 @@ export function AppearanceSettings({ orgSettings, handleOrgChange }: AppearanceS
                         value={orgSettings.timeFormat}
                         onValueChange={(value) => handleOrgChange('timeFormat', value)}
                     >
-                        <SelectTrigger className="w-44 h-8 rounded-lg text-xs">
+                        <SelectTrigger className="w-44 h-8 rounded-md text-xs">
                             <SelectValue />
                         </SelectTrigger>
                         <SelectContent>

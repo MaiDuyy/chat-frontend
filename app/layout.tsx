@@ -1,12 +1,17 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans, Geist_Mono } from "next/font/google";
+import { Inter, Geist_Mono, Manrope } from "next/font/google";
 import "./globals.css";
 import RootProvider from "./components/RootProvider";
 import ClientLayoutWrapper from "./components/ClientLayoutWrapper";
 import { Toaster } from "@/components/ui/sonner";
 
-const plusJakarta = Plus_Jakarta_Sans({
-  variable: "--font-plus-jakarta",
+const inter = Inter({
+  variable: "--font-inter",
+  subsets: ["latin"],
+});
+
+const manrope = Manrope({
+  variable: "--font-manrope",
   subsets: ["latin"],
 });
 
@@ -27,7 +32,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning={true}>
-      <body suppressHydrationWarning={true} className={`${plusJakarta.variable} ${geistMono.variable} antialiased font-sans`} >
+      <body suppressHydrationWarning={true} className={`${inter.variable} ${manrope.variable} ${geistMono.variable} antialiased font-sans`} >
         <RootProvider>
 
           <ClientLayoutWrapper>

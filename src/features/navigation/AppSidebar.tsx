@@ -22,6 +22,7 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { HubNodeLogo, HubNodeBrand } from '@/components/ui/hub-node-logo';
 
 interface NavItem {
     label: string;
@@ -91,8 +92,14 @@ export function AppSidebar({ className }: AppSidebarProps) {
             >
                 {/* Logo / Brand */}
                 <div className="h-14 border-b flex items-center px-4">
-                    {!collapsed && (
-                        <span className="font-semibold text-lg">Enterprise Chat</span>
+                    {collapsed ? (
+                        <Link href="/" className="mx-auto flex items-center justify-center">
+                            <HubNodeLogo size={20} />
+                        </Link>
+                    ) : (
+                        <Link href="/">
+                            <HubNodeBrand size={20} />
+                        </Link>
                     )}
                 </div>
 

@@ -111,18 +111,18 @@ export function MarkdownEditorModal({
 
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-            <DialogContent className="w-full sm:max-w-[95vw] md:max-w-[90vw] lg:max-w-7xl h-[90vh] p-0 flex flex-col gap-0 overflow-hidden bg-slate-900 border-slate-800 shadow-[0_0_50px_rgba(0,0,0,0.5)] text-slate-100 rounded-[4px]">
+            <DialogContent className="w-full sm:max-w-[95vw] md:max-w-[90vw] lg:max-w-7xl h-[90vh] p-0 flex flex-col gap-0 overflow-hidden bg-slate-900 border-border shadow-[0_0_50px_rgba(0,0,0,0.5)] text-foreground rounded-md">
                 {/* Header */}
-                <DialogHeader className="px-4 py-2.5 border-b border-slate-800 bg-slate-950 flex flex-row items-center justify-between space-y-0">
+                <DialogHeader className="px-4 py-2.5 border-b border-border bg-slate-950 flex flex-row items-center justify-between space-y-0">
                     <div className="flex items-center gap-2.5">
-                        <div className="p-2 rounded-[4px] bg-primary/10 text-primary border border-primary/20">
+                        <div className="p-2 rounded-md bg-primary/10 text-primary border border-primary/20">
                             <FileText className="w-4 h-4" />
                         </div>
                         <div>
                             <DialogTitle className="text-sm font-bold text-white flex items-center gap-1.5">
                                 Biên tập & Phê duyệt cấu trúc tài liệu
                             </DialogTitle>
-                            <p className="text-[10px] text-slate-500 mt-0.5 max-w-2xl truncate font-mono">
+                            <p className="text-[10px] text-muted-foreground mt-0.5 max-w-2xl truncate font-mono">
                                 File: {fileName} (ID: {documentId})
                             </p>
                         </div>
@@ -130,13 +130,13 @@ export function MarkdownEditorModal({
 
                     <div className="flex items-center gap-3">
                         {/* View Modes */}
-                        <div className="flex items-center bg-slate-900 p-0.5 rounded-[4px] border border-slate-800">
+                        <div className="flex items-center bg-slate-900 p-0.5 rounded-md border border-border">
                             <Button
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => setViewMode('edit')}
                                 className={cn(
-                                    "rounded-[3px] px-2.5 py-1 h-7 text-[11px] font-semibold gap-1.5 transition-all text-slate-400 hover:text-slate-200",
+                                    "rounded-[3px] px-2.5 py-1 h-7 text-[11px] font-semibold gap-1.5 transition-all text-muted-foreground hover:text-foreground",
                                     viewMode === 'edit' && "bg-slate-800 text-white shadow-sm"
                                 )}
                             >
@@ -148,7 +148,7 @@ export function MarkdownEditorModal({
                                 size="sm"
                                 onClick={() => setViewMode('split')}
                                 className={cn(
-                                    "rounded-[3px] px-2.5 py-1 h-7 text-[11px] font-semibold gap-1.5 transition-all text-slate-400 hover:text-slate-200",
+                                    "rounded-[3px] px-2.5 py-1 h-7 text-[11px] font-semibold gap-1.5 transition-all text-muted-foreground hover:text-foreground",
                                     viewMode === 'split' && "bg-slate-800 text-white shadow-sm"
                                 )}
                             >
@@ -160,7 +160,7 @@ export function MarkdownEditorModal({
                                 size="sm"
                                 onClick={() => setViewMode('preview')}
                                 className={cn(
-                                    "rounded-[3px] px-2.5 py-1 h-7 text-[11px] font-semibold gap-1.5 transition-all text-slate-400 hover:text-slate-200",
+                                    "rounded-[3px] px-2.5 py-1 h-7 text-[11px] font-semibold gap-1.5 transition-all text-muted-foreground hover:text-foreground",
                                     viewMode === 'preview' && "bg-slate-800 text-white shadow-sm"
                                 )}
                             >
@@ -174,7 +174,7 @@ export function MarkdownEditorModal({
                             variant="ghost" 
                             size="icon" 
                             onClick={onClose}
-                            className="rounded-[4px] h-7 w-7 border border-slate-800 hover:bg-slate-800 text-slate-400 hover:text-slate-200"
+                            className="rounded-md h-7 w-7 border border-border hover:bg-slate-800 text-muted-foreground hover:text-foreground"
                         >
                             <X className="w-3.5 h-3.5" />
                         </Button>
@@ -186,12 +186,12 @@ export function MarkdownEditorModal({
                     {/* Left Pane: Editor */}
                     <div 
                         className={cn(
-                            "flex flex-col border-r border-slate-800 h-full overflow-hidden bg-slate-950/60",
+                            "flex flex-col border-r border-border h-full overflow-hidden bg-slate-950/60",
                             viewMode === 'preview' && "hidden",
                             viewMode === 'edit' && "md:col-span-2 border-r-0"
                         )}
                     >
-                        <div className="px-3 py-1.5 border-b border-slate-800 bg-slate-900/40 flex items-center justify-between text-[11px] text-slate-400 font-semibold uppercase tracking-wider">
+                        <div className="px-3 py-1.5 border-b border-border bg-slate-900/40 flex items-center justify-between text-[11px] text-muted-foreground font-semibold uppercase tracking-wider">
                             <span>Markdown Editor (Có thể chỉnh sửa tiêu đề, bảng, danh sách)</span>
                             <span className="font-mono text-primary/70">{markdown.length} kí tự</span>
                         </div>
@@ -201,7 +201,7 @@ export function MarkdownEditorModal({
                                 value={markdown}
                                 onChange={(e) => setMarkdown(e.target.value)}
                                 placeholder="Nhập văn bản Markdown..."
-                                className="w-full h-full bg-transparent text-slate-300 font-mono text-sm leading-relaxed resize-none focus:outline-none focus:ring-0 placeholder-slate-700 select-text overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-slate-800 scrollbar-track-transparent"
+                                className="w-full h-full bg-transparent text-muted-foreground font-mono text-sm leading-relaxed resize-none focus:outline-none focus:ring-0 placeholder-slate-700 select-text overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-slate-800 scrollbar-track-transparent"
                                 style={{ tabSize: 4 }}
                                 disabled={isIngesting || isRefactoring}
                             />
@@ -216,13 +216,13 @@ export function MarkdownEditorModal({
                             viewMode === 'preview' && "md:col-span-2"
                         )}
                     >
-                        <div className="px-3 py-1.5 border-b border-slate-800 bg-slate-900/40 flex items-center justify-between text-[11px] text-slate-400 font-semibold uppercase tracking-wider">
+                        <div className="px-3 py-1.5 border-b border-border bg-slate-900/40 flex items-center justify-between text-[11px] text-muted-foreground font-semibold uppercase tracking-wider">
                             <div className="flex gap-2">
                                 <button
                                     onClick={() => setPreviewTab('markdown')}
                                     className={cn(
-                                        "px-2 py-0.5 rounded-[4px] transition-colors",
-                                        previewTab === 'markdown' ? "bg-slate-800 text-slate-200" : "hover:text-slate-300"
+                                        "px-2 py-0.5 rounded-md transition-colors",
+                                        previewTab === 'markdown' ? "bg-slate-800 text-foreground" : "hover:text-muted-foreground"
                                     )}
                                 >
                                     Bản xem trước (Render HTML)
@@ -230,8 +230,8 @@ export function MarkdownEditorModal({
                                 <button
                                     onClick={() => setPreviewTab('pdf')}
                                     className={cn(
-                                        "px-2 py-0.5 rounded-[4px] transition-colors",
-                                        previewTab === 'pdf' ? "bg-slate-800 text-slate-200" : "hover:text-slate-300"
+                                        "px-2 py-0.5 rounded-md transition-colors",
+                                        previewTab === 'pdf' ? "bg-slate-800 text-foreground" : "hover:text-muted-foreground"
                                     )}
                                 >
                                     Bản gốc (PDF)
@@ -247,7 +247,7 @@ export function MarkdownEditorModal({
                                 {markdown ? (
                                     <MarkdownContent content={markdown} isInverted={true} />
                                 ) : (
-                                    <div className="flex flex-col items-center justify-center h-40 text-slate-600 gap-1.5">
+                                    <div className="flex flex-col items-center justify-center h-40 text-muted-foreground gap-1.5">
                                         <AlertTriangle className="w-6 h-6 opacity-20" />
                                         <span className="text-xs">Không có nội dung hiển thị</span>
                                     </div>
@@ -256,7 +256,7 @@ export function MarkdownEditorModal({
                             ) : (
                                 <div className="w-full h-full flex-1 bg-slate-800/20">
                                     {isPdfLoading ? (
-                                        <div className="flex flex-col items-center justify-center h-full text-slate-400">
+                                        <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
                                             <Loader2 className="w-6 h-6 animate-spin mb-2 text-primary" />
                                             <span className="text-xs">Đang tải bản gốc...</span>
                                         </div>
@@ -267,7 +267,7 @@ export function MarkdownEditorModal({
                                             title="PDF Preview"
                                         />
                                     ) : (
-                                        <div className="flex flex-col items-center justify-center h-full text-slate-600 gap-1.5">
+                                        <div className="flex flex-col items-center justify-center h-full text-muted-foreground gap-1.5">
                                             <AlertTriangle className="w-6 h-6 opacity-20" />
                                             <span className="text-xs">Không thể tải bản gốc PDF</span>
                                         </div>
@@ -279,8 +279,8 @@ export function MarkdownEditorModal({
                 </div>
 
                 {/* Footer Controls */}
-                <div className="px-4 py-2.5 border-t border-slate-800 bg-slate-950 flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-[11px] text-amber-500 bg-amber-500/5 border border-amber-500/20 px-3 py-1.5 rounded-[4px] max-w-xl">
+                <div className="px-4 py-2.5 border-t border-border bg-slate-950 flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-[11px] text-amber-500 bg-amber-500/5 border border-amber-500/20 px-3 py-1.5 rounded-md max-w-xl">
                         <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0" />
                         <span>Kiểm duyệt các đề mục H1, H2, H3 để đảm bảo cấu trúc cây phân cấp (Tree Hierarchy) chính xác.</span>
                     </div>
@@ -289,7 +289,7 @@ export function MarkdownEditorModal({
                         <Button
                             variant="outline"
                             onClick={handleAiRefactor}
-                            className="rounded-[4px] border-primary/30 bg-primary/10 text-primary hover:bg-primary/20 hover:text-primary h-8 text-xs px-3 font-semibold transition-all"
+                            className="rounded-md border-primary/30 bg-primary/10 text-primary hover:bg-primary/20 hover:text-primary h-8 text-xs px-3 font-semibold transition-all"
                             disabled={isIngesting || isRefactoring}
                         >
                             {isRefactoring ? (
@@ -302,14 +302,14 @@ export function MarkdownEditorModal({
                         <Button
                             variant="outline"
                             onClick={onClose}
-                            className="rounded-[4px] border-slate-800 bg-slate-900 text-slate-300 hover:bg-slate-800 hover:text-white h-8 text-xs px-3"
+                            className="rounded-md border-border bg-slate-900 text-muted-foreground hover:bg-slate-800 hover:text-white h-8 text-xs px-3"
                             disabled={isIngesting || isRefactoring}
                         >
                             Hủy bỏ
                         </Button>
                         <Button
                             onClick={handleSaveAndIngest}
-                            className="rounded-[4px] bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shadow-sm gap-1.5 h-8 px-4 text-xs"
+                            className="rounded-md bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shadow-sm gap-1.5 h-8 px-4 text-xs"
                             disabled={isIngesting || isRefactoring}
                         >
                             {isIngesting ? (
