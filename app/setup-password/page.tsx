@@ -207,7 +207,7 @@ function SetupPasswordContent() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-4 relative overflow-hidden">
       {/* Visual background accents */}
       <div className="absolute top-[-25%] left-[-15%] w-[60%] h-[60%] bg-primary/5 blur-[150px] rounded-full" />
-      <div className="absolute bottom-[-25%] right-[-15%] w-[60%] h-[60%] bg-indigo-600/5 blur-[150px] rounded-full" />
+      <div className="absolute bottom-[-25%] right-[-15%] w-[60%] h-[60%] bg-emerald-500/5 blur-[150px] rounded-full" />
 
       <Card className="w-full max-w-[520px] shadow-2xl border-border bg-slate-900/90 text-slate-150 backdrop-blur-md overflow-hidden animate-in fade-in duration-300">
         <div className="h-1 bg-gradient-to-r from-blue-500 to-blue-700 w-full" />
@@ -380,7 +380,7 @@ function SetupPasswordContent() {
 
         <CardFooter className="flex flex-col gap-3.5 pt-2 pb-6 px-6">
           <Button
-            className="w-full h-11 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold rounded-md transition-all active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full h-11 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-bold rounded-md transition-all active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed"
             onClick={handleSetupPassword}
             disabled={isAccepting || !name.trim() || !isPasswordValid}
           >

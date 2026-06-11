@@ -42,7 +42,7 @@ const ACTION_COLORS: Record<string, string> = {
     'CREATE': 'bg-green-100 text-green-600',
     'UPDATE': 'bg-yellow-100 text-yellow-600',
     'DELETE': 'bg-red-100 text-red-600',
-    'INVITE': 'bg-purple-100 text-purple-600',
+    'INVITE': 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400',
     'SUSPEND': 'bg-orange-100 text-orange-600',
 };
 

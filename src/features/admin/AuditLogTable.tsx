@@ -52,7 +52,7 @@ const actionColors: Record<string, string> = {
     CREATE: 'bg-green-100/80 text-green-700 dark:bg-green-950/30 dark:text-green-400 border border-green-200/50 dark:border-green-900/30',
     UPDATE: 'bg-blue-100/80 text-blue-700 dark:bg-blue-950/30 dark:text-blue-400 border border-blue-200/50 dark:border-blue-900/30',
     DELETE: 'bg-red-100/80 text-red-700 dark:bg-red-950/30 dark:text-red-400 border border-red-200/50 dark:border-red-900/30',
-    LOGIN: 'bg-indigo-100/80 text-indigo-700 dark:bg-indigo-950/30 dark:text-indigo-400 border border-indigo-200/50 dark:border-indigo-900/30', // Purple Ban: changed from purple to indigo
+    LOGIN: 'bg-emerald-100/80 text-emerald-800 dark:bg-emerald-950/30 dark:text-emerald-400 border border-emerald-200/50 dark:border-emerald-900/30', // Purple Ban: changed from indigo to emerald
     LOGOUT: 'bg-muted text-muted-foreground dark:bg-slate-800 dark:text-muted-foreground border border-border/50 dark:border-border/50',
     ACCESS: 'bg-amber-100/80 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400 border border-amber-200/50 dark:border-amber-900/30',
 };

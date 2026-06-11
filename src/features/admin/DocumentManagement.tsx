@@ -66,6 +66,7 @@ import { cn, formatFileSize } from '@/lib/utils';
 import { toast } from 'sonner';
 import { Input } from '@/components/ui/input';
 import { WikiPagination } from '@/app/wiki/components/WikiPagination';
+import { useListDepartmentsQuery, useGetUserDepartmentsQuery } from '@/src/redux/feature/departmentApi';
 
 const statusConfig = {
     PENDING: { icon: Clock, color: 'bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-400 border border-amber-250/30 dark:border-amber-900/30', label: 'Pending' },
@@ -81,10 +82,19 @@ export function DocumentManagement() {
     const [searchTerm, setSearchTerm] = useState('');
     const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
     const [filterWorkspaceId, setFilterWorkspaceId] = useState<string>('all');
+    const [filterPendingOnly, setFilterPendingOnly] = useState(false);
     const currentWorkspaceId = useSelector((state: RootState) => state.workspace.currentWorkspaceId);
 
     const { data: workspaces = [] } = useGetUserWorkspacesQuery();
     const { data: departments = [] } = useListDepartmentsQuery();
+
+    const user = useSelector((state: RootState) => state.auth.user);
+    const globalRoles = useSelector((state: RootState) => state.auth.roles) || [];
+    const userId = user?.id || '';
+    const { data: userDepts = [] } = useGetUserDepartmentsQuery(userId, { skip: !userId });
+
+    const isGlobalAdmin = globalRoles.some(r => r.includes('ADMIN') || r.includes('SUPER_ADMIN'));
+    const isLeader = isGlobalAdmin || userDepts.some(d => d.userRole === 'HEAD' || d.userRole === 'MANAGER');
 
     // Group workspaces client-side for visual categorization (Hierarchical Model)
     const groupedWorkspaces = useMemo(() => {
@@ -154,6 +164,9 @@ export function DocumentManagement() {
 
     const filteredDocuments = useMemo(() => {
         let docs = allDocs;
+        if (filterPendingOnly) {
+            docs = docs.filter((doc: Document) => doc.status === 'PENDING');
+        }
         if (debouncedSearchTerm.trim()) {
             const q = debouncedSearchTerm.toLowerCase();
             docs = docs.filter((doc: Document) =>
@@ -161,15 +174,24 @@ export function DocumentManagement() {
                 doc.userId.toLowerCase().includes(q)
             );
         }
-        // Workspace filter: match by workspaceId or legacy tag
+        // Workspace filter: match by workspaceId, legacy tag, or department-wide documents belonging to the workspace's department
         if (filterWorkspaceId !== 'all') {
-            docs = docs.filter((doc: Document) =>
-                doc.workspaceId === filterWorkspaceId ||
-                doc.tags?.some(t => t === `ws:${filterWorkspaceId}` || t.includes(filterWorkspaceId))
-            );
+            docs = docs.filter((doc: Document) => {
+                if (doc.workspaceId === filterWorkspaceId) return true;
+                if (doc.tags?.some(t => t === `ws:${filterWorkspaceId}` || t.includes(filterWorkspaceId))) return true;
+
+                // Department-wide document match: doc has no workspace, but departmentId matches workspace's departmentId
+                if (!doc.workspaceId || doc.workspaceId === '') {
+                    const ws = workspaces.find((w: any) => w.id === filterWorkspaceId);
+                    if (ws && ws.departmentId && doc.departmentId === ws.departmentId) {
+                        return true;
+                    }
+                }
+                return false;
+            });
         }
         return docs;
-    }, [allDocs, debouncedSearchTerm, filterWorkspaceId]);
+    }, [allDocs, debouncedSearchTerm, filterWorkspaceId, filterPendingOnly]);
 
     // Compute paginated subset and counts
     const totalElements = debouncedSearchTerm.trim() ? filteredDocuments.length : (isPaged ? (data as any).totalElements : allDocs.length);
@@ -231,13 +253,17 @@ export function DocumentManagement() {
         securityClassification: 'PUBLIC' | 'INTERNAL' | 'CONFIDENTIAL' | 'RESTRICTED';
         departmentId: string;
         allowedRoles: string;
+        uploadScope: 'DEPARTMENT' | 'WORKSPACE';
+        workspaceId?: string;
     }) => {
         if (!uploadPendingFile) return;
 
         const formData = new FormData();
         formData.append('file', uploadPendingFile);
 
-        const targetUploadWorkspaceId = (workspaceIdForQuery && workspaceIdForQuery !== 'all') ? workspaceIdForQuery : (currentWorkspaceId || 'default-workspace');
+        const targetUploadWorkspaceId = meta.uploadScope === 'DEPARTMENT'
+            ? (meta.workspaceId || '')
+            : (meta.workspaceId || ((workspaceIdForQuery && workspaceIdForQuery !== 'all') ? workspaceIdForQuery : (currentWorkspaceId || 'default-workspace')));
         try {
             const result = await uploadDocument({
                 formData,
@@ -324,6 +350,18 @@ export function DocumentManagement() {
                             }`}
                         >
                             <Database className="w-3 h-3 text-emerald-500" /> Không gian mặc định
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={() => setFilterPendingOnly(!filterPendingOnly)}
+                            className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-bold border transition-all whitespace-nowrap cursor-pointer ${
+                                filterPendingOnly
+                                    ? 'border-amber-400 bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300'
+                                    : 'border-border bg-background text-muted-foreground hover:bg-accent'
+                            }`}
+                        >
+                            <Clock className="w-3.5 h-3.5 text-amber-500" /> Chờ duyệt ({allDocs.filter((d: any) => d.status === 'PENDING').length})
                         </button>
 
                         {/* Department Workspaces */}
@@ -438,6 +476,7 @@ export function DocumentManagement() {
                                 <TableHead className="font-bold text-xs text-foreground pl-4 py-2">Tài liệu</TableHead>
                                 <TableHead className="font-bold text-xs text-foreground py-2">Kích thước</TableHead>
                                 <TableHead className="font-bold text-xs text-foreground py-2">Phân loại</TableHead>
+                                <TableHead className="font-bold text-xs text-foreground py-2">Không gian (Workspace)</TableHead>
                                 <TableHead className="font-bold text-xs text-foreground py-2">Trạng thái</TableHead>
                                 <TableHead className="font-bold text-xs text-foreground py-2">Ngày tải</TableHead>
                                 <TableHead className="w-[80px] pr-4 py-2"></TableHead>
@@ -446,7 +485,7 @@ export function DocumentManagement() {
                         <TableBody>
                             {filteredDocuments.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={6} className="text-center py-16 text-muted-foreground">
+                                    <TableCell colSpan={7} className="text-center py-16 text-muted-foreground">
                                         <FileText className="w-10 h-10 mx-auto mb-3 opacity-15" />
                                         <p className="text-xs font-semibold">Không tìm thấy tài liệu nào</p>
                                     </TableCell>
@@ -506,6 +545,19 @@ export function DocumentManagement() {
                                                     )}
                                                 </div>
                                             </TableCell>
+                                            <TableCell className="py-1.5 text-xs font-semibold text-muted-foreground">
+                                                {doc.workspaceId ? (
+                                                    <span className="flex items-center gap-1.5">
+                                                        <Database className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                                                        {workspaces.find((ws: any) => ws.id === doc.workspaceId)?.name || doc.workspaceId}
+                                                    </span>
+                                                ) : (
+                                                    <span className="flex items-center gap-1.5 text-slate-550 dark:text-slate-400">
+                                                        <Globe className="w-3.5 h-3.5 text-slate-450 shrink-0" />
+                                                        Dùng chung
+                                                    </span>
+                                                )}
+                                            </TableCell>
                                             <TableCell className="py-1.5">
                                                 <Badge className={cn('rounded-md text-[9px] font-bold px-2 py-0.5 shadow-sm', status.color)}>
                                                     <StatusIcon className={cn("w-2.5 h-2.5 mr-1", doc.status === 'PROCESSING' && "animate-spin")} />
@@ -517,6 +569,22 @@ export function DocumentManagement() {
                                             </TableCell>
                                             <TableCell className="pr-4 py-1.5">
                                                 <div className="flex items-center gap-1.5 justify-end">
+                                                    {doc.status === 'PENDING' && isLeader && (
+                                                        <Button
+                                                            variant="outline"
+                                                            size="sm"
+                                                            onClick={() => handleApprove(doc.id)}
+                                                            disabled={isApproving}
+                                                            className="rounded-md h-7 text-[10px] font-semibold text-emerald-650 hover:text-emerald-700 border-emerald-200 dark:border-emerald-900 bg-emerald-50/30 dark:bg-emerald-950/20 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 transition-all shadow-sm cursor-pointer flex items-center gap-1"
+                                                        >
+                                                            {isApproving ? (
+                                                                <Loader2 className="w-3 h-3 animate-spin text-emerald-500" />
+                                                            ) : (
+                                                                <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />
+                                                            )}
+                                                            Duyệt
+                                                        </Button>
+                                                    )}
                                                     {doc.status === 'PREVIEW' && (
                                                         <Button
                                                             variant="outline"

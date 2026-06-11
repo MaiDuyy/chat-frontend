@@ -66,8 +66,8 @@ const ROLE_CONFIG: Record<
     label: 'Quản lý',
     short: 'Manager',
     badgeCls:
-      'bg-indigo-50 text-indigo-800 border-indigo-200 dark:bg-indigo-500/10 dark:text-indigo-300 dark:border-indigo-500/20',
-    dotCls: 'bg-indigo-500',
+      'bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-300 dark:border-emerald-500/20',
+    dotCls: 'bg-emerald-500',
     icon: <ShieldAlert className="w-3 h-3" />,
     priority: 1,
   },

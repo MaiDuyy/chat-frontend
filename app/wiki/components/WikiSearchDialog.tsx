@@ -181,9 +181,9 @@ export function WikiSearchDialog({
               {/* Slate UI AI Semantic Search Toggle */}
               <button
                 onClick={() => setSemanticSearch((prev) => !prev)}
-                className={`flex items-center gap-1.5 px-2.5 py-1.5 border text-[10px] font-mono font-bold uppercase transition-all rounded-md select-none shrink-0 ${
+                className={`flex items-center gap-1.5 px-2.5 py-1.5 border text-[10px] font-mono font-bold uppercase transition-all rounded-md select-none shrink-0 cursor-pointer ${
                   semanticSearch
-                    ? "bg-slate-900 text-white border-slate-900 dark:bg-muted dark:text-foreground dark:border-border shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]"
+                    ? "bg-primary text-primary-foreground border-transparent shadow-[1px_1px_0px_0px_rgba(0,0,0,0.15)]"
                     : "border-border bg-background hover:bg-muted text-muted-foreground"
                 }`}
                 title="Tìm kiếm ngữ nghĩa bằng AI"
@@ -195,7 +195,7 @@ export function WikiSearchDialog({
               {query && (
                 <button 
                   onClick={() => setQuery("")} 
-                  className="text-muted-foreground hover:text-foreground focus:outline-none ml-1"
+                  className="text-muted-foreground hover:text-foreground focus:outline-none ml-1 cursor-pointer"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -208,7 +208,7 @@ export function WikiSearchDialog({
                 /* AI Semantic Search Results */
                 isSearching ? (
                   <div className="py-12 text-center flex flex-col items-center justify-center gap-2 bg-background">
-                    <div className="w-6 h-6 border-2 border-slate-900 border-t-transparent animate-spin rounded-full dark:border-border" />
+                    <div className="w-6 h-6 border-2 border-primary border-t-transparent animate-spin rounded-full" />
                     <p className="text-[11px] font-mono text-muted-foreground uppercase tracking-wider">
                       Đang phân tích ngữ nghĩa AI...
                     </p>

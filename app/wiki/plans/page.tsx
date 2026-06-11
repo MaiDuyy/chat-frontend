@@ -225,7 +225,7 @@ export default function CompilationPlansPage({ isEmbedded = false }: { isEmbedde
           <div className="flex items-center gap-3">
             <Link
               href="/wiki"
-              className="p-1.5 border border-border bg-secondary hover:bg-secondary/80 text-secondary-foreground transition-colors rounded-md shadow-sm active:scale-[0.98]"
+              className="p-1.5 border border-border bg-secondary hover:bg-secondary/90 text-secondary-foreground transition-all duration-200 rounded-md shadow-sm hover:shadow-md hover:-translate-y-[0.5px] active:scale-[0.98] select-none cursor-pointer"
               title="Quay lại Dashboard"
             >
               <ArrowLeft className="w-4 h-4" />
@@ -244,7 +244,7 @@ export default function CompilationPlansPage({ isEmbedded = false }: { isEmbedde
           <div className="flex items-center gap-2">
             <button
               onClick={() => refetchPlans()}
-              className="p-2 border border-border bg-secondary hover:bg-secondary/80 text-secondary-foreground transition-colors rounded-md shadow-sm active:scale-[0.98]"
+              className="p-2 border border-border bg-secondary hover:bg-secondary/90 text-secondary-foreground transition-all duration-200 rounded-md shadow-sm hover:shadow-md hover:-translate-y-[0.5px] active:scale-[0.98] select-none cursor-pointer"
               title="Làm mới danh sách"
             >
               <RotateCw className="w-3.5 h-3.5" />
@@ -528,7 +528,7 @@ export default function CompilationPlansPage({ isEmbedded = false }: { isEmbedde
                       <button
                         onClick={handleApprovePlan}
                         disabled={isApproving}
-                        className="w-full sm:w-auto px-4 py-2 text-xs font-medium bg-emerald-600 hover:bg-emerald-600/90 text-white transition-colors rounded-md shadow-sm active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-1.5"
+                        className="w-full sm:w-auto px-4 py-2 text-xs font-semibold bg-emerald-600 hover:bg-emerald-600/95 text-white transition-all duration-200 rounded-md shadow-sm hover:shadow-md hover:-translate-y-[0.5px] active:scale-[0.98] disabled:opacity-50 disabled:translate-y-0 disabled:shadow-sm flex items-center justify-center gap-1.5 select-none cursor-pointer"
                       >
                         <Play className="w-3.5 h-3.5" />
                         {isApproving ? "Đang thực thi..." : "Phê duyệt & Chạy (D)"}

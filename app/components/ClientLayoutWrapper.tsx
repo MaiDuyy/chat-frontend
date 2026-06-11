@@ -22,9 +22,12 @@ export default function ClientLayoutWrapper({ children }: { children: React.Reac
 
         // Dashboard / App UI with Sidebar
         return (
-          <div className="flex h-screen w-full overflow-hidden bg-muted dark:bg-slate-950 font-sans">
+          <div className="flex h-screen w-full overflow-hidden bg-background font-sans relative">
+            {/* Grid Line Overlay */}
+            <div className="absolute inset-0 bg-grid-pattern opacity-[0.25] pointer-events-none z-0"></div>
+
             <Sidebar />
-            <main className="flex-1 overflow-hidden relative flex flex-col">
+            <main className="flex-1 overflow-hidden relative flex flex-col z-10">
               {children}
             </main>
           </div>

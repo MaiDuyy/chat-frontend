@@ -33,11 +33,15 @@ export function UploadModal({ open, onClose }: { open: boolean; onClose: () => v
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
       <div className="bg-white p-6 rounded-md shadow-lg w-96">
         <h2 className="text-xl font-bold mb-4">Upload Document</h2>
+        <label htmlFor="file-upload" className="block text-sm font-medium text-foreground mb-2">
+          Chọn tài liệu (.pdf, .docx, .txt, .md):
+        </label>
         <input 
+          id="file-upload"
           type="file" 
           accept=".pdf,.docx,.txt,.md" 
           onChange={handleFileChange} 
-          className="mb-4 block w-full text-sm text-muted-foreground file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+          className="mb-4 block w-full text-sm text-muted-foreground file:mr-4 file:py-2 file:px-4 file:rounded-sm file:border-0 file:text-sm file:font-semibold file:bg-accent-dim file:text-accent-emerald hover:file:bg-accent-dim/30 cursor-pointer"
         />
         <div className="flex justify-end gap-2">
           <button 

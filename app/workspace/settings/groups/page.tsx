@@ -435,7 +435,7 @@ export default function GroupsManagement() {
                 <tr key={chat.id} className="hover:bg-muted/30 dark:hover:bg-white/[0.01] transition-colors duration-150 group">
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2.5">
-                      <div className="h-7 w-7 rounded-sm bg-muted dark:bg-muted text-indigo-600 flex items-center justify-center border border-border/50 shrink-0 overflow-hidden">
+                      <div className="h-7 w-7 rounded-sm bg-muted dark:bg-muted text-emerald-500 flex items-center justify-center border border-border/50 shrink-0 overflow-hidden">
                         <Avatar className="h-full w-full rounded-sm">
                           <AvatarImage src={getAvatarUrl(chat.avatar)} className="object-cover rounded-sm" />
                           <AvatarFallback className="rounded-sm bg-muted dark:bg-muted text-muted-foreground text-xs font-bold">{chat.name.substring(0, 1).toUpperCase()}</AvatarFallback>

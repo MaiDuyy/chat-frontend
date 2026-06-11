@@ -161,7 +161,7 @@ export const departmentApi = apiSlice.injectEndpoints({
       invalidatesTags: ['Departments'],
     }),
 
-    validateDepartmentInviteToken: builder.query<unknown, string>({
+    validateDepartmentInviteToken: builder.query<any, string>({
       query: (token) => `/departments/invitations/validate/${token}`,
     }),
 

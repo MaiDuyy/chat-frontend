@@ -113,7 +113,7 @@ export function AppSidebar({ className }: AppSidebarProps) {
                             <Link
                                 href={item.href}
                                 className={cn(
-                                    'flex items-center gap-3 px-3 py-2 rounded-md transition-colors',
+                                    'flex items-center gap-3 px-3 py-2 rounded-md transition-all active:scale-[0.98]',
                                     'hover:bg-muted',
                                     isActive
                                         ? 'bg-primary/10 text-primary font-medium'

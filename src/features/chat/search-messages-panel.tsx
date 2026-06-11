@@ -114,7 +114,7 @@ export const SearchMessagesPanel: React.FC<SearchMessagesPanelProps> = ({
             results.map((msg) => (
               <div 
                 key={msg.id} 
-                className="group p-4 rounded-xl bg-muted border border-border hover:border-blue-200 hover:bg-blue-50/30 transition-all cursor-pointer"
+                className="group p-4 rounded-md bg-muted border border-border hover:border-blue-200 hover:bg-blue-50/30 transition-all cursor-pointer"
                 onClick={() => onJumpToMessage(msg.id)}
               >
                 <div className="flex items-start gap-3 mb-2">

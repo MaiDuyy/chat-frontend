@@ -295,7 +295,7 @@ export const ChatItem = ({
                         <AvatarFallback
                             className={`${chat.isGroup
                                 ? "bg-gradient-to-br from-green-600 to-emerald-600"
-                                : "bg-gradient-to-br from-blue-600 to-indigo-600"
+                                : "bg-gradient-to-br from-blue-600 to-cyan-600"
                                 } text-white font-mono font-bold rounded-sm`}
                         >
                             {initials}

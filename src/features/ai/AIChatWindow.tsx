@@ -1,15 +1,28 @@
 'use client';
 
 import { useState, useRef, useEffect, useCallback } from 'react';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/src/redux/store';
 import { useGetConversationMessagesQuery, useChatWithRagMutation } from '@/src/redux/feature/aiApi';
 import type { ChatMessage, Citation } from '@/src/redux/feature/aiApi';
+import { useGetUserWorkspacesQuery } from '@/src/redux/feature/workspaceApi';
+import { useListDepartmentsQuery, useGetUserDepartmentsQuery } from '@/src/redux/feature/departmentApi';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { AIMessageBubble } from './AIMessageBubble';
 import { EmptyState } from '@/components/enterprise/EmptyState';
-import { Send, Loader2, Sparkles, StopCircle } from 'lucide-react';
+import { Send, Loader2, Sparkles, StopCircle, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 
 export interface AIMessageLocal {
     id: string;
@@ -29,9 +42,26 @@ export function AIChatWindow({ conversationId, className }: AIChatWindowProps) {
     const [input, setInput] = useState('');
     const [isStreaming, setIsStreaming] = useState(false);
     const scrollEndRef = useRef<HTMLDivElement>(null);
+    const [selectedScope, setSelectedScope] = useState<string>('default');
+
+    const user = useSelector((state: RootState) => state.auth.user);
+    const globalRoles = useSelector((state: RootState) => state.auth.roles) || [];
+    const userId = user?.id || '';
+    const { data: userDepts = [] } = useGetUserDepartmentsQuery(userId, { skip: !userId });
+    const { data: workspaces = [] } = useGetUserWorkspacesQuery();
+    const { data: departments = [] } = useListDepartmentsQuery();
+
+    const isGlobalAdmin = globalRoles.some(r => r.includes('ADMIN') || r.includes('SUPER_ADMIN'));
 
     const { data: history, isFetching } = useGetConversationMessagesQuery(conversationId);
     const [chatWithRag] = useChatWithRagMutation();
+
+    const hasPartialResults = messages.some(
+        (m) =>
+            m.role === 'assistant' &&
+            (m.content.includes('Hệ thống quản lý phòng ban hiện đang bảo trì') ||
+                m.content.includes('partial_results'))
+    );
 
     useEffect(() => {
         if (history) {
@@ -70,8 +100,22 @@ export function AIChatWindow({ conversationId, className }: AIChatWindowProps) {
         }]);
         setIsStreaming(true);
 
+        const headers: Record<string, string> = {};
+        if (isGlobalAdmin && selectedScope && selectedScope !== 'default') {
+            const [type, id] = selectedScope.split(':');
+            if (type === 'dept') {
+                headers['x-rag-scope'] = JSON.stringify({ type: 'department', id });
+            } else if (type === 'ws') {
+                headers['x-rag-scope'] = JSON.stringify({ type: 'workspace', id });
+            }
+        }
+
         try {
-            const response = await chatWithRag({ message: userMsgContent, conversationId }).unwrap();
+            const response = await chatWithRag({ 
+                message: userMsgContent, 
+                conversationId,
+                headers
+            }).unwrap();
 
             let resolvedContent = '';
             if (typeof response === 'string') {
@@ -125,8 +169,16 @@ export function AIChatWindow({ conversationId, className }: AIChatWindowProps) {
 
     return (
         <div className={cn('flex-1 flex flex-col min-h-0 h-full bg-background relative overflow-hidden', className)}>
+            {/* Warning Banner */}
+            {hasPartialResults && (
+                <div className="bg-amber-500/10 border-b border-amber-500/20 text-amber-600 dark:text-amber-400 text-xs px-4 py-2.5 flex items-center gap-2.5 z-20 animate-in slide-in-from-top duration-300 pointer-events-auto">
+                    <AlertCircle className="w-4 h-4 shrink-0 text-amber-500" />
+                    <span className="font-semibold">Hệ thống quản lý phòng ban hiện đang bảo trì. Kết quả tìm kiếm chỉ truy xuất dữ liệu trong Workspace này.</span>
+                </div>
+            )}
+
             {/* Fade top */}
-            <div className="absolute top-0 left-0 right-0 h-14 bg-gradient-to-b from-background to-transparent z-10 pointer-events-none" />
+            <div className={cn("absolute left-0 right-0 h-14 bg-gradient-to-b from-background to-transparent z-10 pointer-events-none", hasPartialResults ? "top-10" : "top-0")} />
 
             {/* Chat History */}
             <ScrollArea className="flex-1 min-h-0 px-4 sm:px-6">
@@ -187,6 +239,45 @@ export function AIChatWindow({ conversationId, className }: AIChatWindowProps) {
             {/* ── Input Bar ─────────────────────────────────────────────────── */}
             <div className="absolute bottom-0 left-0 right-0 px-4 pb-5 pt-2 z-20 pointer-events-none bg-gradient-to-t from-background via-background/95 to-transparent">
                 <div className="max-w-3xl mx-auto pointer-events-auto">
+                    {/* Admin Search Scope Dropdown */}
+                    {isGlobalAdmin && (
+                        <div className="flex items-center gap-2 mb-2 bg-slate-900 border border-border px-3 py-1.5 rounded-lg w-fit shadow-md">
+                            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Phạm vi RAG:</span>
+                            <Select
+                                value={selectedScope}
+                                onValueChange={setSelectedScope}
+                            >
+                                <SelectTrigger className="h-6 w-[200px] text-xs bg-slate-950 border-border text-white rounded-md">
+                                    <SelectValue placeholder="Chọn phạm vi" />
+                                </SelectTrigger>
+                                <SelectContent className="bg-slate-950 border-border text-white text-xs max-h-[250px] overflow-y-auto">
+                                    <SelectItem value="default" className="text-xs cursor-pointer focus:bg-slate-800">
+                                        Mặc định (Không gian hiện tại)
+                                    </SelectItem>
+                                    {departments.length > 0 && (
+                                        <SelectGroup>
+                                            <SelectLabel className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest px-2 py-1">Phòng ban</SelectLabel>
+                                            {departments.map((dept: any) => (
+                                                <SelectItem key={dept.id} value={`dept:${dept.id}`} className="text-xs cursor-pointer focus:bg-slate-800 pl-4">
+                                                    Phòng {dept.name}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectGroup>
+                                    )}
+                                    {workspaces.length > 0 && (
+                                        <SelectGroup>
+                                            <SelectLabel className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest px-2 py-1">Workspace</SelectLabel>
+                                            {workspaces.map((ws: any) => (
+                                                <SelectItem key={ws.id} value={`ws:${ws.id}`} className="text-xs cursor-pointer focus:bg-slate-800 pl-4">
+                                                    {ws.name}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectGroup>
+                                    )}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    )}
                     <div
                         className={cn(
                             'relative flex items-end gap-2',

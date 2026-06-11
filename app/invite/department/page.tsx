@@ -169,7 +169,7 @@ function DepartmentInviteContent() {
     return (
       <FullscreenLayout>
         <Card className="w-full max-w-[480px] shadow-2xl border-border bg-slate-900/90 text-foreground backdrop-blur-md overflow-hidden">
-          <div className="h-1.5 bg-gradient-to-r from-blue-500 to-indigo-500 w-full" />
+          <div className="h-1.5 bg-gradient-to-r from-blue-500 to-cyan-500 w-full" />
           <CardHeader className="text-center pt-8 pb-4">
             <div className="mx-auto w-20 h-20 relative mb-5">
               <div className="absolute inset-0 bg-blue-500/10 rounded-xl rotate-6 animate-pulse" />
@@ -224,7 +224,7 @@ function DepartmentInviteContent() {
   return (
     <FullscreenLayout>
       <Card className="w-full max-w-[540px] shadow-2xl border-border bg-slate-900/90 text-foreground backdrop-blur-md overflow-hidden animate-in fade-in zoom-in duration-500">
-        <div className="h-1.5 bg-gradient-to-r from-blue-500 to-indigo-500 w-full" />
+        <div className="h-1.5 bg-gradient-to-r from-blue-500 to-cyan-500 w-full" />
 
         <CardHeader className="text-center pb-3 pt-8">
           <div className="mx-auto w-20 h-20 relative mb-5">
@@ -327,9 +327,9 @@ function DepartmentInviteContent() {
 
 function FullscreenLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-950 via-slate-950 to-blue-950 p-4 relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 via-slate-950 to-blue-950 p-4 relative overflow-hidden">
       <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-blue-500/8 blur-[130px] rounded-full" />
-      <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-indigo-500/8 blur-[130px] rounded-full" />
+      <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-cyan-500/8 blur-[130px] rounded-full" />
       {children}
     </div>
   );
@@ -357,7 +357,7 @@ function InviteInfoGrid({ inviteData }: { inviteData: any }) {
       </div>
       {inviteData?.department && (
         <div className="col-span-2 p-3.5 rounded-lg bg-slate-800/60 border border-slate-750 flex items-center gap-3">
-          <Building2 className="w-4 h-4 text-indigo-400 shrink-0" />
+          <Building2 className="w-4 h-4 text-emerald-400 shrink-0" />
           <div className="min-w-0">
             <p className="text-[9px] uppercase font-bold text-muted-foreground tracking-wider">Phòng ban</p>
             <p className="text-xs font-bold text-foreground">{inviteData.department.name}</p>

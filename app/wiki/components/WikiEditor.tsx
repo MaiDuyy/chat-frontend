@@ -75,7 +75,7 @@ export function WikiEditor({
             <button
               type="button"
               onClick={onCancel}
-              className="p-1.5 border border-border bg-secondary hover:bg-secondary/80 text-secondary-foreground transition-colors rounded-md shadow-sm active:scale-[0.98]"
+              className="p-1.5 border border-border bg-secondary hover:bg-secondary/90 text-secondary-foreground transition-all duration-200 rounded-md shadow-sm hover:shadow-md hover:-translate-y-[0.5px] active:scale-[0.98] select-none cursor-pointer"
               title="Quay lại"
             >
               <ArrowLeft className="w-4 h-4" />
@@ -98,23 +98,25 @@ export function WikiEditor({
         {/* Basic Fields */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-3 border border-border bg-card p-3 rounded-lg shadow-md">
           <div className="md:col-span-2 flex flex-col gap-1.5">
-            <label className="text-xs font-mono font-extrabold uppercase text-foreground">Tiêu đề trang (Title)</label>
+            <label htmlFor="wiki-title" className="text-xs font-mono font-extrabold uppercase text-foreground">Tiêu đề trang (Title)</label>
             <input
+              id="wiki-title"
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Nhập tiêu đề trang..."
               required
-              className="border border-border bg-background rounded-md px-3 py-1.5 text-sm font-sans focus:outline-none focus:ring-0 focus:border-primary"
+              className="border border-border bg-background rounded-md px-3 py-1.5 text-sm font-sans focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all duration-150"
             />
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-mono font-extrabold uppercase text-foreground">Loại trang (Type)</label>
+            <label htmlFor="wiki-page-type" className="text-xs font-mono font-extrabold uppercase text-foreground">Loại trang (Type)</label>
             <select
+              id="wiki-page-type"
               value={pageType}
               onChange={(e) => setPageType(e.target.value)}
-              className="border border-border bg-background rounded-md px-3 py-1.5 text-sm font-sans focus:outline-none focus:ring-0 focus:border-primary"
+              className="border border-border bg-background rounded-md px-3 py-1.5 text-sm font-sans focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all duration-150"
             >
               <option value="concept">Concept (Khái niệm)</option>
               <option value="entity">Entity (Thực thể)</option>
@@ -124,13 +126,14 @@ export function WikiEditor({
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-mono font-extrabold uppercase text-foreground">Thẻ (Tags)</label>
+            <label htmlFor="wiki-tags" className="text-xs font-mono font-extrabold uppercase text-foreground">Thẻ (Tags)</label>
             <input
+              id="wiki-tags"
               type="text"
               value={tags}
               onChange={(e) => setTags(e.target.value)}
               placeholder="ngôn-ngữ, java, spring..."
-              className="border border-border bg-background rounded-md px-3 py-1.5 text-sm font-sans focus:outline-none focus:ring-0 focus:border-primary"
+              className="border border-border bg-background rounded-md px-3 py-1.5 text-sm font-sans focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all duration-150"
             />
           </div>
         </div>
@@ -177,14 +180,15 @@ export function WikiEditor({
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-mono font-bold uppercase text-foreground">Ghi chú chỉnh sửa (Change Note)</label>
+                <label htmlFor="wiki-note" className="text-xs font-mono font-bold uppercase text-foreground">Ghi chú chỉnh sửa (Change Note)</label>
                 <textarea
+                  id="wiki-note"
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
                   placeholder="Mô tả tóm tắt lý do hoặc những gì bạn đã chỉnh sửa..."
                   required
                   rows={3}
-                  className="w-full border border-border bg-background rounded-md p-2 text-xs font-sans focus:outline-none focus:ring-0 focus:border-primary"
+                  className="w-full border border-border bg-background rounded-md p-2 text-xs font-sans focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all duration-150"
                 />
               </div>
 
@@ -192,7 +196,7 @@ export function WikiEditor({
                 <button
                   type="submit"
                   disabled={isLoading || !title.trim() || !content.trim()}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium bg-primary hover:bg-primary/90 text-primary-foreground transition-colors duration-200 rounded-md shadow-sm active:scale-[0.98] disabled:opacity-50"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold bg-primary hover:bg-primary/95 text-primary-foreground transition-all duration-200 rounded-md shadow-sm hover:shadow-md hover:-translate-y-[0.5px] active:scale-[0.98] disabled:opacity-50 disabled:translate-y-0 disabled:shadow-sm select-none cursor-pointer"
                 >
                   <CheckCircle className="w-4 h-4" />
                   {isLoading ? "Đang gửi..." : "Gửi đề xuất nháp"}
@@ -202,7 +206,7 @@ export function WikiEditor({
                   <button
                     type="button"
                     onClick={onCancel}
-                    className="w-full px-4 py-2 text-xs font-medium border border-border bg-secondary hover:bg-secondary/80 text-secondary-foreground transition-colors duration-200 rounded-md shadow-sm active:scale-[0.98]"
+                    className="w-full px-4 py-2 text-xs font-semibold border border-border bg-secondary hover:bg-secondary/90 text-secondary-foreground transition-all duration-200 rounded-md shadow-sm hover:shadow-md hover:-translate-y-[0.5px] active:scale-[0.98] select-none cursor-pointer"
                   >
                     Hủy bỏ
                   </button>

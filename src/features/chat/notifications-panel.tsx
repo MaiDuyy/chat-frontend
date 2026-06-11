@@ -49,9 +49,9 @@ const NOTIFICATION_ICONS: Record<NotificationType, React.ReactNode> = {
     FRIEND_REQUEST:   <UserPlus className="h-4 w-4 text-blue-500" />,
     FRIEND_ACCEPTED:  <UserCheck className="h-4 w-4 text-emerald-500" />,
     NEW_MESSAGE:      <MessageCircle className="h-4 w-4 text-blue-500" />,
-    GROUP_INVITE:     <Users className="h-4 w-4 text-indigo-500" />,
+    GROUP_INVITE:     <Users className="h-4 w-4 text-emerald-500" />,
     GROUP_REMOVED:    <Users className="h-4 w-4 text-red-500" />,
-    WORKSPACE_INVITE: <Users className="h-4 w-4 text-violet-500" />,
+    WORKSPACE_INVITE: <Users className="h-4 w-4 text-emerald-500" />,
     MENTION:          <AtSign className="h-4 w-4 text-amber-500" />,
     REACTION:         <Heart className="h-4 w-4 text-rose-400" />,
     SYSTEM:           <AlertCircle className="h-4 w-4 text-muted-foreground" />,
@@ -355,7 +355,7 @@ function CategoryBadge({ type }: { type: NotificationType }) {
         all:       { label: "",           className: "" },
         social:    { label: "Xã hội",    className: "text-emerald-600 bg-emerald-50 dark:bg-emerald-950/40" },
         messaging: { label: "Tin nhắn",  className: "text-blue-600 bg-blue-50 dark:bg-blue-950/40" },
-        workspace: { label: "Workspace", className: "text-indigo-600 bg-indigo-50 dark:bg-indigo-950/40" },
+        workspace: { label: "Workspace", className: "text-emerald-600 bg-emerald-50 dark:bg-emerald-950/40" },
         system:    { label: "Hệ thống",  className: "text-muted-foreground bg-muted dark:bg-slate-800" },
     };
     const { label, className } = config[category];

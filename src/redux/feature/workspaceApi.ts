@@ -54,7 +54,7 @@ export const workspaceApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ["WorkspaceInvites"],
     }),
-    validateInviteToken: builder.query<{ success: boolean; invite: any }, string>({
+    validateInviteToken: builder.query<{ success: boolean; invitation: any }, string>({
       query: (token) => `/workspaces/invites/validate/${token}`,
     }),
     acceptInvite: builder.mutation<any, { token: string; name?: string; password?: string; gender?: string }>({

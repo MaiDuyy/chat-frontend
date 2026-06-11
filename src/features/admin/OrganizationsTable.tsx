@@ -134,8 +134,8 @@ export function OrganizationsTable() {
                                 <TableRow key={org.id} className="hover:bg-muted/50 dark:hover:bg-slate-800/40 border-b border-border transition-colors">
                                     <TableCell className="py-2">
                                         <div className="flex items-center gap-2">
-                                            <div className="h-7 w-7 rounded-md bg-indigo-50 dark:bg-indigo-950/30 flex items-center justify-center shrink-0">
-                                                <Building2 className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                                            <div className="h-7 w-7 rounded-md bg-emerald-50 dark:bg-emerald-950/30 flex items-center justify-center shrink-0">
+                                                <Building2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                                             </div>
                                             <div className="flex flex-col">
                                                 <span className="font-semibold text-xs text-foreground">{org.name}</span>

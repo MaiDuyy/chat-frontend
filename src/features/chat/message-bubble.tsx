@@ -796,8 +796,8 @@ export default function MessageBubble({
 
                             {/* Sender name — visible only on first/single message of cluster */}
                             {!isMe && message.sender?.name && (isFirst || isSingle) && (
-                                <p className={`px-3 pt-2 text-xs font-bold flex items-center gap-1.5 text-left ${isAI ? "text-indigo-650 dark:text-indigo-400" : "text-primary"}`}>
-                                    {isAI && <Sparkles size={12} className="text-indigo-500" />}
+                                <p className={`px-3 pt-2 text-xs font-bold flex items-center gap-1.5 text-left ${isAI ? "text-emerald-600 dark:text-emerald-400" : "text-primary"}`}>
+                                    {isAI && <Sparkles size={12} className="text-emerald-500" />}
                                     <span>{message.sender.name}</span>
                                     <RoleBadge role={message.sender.role} />
                                 </p>

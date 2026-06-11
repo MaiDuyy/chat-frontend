@@ -100,18 +100,18 @@ export function SettingsTab({
                                 disabled={!isAdmin}
                                 onClick={() => handleUpdateReadOnly(p.value)}
                                 className={`p-3 rounded-xl border text-left flex items-start gap-3 transition-all ${chat?.isReadOnly === p.value
-                                        ? "bg-indigo-50 border-indigo-200 ring-1 ring-indigo-100"
+                                        ? "bg-blue-50 border-blue-200 ring-1 ring-blue-100"
                                         : "hover:bg-muted border-border"
                                     }`}
                             >
                                 <div
-                                    className={`mt-1 h-3.5 w-3.5 rounded-full border-2 flex items-center justify-center ${chat?.isReadOnly === p.value ? "border-indigo-500" : "border-border"
+                                    className={`mt-1 h-3.5 w-3.5 rounded-full border-2 flex items-center justify-center ${chat?.isReadOnly === p.value ? "border-blue-500" : "border-border"
                                         }`}
                                 >
-                                    {chat?.isReadOnly === p.value && <div className="h-1.5 w-1.5 bg-indigo-500 rounded-full" />}
+                                    {chat?.isReadOnly === p.value && <div className="h-1.5 w-1.5 bg-blue-500 rounded-full" />}
                                 </div>
                                 <div>
-                                    <p className={`text-sm font-bold ${chat?.isReadOnly === p.value ? "text-indigo-700" : "text-muted-foreground"}`}>
+                                    <p className={`text-sm font-bold ${chat?.isReadOnly === p.value ? "text-blue-700" : "text-muted-foreground"}`}>
                                         {p.label}
                                     </p>
                                     <p className="text-[10px] text-muted-foreground">{p.desc}</p>

@@ -109,7 +109,7 @@ export function DocumentTable({ documents }: { documents: Document[] }) {
                 {doc.status === 'PENDING' && (
                   <button 
                     onClick={() => handleApprove(doc.id)} 
-                    className="text-purple-600 hover:text-purple-900 font-semibold ml-2"
+                    className="text-emerald-600 hover:text-emerald-900 dark:text-accent-mint dark:hover:text-accent-emerald font-semibold ml-2"
                   >
                     Approve
                   </button>

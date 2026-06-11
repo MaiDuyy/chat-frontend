@@ -1,7 +1,8 @@
 "use client";
 
 import React from 'react';
-import { MessageSquare, Shield, Zap, Globe } from "lucide-react";
+import { Shield, Zap, Globe } from "lucide-react";
+import { HubNodeBrand } from '@/components/ui/hub-node-logo';
 
 interface AuthLayoutProps {
   children: React.ReactNode;
@@ -20,11 +21,8 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({ children }) => {
 
         {/* Top: Logo */}
         <div className="relative z-10">
-          <div className="flex items-center gap-2.5 mb-14">
-            <div className="w-8 h-8 bg-primary rounded-sm flex items-center justify-center">
-              <MessageSquare className="w-4 h-4 text-white" />
-            </div>
-            <span className="text-sm font-mono font-bold text-white tracking-widest uppercase">NEXUS</span>
+          <div className="mb-14">
+            <HubNodeBrand size={26} textClassName="text-white" />
           </div>
 
           <div className="space-y-8 text-left">
@@ -76,11 +74,8 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({ children }) => {
       <div className="flex-1 flex flex-col justify-center items-center p-6 sm:p-12 bg-muted dark:bg-[#111113]">
         <div className="w-full max-w-[400px]">
           {/* Mobile logo */}
-          <div className="lg:hidden flex items-center justify-center gap-2 mb-10 select-none">
-            <div className="w-8 h-8 bg-primary rounded-sm flex items-center justify-center">
-              <MessageSquare className="w-4 h-4 text-white" />
-            </div>
-            <span className="text-sm font-mono font-bold text-foreground tracking-widest uppercase">NEXUS</span>
+          <div className="lg:hidden flex items-center justify-center mb-10">
+            <HubNodeBrand size={26} />
           </div>
 
           <div className="bg-background p-8 rounded-sm border border-border shadow-none">

@@ -211,8 +211,8 @@ export default function FriendProfileSheet({
             <Sheet open={isOpen} onOpenChange={onClose}>
                 <SheetContent className="w-full sm:w-[400px] p-0 overflow-y-auto">
                     {/* Header with gradient background */}
-                    <div className="relative h-32 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500">
-                        <div className="absolute inset-0 bg-black/20" />
+                    <div className="relative h-32 bg-gradient-to-br from-accent-emerald to-accent-mint">
+                        <div className="absolute inset-0 bg-black/10" />
                     </div>
 
                     {/* Profile avatar */}
@@ -220,7 +220,7 @@ export default function FriendProfileSheet({
                         <div className="relative inline-block">
                             <Avatar className="h-28 w-28 ring-4 ring-white dark:ring-gray-800 shadow-xl">
                                 <AvatarImage src={getAvatarUrl(friend.avatar, friend.name)} alt={friend.name} />
-                                <AvatarFallback className="bg-gradient-to-br from-blue-400 to-blue-600 text-white text-2xl">
+                                <AvatarFallback className="bg-accent-dim text-accent-emerald text-2xl font-bold font-mono">
                                     {initials}
                                 </AvatarFallback>
                             </Avatar>

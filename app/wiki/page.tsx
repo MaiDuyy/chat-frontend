@@ -417,34 +417,6 @@ export default function WikiDashboard() {
               ))}
             </div>
 
-            {/* Interactive Visual Map Section */}
-            {wikiPages && wikiPages.length > 0 && (
-              <div className="border border-border bg-card p-3 rounded-lg shadow-sm flex flex-col gap-2">
-                <button 
-                  onClick={() => setShowMap(!showMap)}
-                  className="w-full flex items-center justify-between text-left focus:outline-none select-none cursor-pointer"
-                >
-                  <div className="flex items-center gap-2">
-                    <Compass className="w-4 h-4 text-primary shrink-0" />
-                    <span className="font-mono text-xs uppercase font-extrabold text-foreground">
-                      Bản đồ trực quan liên kết tri thức (Visual Map)
-                    </span>
-                    <span className="text-[9px] font-mono font-normal text-muted-foreground bg-muted px-1.5 py-0.5 rounded border border-border">
-                      {showMap ? "Click để thu gọn" : "Click để xem sơ đồ"}
-                    </span>
-                  </div>
-                  <span className="font-mono text-[9px] text-muted-foreground hidden sm:inline">
-                    Quy mô: {graphData.nodes.length} nút &bull; {graphData.edges.length} liên kết
-                  </span>
-                </button>
-                
-                {showMap && (
-                  <div className="w-full h-[240px] overflow-hidden rounded-lg border border-border bg-muted dark:bg-slate-950 mt-1 transition-all">
-                    <WikiGraph nodes={graphData.nodes} edges={graphData.edges} height={240} />
-                  </div>
-                )}
-              </div>
-            )}
 
             {/* Middle row: Compilation controller + Search controls */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 items-start">
@@ -522,7 +494,7 @@ export default function WikiDashboard() {
                           <Link
                             key={page.id}
                             href={`/wiki/${page.slug}`}
-                            className="border border-border bg-card hover:bg-muted/30 p-3 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between min-h-[110px] group"
+                            className="border border-border bg-card hover:bg-muted/30 p-3 rounded-lg shadow-sm hover:shadow-md hover:-translate-y-[1px] active:scale-[0.98] transition-all duration-200 flex flex-col justify-between min-h-[110px] group"
                           >
                             <div>
                               <div className="flex items-start justify-between gap-2 mb-1.5">

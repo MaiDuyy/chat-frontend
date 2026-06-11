@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import { HubNodeBrand } from '@/components/ui/hub-node-logo';
 
 const Footer: React.FC = () => {
     return (
@@ -9,8 +10,8 @@ const Footer: React.FC = () => {
             <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex flex-col md:flex-row items-center justify-between gap-6">
                     <div className="flex flex-col items-center md:items-start gap-2">
-                        <span className="text-xl font-bold text-foreground">NEXUS</span>
-                        <p className="text-sm text-muted-foreground font-medium">
+                        <HubNodeBrand size={20} />
+                        <p className="text-sm text-muted-foreground font-medium mt-1">
                             Giải pháp kết nối an toàn cho cá nhân và doanh nghiệp.
                         </p>
                     </div>

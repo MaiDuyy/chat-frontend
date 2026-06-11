@@ -68,7 +68,7 @@ export function AuthGuard({ children }: AuthGuardProps) {
     return (
       <div className="flex h-screen w-full items-center justify-center bg-muted dark:bg-slate-950">
         <div className="flex flex-col items-center gap-4">
-          <Loader2 className="h-8 w-8 animate-spin text-indigo-600" />
+          <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
           <p className="text-sm font-medium text-muted-foreground">Đang xác thực tài khoản...</p>
         </div>
       </div>
@@ -80,7 +80,7 @@ export function AuthGuard({ children }: AuthGuardProps) {
     return (
       <div className="flex h-screen w-full items-center justify-center bg-muted dark:bg-slate-950">
         <div className="flex flex-col items-center gap-4">
-          <Loader2 className="h-8 w-8 animate-spin text-indigo-600" />
+          <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
           <p className="text-sm font-medium text-muted-foreground">Chờ giây lát...</p>
         </div>
       </div>

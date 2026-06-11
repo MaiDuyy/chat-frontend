@@ -162,7 +162,7 @@ export function ChunkInspectorModal({
                                         : "text-muted-foreground hover:text-foreground"
                                 )}
                             >
-                                <Sparkles className="w-3 h-3 text-indigo-500" />
+                                <Sparkles className="w-3 h-3 text-emerald-500" />
                                 RAG Playground
                             </Button>
                         </div>
@@ -195,7 +195,7 @@ export function ChunkInspectorModal({
                                     </div>
                                 </div>
                                 <div className="bg-card border border-border rounded-lg p-2.5 flex items-center gap-2.5 shadow-sm">
-                                    <div className="p-2 rounded-md bg-indigo-50 dark:bg-indigo-950/20 text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-900/20">
+                                    <div className="p-2 rounded-md bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/20">
                                         <Cpu className="w-3.5 h-3.5" />
                                     </div>
                                     <div>

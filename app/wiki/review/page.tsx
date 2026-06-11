@@ -246,7 +246,7 @@ export default function WikiReviewConsole({ isEmbedded = false }: { isEmbedded?:
           <div className="flex items-center gap-2">
             <Link
               href="/wiki"
-              className="p-1.5 border border-border bg-secondary hover:bg-secondary/80 text-secondary-foreground transition-colors rounded-md shadow-sm active:scale-[0.98]"
+              className="p-1.5 border border-border bg-secondary hover:bg-secondary/90 text-secondary-foreground transition-all duration-200 rounded-md shadow-sm hover:shadow-md hover:-translate-y-[0.5px] active:scale-[0.98] select-none cursor-pointer"
               title="Quay lại"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
@@ -451,7 +451,7 @@ export default function WikiReviewConsole({ isEmbedded = false }: { isEmbedded?:
                       onBlur={() => {
                         if (!reviewerNote.trim()) setIsNoteExpanded(false);
                       }}
-                      className="w-full border border-border bg-background rounded-md p-2 text-xs font-sans focus:outline-none focus:ring-0 focus:border-primary"
+                      className="w-full border border-border bg-background rounded-md p-2 text-xs font-sans focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all duration-150"
                     />
                   </div>
 
@@ -459,21 +459,21 @@ export default function WikiReviewConsole({ isEmbedded = false }: { isEmbedded?:
                     <button
                       onClick={handleApprove}
                       disabled={isApproving || isRejecting || isRequesting}
-                      className="w-full py-1.5 bg-emerald-600 hover:bg-emerald-600/90 text-white transition-colors rounded-md shadow-sm active:scale-[0.98] disabled:opacity-50 uppercase font-medium"
+                      className="w-full py-1.5 bg-emerald-600 hover:bg-emerald-600/95 text-white transition-all duration-200 rounded-md shadow-sm hover:shadow-md hover:-translate-y-[0.5px] active:scale-[0.98] disabled:opacity-50 disabled:translate-y-0 disabled:shadow-sm uppercase font-semibold select-none cursor-pointer"
                     >
                       Duyệt & Xuất bản (A)
                     </button>
                     <button
                       onClick={handleRequestChanges}
                       disabled={isApproving || isRejecting || isRequesting}
-                      className="w-full py-1.5 bg-amber-500 hover:bg-amber-500/90 text-white transition-colors rounded-md shadow-sm active:scale-[0.98] disabled:opacity-50 uppercase font-medium"
+                      className="w-full py-1.5 bg-amber-500 hover:bg-amber-500/95 text-white transition-all duration-200 rounded-md shadow-sm hover:shadow-md hover:-translate-y-[0.5px] active:scale-[0.98] disabled:opacity-50 disabled:translate-y-0 disabled:shadow-sm uppercase font-semibold select-none cursor-pointer"
                     >
                       Yêu cầu sửa đổi (C)
                     </button>
                     <button
                       onClick={handleReject}
                       disabled={isApproving || isRejecting || isRequesting}
-                      className="w-full py-1.5 bg-rose-600 hover:bg-rose-600/90 text-white transition-colors rounded-md shadow-sm active:scale-[0.98] disabled:opacity-50 uppercase font-medium"
+                      className="w-full py-1.5 bg-rose-600 hover:bg-rose-600/95 text-white transition-all duration-200 rounded-md shadow-sm hover:shadow-md hover:-translate-y-[0.5px] active:scale-[0.98] disabled:opacity-50 disabled:translate-y-0 disabled:shadow-sm uppercase font-semibold select-none cursor-pointer"
                     >
                       Từ chối bản thảo (R)
                     </button>

@@ -176,7 +176,7 @@ export default function SettingsPage() {
                     //         <div className="relative">
                     //             <Avatar className="h-24 w-24 ring-4 ring-blue-100 dark:ring-blue-900">
                     //                 <AvatarImage src={avatarPreview || user?.avatar || undefined} />
-                    //                 <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white text-2xl">
+                    //                 <AvatarFallback className="bg-gradient-to-br from-blue-500 to-emerald-600 text-white text-2xl">
                     //                     {initials}
                     //                 </AvatarFallback>
                     //             </Avatar>
@@ -432,7 +432,7 @@ export default function SettingsPage() {
                             <div className="p-4 bg-muted dark:bg-gray-800 rounded-md">
                                 <p className="font-medium text-foreground mb-3">Màu chủ đề</p>
                                 <div className="flex gap-3">
-                                    {["bg-blue-500", "bg-purple-500", "bg-green-500", "bg-pink-500", "bg-orange-500"].map((color) => (
+                                    {["bg-blue-500", "bg-emerald-500", "bg-green-500", "bg-amber-500", "bg-orange-500"].map((color) => (
                                         <button
                                             key={color}
                                             className={`w-10 h-10 rounded-full ${color} ring-2 ring-offset-2 ring-transparent hover:ring-gray-400 transition-all`}

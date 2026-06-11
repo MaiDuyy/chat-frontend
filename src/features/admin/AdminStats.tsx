@@ -55,8 +55,8 @@ export function AdminStats() {
             title: 'Tổng tin nhắn',
             value: formatNumber(data.totalMessages),
             icon: MessageSquare,
-            iconClass: 'text-indigo-600 dark:text-indigo-400',
-            bgClass: 'bg-indigo-50 dark:bg-indigo-950/30',
+            iconClass: 'text-cyan-600 dark:text-cyan-400',
+            bgClass: 'bg-cyan-50 dark:bg-cyan-950/30',
         },
         {
             title: 'Đoạn chat',

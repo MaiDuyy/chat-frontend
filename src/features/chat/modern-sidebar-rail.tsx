@@ -142,7 +142,7 @@ const WsIcon: React.FC<WsIconProps> = ({ name, icon, active, badge, onClick, dep
         <TooltipTrigger asChild>
           <button
             onClick={onClick}
-            className="relative flex items-center justify-center cursor-pointer group"
+            className="relative flex items-center justify-center cursor-pointer group active:scale-[0.93] transition-transform duration-100"
             aria-label={name}
           >
             {/* Active pill indicator */}

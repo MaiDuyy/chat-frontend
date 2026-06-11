@@ -216,7 +216,7 @@ function InvitePageContent() {
 
   return renderWrapper(
     <Card className="w-full max-w-[500px] shadow-2xl border border-border bg-background overflow-hidden rounded-sm animate-in fade-in duration-500">
-      <div className="h-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-teal-500 w-full" />
+      <div className="h-1 bg-gradient-to-r from-blue-500 via-cyan-500 to-teal-500 w-full" />
 
       <CardHeader className="text-center pb-4 pt-6">
         <div className="mx-auto w-16 h-16 relative mb-4">

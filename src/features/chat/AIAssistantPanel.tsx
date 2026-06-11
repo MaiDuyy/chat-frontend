@@ -164,7 +164,7 @@ export function AIAssistantPanel({ chatId, initialQuery, onClose }: AIAssistantP
       <div className={cn(
         'sticky top-0 z-20 flex items-center justify-between px-5 py-4 border-b backdrop-blur-md transition-all duration-500',
         agentMode
-          ? 'bg-amber-50/80 border-amber-100/50'
+          ? 'bg-amber-50/80 dark:bg-amber-950/20 border-amber-100/50 dark:border-amber-900/30'
           : 'bg-background/80 border-border'
       )}>
         <div className="flex items-center gap-3">
@@ -172,9 +172,9 @@ export function AIAssistantPanel({ chatId, initialQuery, onClose }: AIAssistantP
             'w-9 h-9 rounded-md flex items-center justify-center shadow-lg transition-transform duration-300 hover:scale-105',
             agentMode
               ? 'bg-gradient-to-br from-amber-400 to-orange-500 shadow-amber-200/50'
-              : 'bg-gradient-to-br from-blue-600 to-blue-700 shadow-blue-500/20'
+              : 'bg-gradient-to-br from-accent-emerald to-accent-mint shadow-emerald-500/20'
           )}>
-            {agentMode ? <Zap size={18} className="text-white" /> : <Sparkles size={18} className="text-white" />}
+            {agentMode ? <Zap size={18} className="text-white" /> : <Sparkles size={18} className="text-slate-950" />}
           </div>
           <div>
             <h3 className="text-sm font-bold text-foreground tracking-tight leading-none mb-1">
@@ -194,10 +194,9 @@ export function AIAssistantPanel({ chatId, initialQuery, onClose }: AIAssistantP
           <button
             onClick={() => setView(v => v === 'chat' ? 'history' : 'chat')}
             className={cn(
-              'flex items-center justify-center w-8 h-8 rounded-md transition-all duration-300 border shadow-sm',
               view === 'history'
                 ? 'bg-primary border-primary text-primary-foreground shadow-sm'
-                : 'bg-white border-border text-muted-foreground hover:border-primary hover:text-primary'
+                : 'bg-background hover:bg-muted border-border text-muted-foreground hover:text-foreground'
             )}
             title={view === 'chat' ? 'Xem lịch sử hội thoại' : 'Quay lại Chat'}
           >
@@ -212,7 +211,7 @@ export function AIAssistantPanel({ chatId, initialQuery, onClose }: AIAssistantP
                 'group relative flex items-center justify-center w-8 h-8 rounded-md transition-all duration-300 border shadow-sm',
                 agentMode
                   ? 'bg-amber-500 border-amber-400 text-white shadow-amber-100'
-                  : 'bg-white border-border text-muted-foreground hover:border-amber-300 hover:text-amber-500'
+                  : 'bg-background hover:bg-muted border-border text-muted-foreground hover:text-amber-500'
               )}
               title={agentMode ? 'Chuyển về chế độ RAG' : 'Bật Chế độ Agent (Tool Calling)'}
             >
@@ -317,9 +316,9 @@ export function AIAssistantPanel({ chatId, initialQuery, onClose }: AIAssistantP
                     <button
                       key={conv.id}
                       onClick={() => setView('chat')}
-                      className="w-full flex items-center gap-3 p-3 rounded-md bg-white border border-border hover:border-primary/50 hover:bg-muted transition-all duration-200 group text-left shadow-sm"
+                      className="w-full flex items-center gap-3 p-3 rounded-md bg-background border border-border hover:border-primary/50 hover:bg-muted transition-all duration-200 group text-left shadow-sm"
                     >
-                      <div className="w-8 h-8 rounded-md bg-muted flex items-center justify-center shrink-0 group-hover:bg-white transition-colors">
+                      <div className="w-8 h-8 rounded-md bg-muted flex items-center justify-center shrink-0 group-hover:bg-background transition-colors">
                         <MessageSquare size={14} className="text-muted-foreground group-hover:text-primary" />
                       </div>
                       <div className="flex-1 min-w-0">
@@ -351,7 +350,7 @@ export function AIAssistantPanel({ chatId, initialQuery, onClose }: AIAssistantP
       )}
 
       {/* Refined Input Area */}
-      <div className="p-5 bg-white border-t border-border shadow-[0_-10px_20px_-15px_rgba(0,0,0,0.05)]">
+      <div className="p-5 bg-background border-t border-border shadow-[0_-10px_20px_-15px_rgba(0,0,0,0.05)]">
         <div className="relative group transition-all duration-300">
           <Textarea
             ref={textareaRef}
@@ -359,7 +358,7 @@ export function AIAssistantPanel({ chatId, initialQuery, onClose }: AIAssistantP
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={agentMode ? 'Yêu cầu agent thực hiện...' : 'Hỏi về tài liệu nội bộ...'}
-            className="min-h-[50px] max-h-[140px] w-full bg-muted/50 border-border rounded-md py-3.5 pl-4 pr-12 text-sm font-medium placeholder:text-muted-foreground focus:bg-white focus:ring-4 focus:ring-primary/20 focus:border-primary transition-all duration-300 resize-none custom-scrollbar"
+            className="min-h-[50px] max-h-[140px] w-full bg-muted/50 border-border rounded-md py-3.5 pl-4 pr-12 text-sm font-medium placeholder:text-muted-foreground focus:bg-background focus:ring-4 focus:ring-primary/20 focus:border-primary transition-all duration-300 resize-none custom-scrollbar"
             disabled={isStreaming}
             rows={1}
           />
@@ -370,7 +369,7 @@ export function AIAssistantPanel({ chatId, initialQuery, onClose }: AIAssistantP
                 'h-9 w-9 rounded-md shadow-lg transition-all duration-300 transform active:scale-95',
                 agentMode
                   ? 'bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 shadow-amber-200/50'
-                  : 'bg-gradient-to-br bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm'
+                  : 'bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm'
               )}
               onClick={handleSend}
               disabled={!inputValue.trim() || isStreaming}

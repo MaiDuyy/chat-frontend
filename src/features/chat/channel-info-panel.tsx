@@ -296,7 +296,7 @@ export const ChannelInfoPanel: React.FC<ChannelInfoPanelProps> = ({
                           <Badge variant="secondary" className="rounded-sm shadow-none border border-blue-200/40 bg-blue-50/50 text-blue-700 dark:bg-blue-950/20 dark:text-blue-500 dark:border-blue-900/20 font-mono text-[9px] uppercase tracking-wider font-bold">Mặc định</Badge>
                         )}
                         {channel?.isReadOnly && (
-                          <Badge variant="secondary" className="rounded-sm shadow-none border border-indigo-200/40 bg-indigo-50/50 text-indigo-700 dark:bg-indigo-950/20 dark:text-indigo-500 dark:border-indigo-900/20 font-mono text-[9px] uppercase tracking-wider font-bold">Chỉ đọc</Badge>
+                          <Badge variant="secondary" className="rounded-sm shadow-none border border-emerald-200/40 bg-emerald-50/50 text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-500 dark:border-emerald-900/20 font-mono text-[9px] uppercase tracking-wider font-bold">Chỉ đọc</Badge>
                         )}
                       </div>
 
