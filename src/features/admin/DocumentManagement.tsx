@@ -12,8 +12,8 @@ import {
 } from '@/src/redux/feature/knowledgeApi';
 import { useCompileDocumentMutation } from '@/src/redux/feature/mrpApi';
 import { useGetUserWorkspacesQuery } from '@/src/redux/feature/workspaceApi';
-import { useListDepartmentsQuery } from '@/src/redux/feature/departmentApi';
 import { MarkdownEditorModal } from '@/src/features/knowledge/MarkdownEditorModal';
+import { DocumentMetadataModal } from '@/src/features/knowledge/DocumentMetadataModal';
 import { ChunkInspectorModal } from './ChunkInspectorModal';
 import {
     Table,
@@ -58,6 +58,7 @@ import {
     Building2,
     Globe,
     X,
+    Lock,
 } from 'lucide-react';
 import { format, formatDistanceToNow } from 'date-fns';
 import { vi } from 'date-fns/locale';
@@ -68,7 +69,7 @@ import { WikiPagination } from '@/app/wiki/components/WikiPagination';
 
 const statusConfig = {
     PENDING: { icon: Clock, color: 'bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-400 border border-amber-250/30 dark:border-amber-900/30', label: 'Pending' },
-    PREVIEW: { icon: Eye, color: 'bg-indigo-50 dark:bg-indigo-950/20 text-indigo-700 dark:text-indigo-400 border border-indigo-250/30 dark:border-indigo-900/30', label: 'Chờ duyệt' },
+    PREVIEW: { icon: Eye, color: 'bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400 border border-emerald-250/30 dark:border-emerald-900/30', label: 'Chờ duyệt' },
     PROCESSING: { icon: Loader2, color: 'bg-blue-50 dark:bg-blue-950/20 text-blue-700 dark:text-blue-400 border border-blue-250/30 dark:border-blue-900/30', label: 'Processing' },
     COMPLETED: { icon: CheckCircle, color: 'bg-green-50 dark:bg-green-950/20 text-green-700 dark:text-green-400 border border-green-250/30 dark:border-green-900/30', label: 'Completed' },
     FAILED: { icon: AlertCircle, color: 'bg-rose-50 dark:bg-rose-950/20 text-rose-700 dark:text-rose-400 border border-rose-250/30 dark:border-rose-900/30', label: 'Failed' },
@@ -128,6 +129,9 @@ export function DocumentManagement() {
     const [editingDoc, setEditingDoc] = useState<Document | null>(null);
     const [chunkInspectorOpen, setChunkInspectorOpen] = useState(false);
     const [inspectingDoc, setInspectingDoc] = useState<Document | null>(null);
+    const [metadataOpen, setMetadataOpen] = useState(false);
+    const [metadataDoc, setMetadataDoc] = useState<Document | null>(null);
+    const [uploadPendingFile, setUploadPendingFile] = useState<File | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleStartMRP = async (doc: Document) => {
@@ -214,16 +218,36 @@ export function DocumentManagement() {
         fileInputRef.current?.click();
     };
 
-    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
 
+        setUploadPendingFile(file);
+        setMetadataDoc(null);
+        setMetadataOpen(true);
+    };
+
+    const handleMetadataConfirm = async (meta: {
+        securityClassification: 'PUBLIC' | 'INTERNAL' | 'CONFIDENTIAL' | 'RESTRICTED';
+        departmentId: string;
+        allowedRoles: string;
+    }) => {
+        if (!uploadPendingFile) return;
+
         const formData = new FormData();
-        formData.append('file', file);
+        formData.append('file', uploadPendingFile);
 
         const targetUploadWorkspaceId = (workspaceIdForQuery && workspaceIdForQuery !== 'all') ? workspaceIdForQuery : (currentWorkspaceId || 'default-workspace');
         try {
-            const result = await uploadDocument({ formData, preview: previewMode, parser: parserMethod, workspaceId: targetUploadWorkspaceId }).unwrap();
+            const result = await uploadDocument({
+                formData,
+                preview: previewMode,
+                parser: parserMethod,
+                workspaceId: targetUploadWorkspaceId,
+                departmentId: meta.departmentId,
+                allowedRoles: meta.allowedRoles,
+                securityClassification: meta.securityClassification
+            }).unwrap();
             toast.success(`Tải lên thành công: ${result.fileName}`);
             
             if (previewMode && result.markdownContent) {
@@ -235,11 +259,12 @@ export function DocumentManagement() {
                 } as any);
                 setEditorOpen(true);
             }
-            // Reset input
-            if (fileInputRef.current) fileInputRef.current.value = '';
         } catch (error: any) {
             console.error('Upload error:', error);
             toast.error(error.data?.message || 'Lỗi khi tải lên tài liệu');
+        } finally {
+            setUploadPendingFile(null);
+            if (fileInputRef.current) fileInputRef.current.value = '';
         }
     };
 
@@ -298,7 +323,7 @@ export function DocumentManagement() {
                                     : 'border-border bg-background text-muted-foreground hover:bg-accent'
                             }`}
                         >
-                            <Database className="w-3 h-3 text-indigo-505" /> Không gian mặc định
+                            <Database className="w-3 h-3 text-emerald-500" /> Không gian mặc định
                         </button>
 
                         {/* Department Workspaces */}
@@ -358,7 +383,7 @@ export function DocumentManagement() {
                                     : "text-muted-foreground hover:text-foreground"
                             )}
                         >
-                            <Sparkles className="w-3 h-3 text-indigo-500" />
+                            <Sparkles className="w-3 h-3 text-emerald-500" />
                             <span>Gemini AI</span>
                         </button>
                         <button
@@ -447,7 +472,7 @@ export function DocumentManagement() {
                                                                 "text-[8px] font-bold px-1 py-0.2 rounded uppercase tracking-wider border flex items-center gap-0.5",
                                                                 doc.parserMethod === 'tika'
                                                                     ? "bg-sky-50 dark:bg-sky-950/20 text-sky-650 dark:text-sky-400 border-sky-100 dark:border-sky-900/30"
-                                                                    : "bg-indigo-50 dark:bg-indigo-950/20 text-indigo-650 dark:text-indigo-400 border-indigo-100 dark:border-indigo-900/30"
+                                                                    : "bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 border-emerald-100 dark:border-emerald-900/30"
                                                             )}>
                                                                 {doc.parserMethod === 'tika' ? (
                                                                     <>
@@ -456,7 +481,7 @@ export function DocumentManagement() {
                                                                     </>
                                                                 ) : (
                                                                     <>
-                                                                        <Sparkles className="w-2 h-2 text-indigo-500" />
+                                                                        <Sparkles className="w-2 h-2 text-emerald-500" />
                                                                         Gemini AI
                                                                     </>
                                                                 )}
@@ -469,9 +494,17 @@ export function DocumentManagement() {
                                                 {formatFileSize(doc.fileSize)}
                                             </TableCell>
                                             <TableCell className="py-1.5">
-                                                <Badge variant="outline" className="rounded-md text-[9px] font-bold uppercase tracking-tight bg-muted dark:bg-slate-800/40 border-border px-1.5 py-0.5">
-                                                    {doc.securityClassification || 'INTERNAL'}
-                                                </Badge>
+                                                <div className="flex flex-col gap-0.5">
+                                                    <Badge variant="outline" className="rounded-md text-[9px] font-bold uppercase tracking-tight bg-muted dark:bg-slate-800/40 border-border px-1.5 py-0.5 w-fit">
+                                                        {doc.securityClassification || 'INTERNAL'}
+                                                    </Badge>
+                                                    {doc.departmentId && (
+                                                        <span className="text-[8px] font-bold text-blue-550 dark:text-blue-400 flex items-center gap-0.5 mt-0.5">
+                                                            <Building2 className="w-2.5 h-2.5" />
+                                                            {departments.find((d: any) => d.id === doc.departmentId)?.name || 'Phòng ban'} ({doc.allowedRoles || 'ALL'})
+                                                        </span>
+                                                    )}
+                                                </div>
                                             </TableCell>
                                             <TableCell className="py-1.5">
                                                 <Badge className={cn('rounded-md text-[9px] font-bold px-2 py-0.5 shadow-sm', status.color)}>
@@ -492,7 +525,7 @@ export function DocumentManagement() {
                                                                 setEditingDoc(doc);
                                                                 setEditorOpen(true);
                                                             }}
-                                                            className="rounded-md h-7 text-[10px] font-semibold text-primary hover:text-primary border-indigo-200 dark:border-indigo-900 bg-indigo-50/30 dark:bg-indigo-950/20 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 transition-all shadow-sm"
+                                                            className="rounded-md h-7 text-[10px] font-semibold text-primary hover:text-primary border-emerald-200 dark:border-emerald-900 bg-emerald-50/30 dark:bg-emerald-950/20 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 transition-all shadow-sm"
                                                         >
                                                             <Eye className="w-3.5 h-3.5 mr-1" /> Duyệt & Lưu
                                                         </Button>
@@ -534,7 +567,7 @@ export function DocumentManagement() {
                                                                         setEditingDoc(doc);
                                                                         setEditorOpen(true);
                                                                     }} 
-                                                                    className="rounded-md text-xs gap-1.5 cursor-pointer text-indigo-650 dark:text-indigo-400 focus:text-indigo-650"
+                                                                    className="rounded-md text-xs gap-1.5 cursor-pointer text-emerald-600 dark:text-emerald-450 focus:text-emerald-600"
                                                                 >
                                                                     <Eye className="w-3.5 h-3.5" />
                                                                     Biên tập & Duyệt
@@ -568,6 +601,16 @@ export function DocumentManagement() {
                                                                     Duyệt tài liệu
                                                                 </DropdownMenuItem>
                                                             )}
+                                                            <DropdownMenuItem 
+                                                                onClick={() => {
+                                                                    setMetadataDoc(doc);
+                                                                    setMetadataOpen(true);
+                                                                }}
+                                                                className="rounded-md text-xs gap-1.5 cursor-pointer text-blue-650 dark:text-blue-400 focus:text-blue-600 dark:focus:text-blue-450 font-semibold"
+                                                            >
+                                                                <Lock className="w-3.5 h-3.5" />
+                                                                Phân quyền tài liệu
+                                                            </DropdownMenuItem>
                                                             <DropdownMenuItem className="rounded-md text-xs gap-1.5 cursor-pointer">
                                                                 <Download className="w-3.5 h-3.5" />
                                                                 Tải về
@@ -612,6 +655,18 @@ export function DocumentManagement() {
                 documentId={editingDoc?.id || 0}
                 fileName={editingDoc?.fileName || ''}
                 onSuccess={() => refetch()}
+            />
+
+            <DocumentMetadataModal
+                isOpen={metadataOpen}
+                onClose={() => {
+                    setMetadataOpen(false);
+                    setMetadataDoc(null);
+                    setUploadPendingFile(null);
+                    if (fileInputRef.current) fileInputRef.current.value = '';
+                }}
+                document={metadataDoc}
+                onConfirm={handleMetadataConfirm}
             />
 
             <ChunkInspectorModal
