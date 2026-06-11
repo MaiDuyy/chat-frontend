@@ -60,7 +60,7 @@ export function AuditBanner({
     return (
         <div
             className={cn(
-                'flex items-start gap-3 p-4 rounded-lg border',
+                'flex items-start gap-3 p-4 rounded-md border',
                 style.bg,
                 style.border,
                 className

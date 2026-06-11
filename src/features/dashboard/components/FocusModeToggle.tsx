@@ -15,7 +15,7 @@ export const FocusModeToggle: React.FC<FocusModeToggleProps> = ({ isFocusMode, o
         border overflow-hidden rounded-sm
         ${isFocusMode 
           ? 'border-[#ccff00] bg-[#ccff00]/10 text-[#ccff00] shadow-[0_0_15px_#ccff0020]' 
-          : 'border-zinc-800 bg-zinc-900 text-zinc-400 hover:text-zinc-200 hover:border-zinc-700'
+          : 'border-border bg-muted text-muted-foreground hover:text-foreground hover:border-border'
         }
       `}
     >

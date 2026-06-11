@@ -154,7 +154,7 @@ export function WikiAiCheckPanel({ content, title, slug, wikiPages }: WikiAiChec
   }, []);
 
   return (
-    <div className="border border-border bg-card text-card-foreground rounded-xl p-3 flex flex-col gap-3 font-sans shadow-sm transition-colors duration-200">
+    <div className="border border-border bg-card text-card-foreground rounded-lg p-3 flex flex-col gap-3 font-sans shadow-sm transition-colors duration-200">
       <div className="flex items-center justify-between border-b border-border pb-2">
         <div className="flex items-center gap-2">
           {hasErrors ? (
@@ -171,7 +171,7 @@ export function WikiAiCheckPanel({ content, title, slug, wikiPages }: WikiAiChec
         <button
           onClick={triggerScan}
           disabled={isScanning}
-          className="flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-mono uppercase tracking-wide bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-200 disabled:opacity-50 rounded-lg shadow-sm active:scale-[0.98]"
+          className="flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-mono uppercase tracking-wide bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-200 disabled:opacity-50 rounded-md shadow-sm active:scale-[0.98]"
         >
           <RefreshCw className={`w-3 h-3 ${isScanning ? "animate-spin" : ""}`} />
           {isScanning ? "Đang quét..." : "Quét lại"}
@@ -182,7 +182,7 @@ export function WikiAiCheckPanel({ content, title, slug, wikiPages }: WikiAiChec
         {checks.map((chk, idx) => (
           <div
             key={idx}
-            className={`border border-border p-2.5 rounded-lg flex items-start gap-2.5 transition-colors ${
+            className={`border border-border p-2.5 rounded-md flex items-start gap-2.5 transition-colors ${
               chk.status === "success"
                 ? "bg-emerald-500/5 hover:bg-emerald-500/10"
                 : chk.status === "error"

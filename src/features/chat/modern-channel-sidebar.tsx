@@ -51,7 +51,7 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useGetChatsQuery, useGetWorkspaceUnreadCountsQuery } from '@/src/redux/feature/chatApi';
 import { Chat } from '@/src/type/chat.types';
@@ -109,17 +109,17 @@ const CreateChannelModal: React.FC<CreateChannelModalProps> = ({ open, onClose, 
 
   return (
     <Dialog open={open} onOpenChange={(v) => { if (!v) { setName(''); onClose(); } }}>
-      <DialogContent className="max-w-md rounded-[2px] border border-slate-200/80 dark:border-white/[0.06] bg-white dark:bg-[#19191B]">
+      <DialogContent className="max-w-md rounded-md border border-border bg-background text-foreground">
         <DialogHeader className="font-mono">
-          <DialogTitle className="text-sm font-bold uppercase tracking-wider text-slate-900 dark:text-slate-100">Tạo kênh mới</DialogTitle>
-          <DialogDescription className="text-xs text-slate-500 dark:text-zinc-400">
+          <DialogTitle className="text-sm font-bold uppercase tracking-wider text-foreground">Tạo kênh mới</DialogTitle>
+          <DialogDescription className="text-xs text-muted-foreground">
             Kênh là nơi nhóm thảo luận xung quanh một chủ đề cụ thể.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Channel type selector */}
           <div className="space-y-1.5 font-mono">
-            <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Loại kênh</label>
+            <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Loại kênh</label>
             <div className="flex gap-1.5">
               {CHANNEL_TYPES.map((t) => (
                 <button
@@ -127,10 +127,10 @@ const CreateChannelModal: React.FC<CreateChannelModalProps> = ({ open, onClose, 
                   type="button"
                   onClick={() => setType(t.value)}
                   className={`
-                    flex-1 flex items-center justify-center gap-1.5 py-2 rounded-[2px] border text-xs font-bold transition-all duration-150
+                    flex-1 flex items-center justify-center gap-1.5 py-2 rounded-sidebar-item border text-xs font-bold transition-all duration-150
                     ${type === t.value
                       ? 'border-blue-600 bg-blue-50/50 text-blue-700 dark:bg-blue-950/20 dark:text-blue-300 dark:border-blue-900/30'
-                      : 'border-slate-200 dark:border-white/[0.06] text-slate-500 dark:text-zinc-400 hover:border-slate-350 dark:hover:border-white/[0.1] bg-transparent'
+                      : 'border-border text-muted-foreground hover:border-sidebar-border hover:bg-sidebar-item-hover bg-transparent'
                     }
                   `}
                 >
@@ -139,7 +139,7 @@ const CreateChannelModal: React.FC<CreateChannelModalProps> = ({ open, onClose, 
                 </button>
               ))}
             </div>
-            <p className="text-[10px] text-slate-450 dark:text-zinc-550 leading-relaxed">
+            <p className="text-[10px] text-muted-foreground leading-relaxed">
               {type === 'PUBLIC' && 'Mọi thành viên workspace có thể tìm thấy và tham gia.'}
               {type === 'PRIVATE' && 'Chỉ người được mời mới thấy và tham gia kênh này.'}
               {type === 'ANNOUNCEMENT' && 'Chỉ Owner mới đăng được. Dùng cho thông báo chính thức.'}
@@ -148,14 +148,14 @@ const CreateChannelModal: React.FC<CreateChannelModalProps> = ({ open, onClose, 
 
           {/* Channel name */}
           <div className="space-y-1.5 font-mono">
-            <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Tên kênh</label>
+            <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Tên kênh</label>
             <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">#</span>
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">#</span>
               <Input
                 placeholder="ví-dụ-tên-kênh"
                 value={name}
                 onChange={(e) => setName(e.target.value.toLowerCase().replace(/\s+/g, '-'))}
-                className="pl-7 h-8 text-xs rounded-[2px] font-mono border-slate-200/80 dark:border-white/[0.06] bg-transparent text-slate-900 dark:text-slate-100"
+                className="pl-7 h-8 text-xs rounded-sidebar-item font-mono border-border bg-transparent text-foreground"
                 autoFocus
                 required
               />
@@ -164,18 +164,18 @@ const CreateChannelModal: React.FC<CreateChannelModalProps> = ({ open, onClose, 
 
           {/* Description */}
           <div className="space-y-1.5 font-mono">
-            <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Mô tả (tùy chọn)</label>
+            <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Mô tả (tùy chọn)</label>
             <Input
               placeholder="Kênh này dùng để..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="h-8 text-xs rounded-[2px] font-mono border-slate-200/80 dark:border-white/[0.06] bg-transparent text-slate-900 dark:text-slate-100"
+              className="h-8 text-xs rounded-sidebar-item font-mono border-border bg-transparent text-foreground"
             />
           </div>
 
           <div className="flex justify-end gap-2 pt-1 font-mono">
-            <Button type="button" variant="outline" size="sm" onClick={onClose} className="h-8 text-xs rounded-[2px] border-slate-250 dark:border-white/[0.06] hover:bg-slate-50 dark:hover:bg-white/[0.02]">Hủy</Button>
-            <Button type="submit" size="sm" disabled={isLoading || !name.trim()} className="h-8 text-xs gap-1.5 rounded-[2px] bg-slate-900 hover:bg-slate-800 text-white dark:bg-slate-100 dark:hover:bg-slate-200 dark:text-slate-900 font-bold border border-transparent shadow-none">
+            <Button type="button" variant="outline" size="sm" onClick={onClose} className="h-8 text-xs rounded-sidebar-item border-border hover:bg-sidebar-item-hover">Hủy</Button>
+            <Button type="submit" size="sm" disabled={isLoading || !name.trim()} className="h-8 text-xs gap-1.5 rounded-sidebar-item bg-primary hover:bg-primary/90 text-primary-foreground font-bold border border-transparent shadow-none">
               {isLoading ? <Loader2 size={13} className="animate-spin" /> : <Plus size={13} />}
               Tạo kênh
             </Button>
@@ -216,57 +216,57 @@ const BrowseChannelsModal: React.FC<BrowseChannelsModalProps> = ({ open, onClose
 
   return (
     <Dialog open={open} onOpenChange={(v) => { if (!v) onClose(); }}>
-      <DialogContent className="max-w-lg rounded-[2px] border border-slate-200/80 dark:border-white/[0.06] bg-white dark:bg-[#19191B]">
+      <DialogContent className="max-w-lg rounded-md border border-border bg-background text-foreground">
         <DialogHeader className="font-mono">
-          <DialogTitle className="text-sm font-bold uppercase tracking-wider text-slate-900 dark:text-slate-100">Khám phá kênh</DialogTitle>
-          <DialogDescription className="text-xs text-slate-500 dark:text-zinc-400">
+          <DialogTitle className="text-sm font-bold uppercase tracking-wider text-foreground">Khám phá kênh</DialogTitle>
+          <DialogDescription className="text-xs text-muted-foreground">
             Tìm và tham gia các kênh công khai trong workspace này.
           </DialogDescription>
         </DialogHeader>
         <div className="relative mb-3">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 dark:text-zinc-500" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
           <Input
             placeholder="Tìm kênh..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-8 h-8 text-xs rounded-[2px] font-mono border-slate-200/80 dark:border-white/[0.06] bg-transparent text-slate-900 dark:text-slate-100"
+            className="pl-8 h-8 text-xs rounded-sidebar-item font-mono border-border bg-transparent text-foreground"
             autoFocus
           />
           {search && (
-            <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:text-zinc-500 dark:hover:text-zinc-300 cursor-pointer">
+            <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-muted-foreground dark:text-muted-foreground dark:hover:text-muted-foreground cursor-pointer">
               <X className="w-3.5 h-3.5" />
             </button>
           )}
         </div>
 
         <div className="overflow-y-auto max-h-72 space-y-0.5 no-scrollbar">
-          {isLoading && <p className="text-center text-xs text-slate-400 py-6 font-mono">Đang tải...</p>}
+          {isLoading && <p className="text-center text-xs text-muted-foreground py-6 font-mono">Đang tải...</p>}
           {!isLoading && (!data?.channels || data.channels.length === 0) && (
-            <p className="text-center text-xs text-slate-400 py-6 font-mono">Không tìm thấy kênh nào.</p>
+            <p className="text-center text-xs text-muted-foreground py-6 font-mono">Không tìm thấy kênh nào.</p>
           )}
           {data?.channels?.map((ch: any) => {
             const isMember = ch.isJoined ?? myChannelIds.has(ch.id);
             return (
-              <div key={ch.id} className="flex items-center justify-between gap-3 p-2 rounded-[2px] hover:bg-slate-50/50 dark:hover:bg-white/[0.01] transition-colors cursor-pointer border border-transparent hover:border-slate-100 dark:hover:border-white/[0.02]">
+              <div key={ch.id} className="flex items-center justify-between gap-3 p-2 rounded-sidebar-item hover:bg-sidebar-item-hover transition-colors cursor-pointer border border-transparent hover:border-sidebar-border">
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <div className="w-7 h-7 rounded-[2px] bg-slate-100 dark:bg-zinc-800/40 border border-slate-200/50 dark:border-white/[0.04] flex items-center justify-center shrink-0">
-                    <Hash className="w-3.5 h-3.5 text-slate-550 dark:text-zinc-450" />
+                  <div className="w-7 h-7 rounded-sidebar-item bg-sidebar-item-hover border border-sidebar-border flex items-center justify-center shrink-0">
+                    <Hash className="w-3.5 h-3.5 text-muted-foreground" />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">#{ch.name}</p>
-                    {ch.description && <p className="text-[10px] font-mono text-slate-450 dark:text-zinc-550 truncate">{ch.description}</p>}
-                    <p className="text-[9px] font-mono text-slate-400 dark:text-zinc-555">{ch.memberCount ?? ch._count?.members ?? 0} thành viên</p>
+                    <p className="text-xs font-bold text-foreground truncate">#{ch.name}</p>
+                    {ch.description && <p className="text-[10px] font-mono text-muted-foreground truncate">{ch.description}</p>}
+                    <p className="text-[9px] font-mono text-muted-foreground">{ch.memberCount ?? ch._count?.members ?? 0} thành viên</p>
                   </div>
                 </div>
                 {isMember ? (
-                  <Badge variant="secondary" className="text-[9px] font-mono shrink-0 rounded-[2px] bg-slate-100 dark:bg-zinc-800 text-slate-650 dark:text-zinc-350 border border-slate-200/60 dark:border-white/[0.04]">Đã tham gia</Badge>
+                  <Badge variant="secondary" className="text-[9px] font-mono shrink-0 rounded-sidebar-item bg-sidebar-item-hover text-muted-foreground border border-sidebar-border">Đã tham gia</Badge>
                 ) : (
                   <div className="flex gap-1.5 shrink-0">
                     {isAdmin && (
                       <Button
                         size="sm"
                         variant="secondary"
-                        className="h-6 text-[10px] font-mono rounded-[2px] px-2.5 border-slate-250 dark:border-white/[0.06] hover:bg-slate-50 dark:hover:bg-white/[0.02]"
+                        className="h-6 text-[10px] font-mono rounded-sidebar-item px-2.5 border-sidebar-border hover:bg-sidebar-item-hover"
                         onClick={() => {
                           router.push(`/chat/${ch.id}`);
                           onClose();
@@ -278,7 +278,7 @@ const BrowseChannelsModal: React.FC<BrowseChannelsModalProps> = ({ open, onClose
                     <Button
                       size="sm"
                       variant="outline"
-                      className="h-6 text-[10px] font-mono rounded-[2px] px-2.5 border-slate-250 dark:border-white/[0.06] hover:bg-slate-50 dark:hover:bg-white/[0.02]"
+                      className="h-6 text-[10px] font-mono rounded-sidebar-item px-2.5 border-sidebar-border hover:bg-sidebar-item-hover"
                       onClick={() => handleJoin(ch.id, ch.name)}
                       disabled={joining}
                     >
@@ -312,13 +312,13 @@ const ChannelRow: React.FC<ChannelRowProps> = ({ channel, active, unreadCount, o
   return (
     <div
       className={`
-        group flex items-center justify-between px-1.5 py-[5px] rounded-[2px] border border-transparent cursor-pointer
+        group flex items-center justify-between px-1.5 py-[5px] rounded-sidebar-item border border-transparent cursor-pointer
         transition-all duration-100 text-xs select-none
         ${active
-          ? 'bg-blue-600/15 border-blue-200/10 text-blue-700 dark:text-blue-300'
+          ? 'bg-sidebar-item-active text-sidebar-foreground font-bold'
           : hasUnread
-            ? 'text-slate-900 dark:text-slate-100 hover:bg-slate-200/50 dark:hover:bg-white/[0.02]'
-            : 'text-slate-650 dark:text-zinc-400 hover:bg-slate-200/50 dark:hover:bg-white/[0.02] hover:text-slate-900 dark:hover:text-slate-200'
+            ? 'text-foreground hover:bg-sidebar-item-hover font-semibold'
+            : 'text-muted-foreground hover:bg-sidebar-item-hover hover:text-foreground'
         }
       `}
     >
@@ -326,16 +326,16 @@ const ChannelRow: React.FC<ChannelRowProps> = ({ channel, active, unreadCount, o
         <ChannelIcon
           size={14}
           strokeWidth={1.5}
-          className={`shrink-0 ${active ? 'text-blue-600 dark:text-blue-400' : hasUnread ? 'text-slate-700 dark:text-slate-300' : 'text-slate-400 dark:text-zinc-500'}`}
+          className={`shrink-0 ${active ? 'text-sidebar-foreground' : hasUnread ? 'text-foreground' : 'text-muted-foreground'}`}
         />
         <span className={`truncate ${active || hasUnread ? 'font-bold' : 'font-medium'}`}>
           {channel.name}
           {channel.isMember === false && (
-            <span className="ml-1.5 text-[8px] font-bold uppercase tracking-wider text-slate-400 dark:text-zinc-550 border border-slate-200/60 dark:border-white/[0.04] bg-slate-100 dark:bg-zinc-800 px-1 rounded-[2px]">Xem</span>
+            <span className="ml-1.5 text-[8px] font-bold uppercase tracking-wider text-muted-foreground border border-sidebar-border bg-sidebar-item-hover px-1 rounded-sidebar-item">Xem</span>
           )}
         </span>
         {hasUnread && (
-          <span className="ml-auto bg-blue-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-[2px] leading-none shrink-0 font-mono">
+          <span className="ml-auto bg-primary text-white text-[9px] font-bold px-1.5 py-0.5 rounded-sidebar-item leading-none shrink-0 font-mono">
             {unreadCount > 99 ? '99+' : unreadCount}
           </span>
         )}
@@ -343,21 +343,21 @@ const ChannelRow: React.FC<ChannelRowProps> = ({ channel, active, unreadCount, o
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <button className="opacity-0 group-hover:opacity-100 h-5 w-5 flex items-center justify-center rounded-[2px] hover:bg-slate-300/50 dark:hover:bg-white/[0.03] transition-all cursor-pointer ml-0.5 shrink-0">
-            <MoreHorizontal size={12} className="text-slate-400 dark:text-zinc-500" />
+          <button className="opacity-0 group-hover:opacity-100 h-5 w-5 flex items-center justify-center rounded-sidebar-item hover:bg-sidebar-item-hover transition-all cursor-pointer ml-0.5 shrink-0">
+            <MoreHorizontal size={12} className="text-muted-foreground" />
           </button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-40 p-1.5 rounded-[2px] shadow-2xl bg-white dark:bg-[#19191B] border border-slate-200/80 dark:border-white/[0.06] font-mono text-[11px]">
-          <DropdownMenuItem className="gap-2 cursor-pointer rounded-[2px] py-1.5">
-            <BellOff size={13} className="text-slate-400 dark:text-zinc-550" /> Tắt thông báo
+        <DropdownMenuContent align="end" className="w-40 p-1.5 rounded-md shadow-2xl bg-popover text-popover-foreground border border-border font-mono text-[11px]">
+          <DropdownMenuItem className="gap-2 cursor-pointer rounded-sidebar-item py-1.5">
+            <BellOff size={13} className="text-muted-foreground" /> Tắt thông báo
           </DropdownMenuItem>
-          <DropdownMenuSeparator className="dark:bg-white/[0.06]" />
+          <DropdownMenuSeparator className="border-border" />
           {channel.isMember !== false ? (
-            <DropdownMenuItem onClick={onLeave} className="gap-2 text-rose-600 focus:text-rose-750 cursor-pointer rounded-[2px] py-1.5">
+            <DropdownMenuItem onClick={onLeave} className="gap-2 text-rose-600 focus:text-rose-750 cursor-pointer rounded-sidebar-item py-1.5">
               <LogOut size={13} /> Rời kênh
             </DropdownMenuItem>
           ) : (
-            <DropdownMenuItem onClick={onJoin} className="gap-2 text-blue-600 focus:text-blue-750 cursor-pointer rounded-[2px] py-1.5">
+            <DropdownMenuItem onClick={onJoin} className="gap-2 text-blue-600 focus:text-blue-750 cursor-pointer rounded-sidebar-item py-1.5">
               <Check size={13} /> Tham gia kênh
             </DropdownMenuItem>
           )}
@@ -380,14 +380,14 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({ label, expanded, onToggle
   <div className="flex items-center gap-0.5 px-1 mb-0.5 h-6">
     <button
       onClick={onToggle}
-      className="flex items-center gap-1 flex-1 min-w-0 text-[10px] font-bold font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-colors cursor-pointer"
+      className="flex items-center gap-1 flex-1 min-w-0 text-[10px] font-bold font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
     >
       <span className="w-3 h-3 flex items-center justify-center shrink-0">
-        {expanded ? <ChevronDown size={11} className="text-slate-400 dark:text-zinc-500" /> : <ChevronRight size={11} className="text-slate-400 dark:text-zinc-500" />}
+        {expanded ? <ChevronDown size={11} className="text-muted-foreground" /> : <ChevronRight size={11} className="text-muted-foreground" />}
       </span>
       <span className="truncate">{label}</span>
       {count !== undefined && (
-        <span className="text-[9px] font-mono text-slate-400 dark:text-zinc-650 shrink-0">({count})</span>
+        <span className="text-[9px] font-mono text-muted-foreground shrink-0">({count})</span>
       )}
     </button>
     {actions}
@@ -407,10 +407,10 @@ const IconBtn: React.FC<IconBtnProps> = ({ icon, label, onClick, variant = 'defa
     onClick={onClick}
     title={label}
     className={`
-      h-5 w-5 flex items-center justify-center rounded-[2px] transition-colors duration-100 shrink-0 cursor-pointer
+      h-5 w-5 flex items-center justify-center rounded-sidebar-item transition-colors duration-100 shrink-0 cursor-pointer
       ${variant === 'primary'
-        ? 'text-blue-600 hover:bg-blue-100/50 dark:hover:bg-blue-950/20'
-        : 'text-slate-400 hover:text-slate-755 dark:hover:text-slate-200 hover:bg-slate-200/50 dark:hover:bg-white/[0.02]'
+        ? 'text-blue-600 hover:bg-sidebar-item-hover'
+        : 'text-muted-foreground hover:text-foreground hover:bg-sidebar-item-hover'
       }
     `}
   >
@@ -425,8 +425,10 @@ export const ModernChannelSidebar: React.FC = () => {
   const dispatch = useDispatch();
   const router = useRouter();
   const params = useParams();
+  const pathname = usePathname();
   const currentChatId = Array.isArray(params?.id) ? params.id[0] : params?.id;
   const currentUser = useSelector((state: any) => state.auth?.user);
+  const isChatDetailPage = pathname.startsWith('/chat/') && pathname.split('/').length > 2 && pathname.split('/')[2] !== 'department';
 
   // ── State ──
   const [searchQuery, setSearchQuery] = useState('');
@@ -564,57 +566,57 @@ export const ModernChannelSidebar: React.FC = () => {
   const wsDisplayName = currentWorkspace?.name || 'Nexus Global';
 
   return (
-    <div className="w-[300px] flex flex-col bg-[#F8F8F8] dark:bg-[#19191B] border-r border-slate-200/80 dark:border-white/[0.06] h-screen shrink-0">
+    <div className={`w-[300px] flex flex-col bg-sidebar-bg border-r border-sidebar-border h-screen shrink-0 ${isChatDetailPage ? 'hidden md:flex' : 'flex w-full md:w-[300px]'}`}>
 
       {/* ══ HEADER: Workspace identity ══ */}
-      <div className="shrink-0 border-b border-slate-200/80 dark:border-white/[0.06] bg-[#F8F8F8] dark:bg-[#19191B]">
+      <div className="shrink-0 border-b border-sidebar-border bg-sidebar-bg">
         {/* Workspace name + dropdown */}
         <div className="flex items-center justify-between px-3 h-12">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="flex items-center gap-2 min-w-0 flex-1 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 px-1.5 py-1 rounded-[4px] transition-colors cursor-pointer group">
+              <button className="flex items-center gap-2 min-w-0 flex-1 hover:bg-sidebar-item-hover px-1.5 py-1 rounded-md transition-colors cursor-pointer group">
                 {/* Workspace avatar */}
-                <Avatar className="h-6 w-6 rounded-[4px] shrink-0 border border-slate-200/50 dark:border-white/[0.08]">
+                <Avatar className="h-6 w-6 rounded-md shrink-0 border border-sidebar-border">
                   <AvatarImage
-                    className="rounded-[4px]"
+                    className="rounded-md"
                     src={currentWorkspace?.icon ? getAvatarUrl(currentWorkspace.icon) : undefined}
                     alt={wsDisplayName}
                   />
-                  <AvatarFallback className="bg-blue-600 text-white text-[9px] font-bold rounded-[4px]">
+                  <AvatarFallback className="bg-primary text-white text-[9px] font-bold rounded-md">
                     {wsDisplayName.substring(0, 2).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
                 
                 {/* Name & Department label stack */}
                 <div className="flex flex-col items-start min-w-0 flex-1 select-none text-left">
-                  <span className="font-bold text-[13px] leading-snug text-slate-900 dark:text-slate-100 truncate w-full">
+                  <span className="font-bold text-[13px] leading-snug text-sidebar-foreground truncate w-full">
                     {wsDisplayName}
                   </span>
                   {currentDepartment ? (
-                    <span className="flex items-center gap-0.5 text-[9px] font-semibold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/40 px-1 rounded-[3px] border border-blue-100 dark:border-blue-900/30 mt-0.5 truncate max-w-full">
+                    <span className="flex items-center gap-0.5 text-[9px] font-semibold text-primary bg-blue-50 dark:bg-blue-955/40 px-1 rounded-sidebar-item border border-blue-100 dark:border-blue-900/30 mt-0.5 truncate max-w-full">
                       <Building2 size={9} strokeWidth={2} />
                       {currentDepartment.name}
                     </span>
                   ) : (
-                    <span className="text-[9px] font-medium text-slate-400 dark:text-slate-500 mt-0.5 truncate">
+                    <span className="text-[9px] font-medium text-muted-foreground mt-0.5 truncate">
                       Workspace chung
                     </span>
                   )}
                 </div>
-                <ChevronDown size={13} className="text-slate-400 shrink-0 group-hover:text-slate-600 dark:group-hover:text-slate-200 transition-colors ml-0.5" />
+                <ChevronDown size={13} className="text-muted-foreground shrink-0 group-hover:text-foreground transition-colors ml-0.5" />
               </button>
             </DropdownMenuTrigger>
 
             <DropdownMenuContent
               align="start"
               sideOffset={4}
-              className="w-52 p-1.5 rounded-[6px] shadow-2xl border-slate-200 dark:border-slate-800"
+              className="w-52 p-1.5 rounded-md shadow-2xl border-border bg-popover text-popover-foreground"
             >
-              <div className="px-2 py-1.5 border-b border-slate-100 dark:border-slate-800 mb-1">
-                <p className="text-[11px] font-semibold text-slate-900 dark:text-slate-100 truncate">{wsDisplayName}</p>
+              <div className="px-2 py-1.5 border-b border-border mb-1">
+                <p className="text-[11px] font-semibold text-foreground truncate">{wsDisplayName}</p>
                 <div className="flex items-center gap-1 mt-0.5">
                   <span className={`w-1.5 h-1.5 rounded-full ${isConnected ? 'bg-emerald-500' : 'bg-red-400'}`} />
-                  <span className="text-[10px] text-slate-500">{isConnected ? 'Đang kết nối' : 'Đang kết nối lại...'}</span>
+                  <span className="text-[10px] text-muted-foreground">{isConnected ? 'Đang kết nối' : 'Đang kết nối lại...'}</span>
                 </div>
               </div>
 
@@ -622,9 +624,9 @@ export const ModernChannelSidebar: React.FC = () => {
                 <WorkspaceGuard allowedRoles={['WORKSPACE_OWNER', 'WORKSPACE_ADMIN', 'WORKSPACE_MANAGER']}>
                   <DropdownMenuItem
                     onClick={() => router.push('/workspace/settings')}
-                    className="rounded-[4px] py-1.5 cursor-pointer flex items-center gap-2 text-xs"
+                    className="rounded-md py-1.5 cursor-pointer flex items-center gap-2 text-xs"
                   >
-                    <Settings size={13} className="text-slate-400" />
+                    <Settings size={13} className="text-muted-foreground" />
                     Cài đặt Workspace
                   </DropdownMenuItem>
                 </WorkspaceGuard>
@@ -633,7 +635,7 @@ export const ModernChannelSidebar: React.FC = () => {
               <RequirePermission anyRole={['SUPER_ADMIN', 'ADMIN', 'WORKSPACE_MANAGER']} silent>
                 <DropdownMenuItem
                   onClick={() => setIsCreateModalOpen(true)}
-                  className="rounded-[4px] py-1.5 cursor-pointer flex items-center gap-2 text-xs text-blue-600"
+                  className="rounded-md py-1.5 cursor-pointer flex items-center gap-2 text-xs text-blue-600"
                 >
                   <Plus size={13} /> Thêm không gian mới
                 </DropdownMenuItem>
@@ -641,10 +643,10 @@ export const ModernChannelSidebar: React.FC = () => {
 
               {workspaceId && (
                 <>
-                  <DropdownMenuSeparator className="my-1" />
+                  <DropdownMenuSeparator className="my-1 border-border" />
                   <DropdownMenuItem
                     onClick={handleLeaveWorkspaceClick}
-                    className="rounded-[4px] py-1.5 cursor-pointer flex items-center gap-2 text-xs text-rose-600 focus:text-rose-600"
+                    className="rounded-md py-1.5 cursor-pointer flex items-center gap-2 text-xs text-rose-600 focus:text-rose-600"
                   >
                     <LogOut size={13} /> Rời Workspace
                   </DropdownMenuItem>
@@ -658,7 +660,7 @@ export const ModernChannelSidebar: React.FC = () => {
             <Sheet>
               <SheetTrigger asChild>
                 <button
-                  className="relative h-7 w-7 flex items-center justify-center rounded-[4px] text-slate-500 dark:text-slate-400 hover:bg-slate-200/80 dark:hover:bg-slate-700/60 hover:text-slate-900 dark:hover:text-slate-100 transition-colors cursor-pointer"
+                  className="relative h-7 w-7 flex items-center justify-center rounded-md text-muted-foreground hover:bg-sidebar-item-hover hover:text-foreground transition-colors cursor-pointer"
                   aria-label="Thông báo"
                 >
                   <Bell size={15} strokeWidth={1.5} />
@@ -674,7 +676,7 @@ export const ModernChannelSidebar: React.FC = () => {
 
             <button
               onClick={() => setIsSearchModalOpen(true)}
-              className="h-7 w-7 flex items-center justify-center rounded-[4px] text-slate-500 dark:text-slate-400 hover:bg-slate-200/80 dark:hover:bg-slate-700/60 hover:text-slate-900 dark:hover:text-slate-100 transition-colors cursor-pointer"
+              className="h-7 w-7 flex items-center justify-center rounded-md text-muted-foreground hover:bg-sidebar-item-hover hover:text-foreground transition-colors cursor-pointer"
               aria-label="Tin nhắn mới"
             >
               <SquarePen size={15} strokeWidth={1.5} />
@@ -692,10 +694,10 @@ export const ModernChannelSidebar: React.FC = () => {
               key={tab.id}
               onClick={() => setActiveTab(tab.id as 'messages' | 'friends')}
               className={`
-                flex-1 flex items-center justify-center gap-1.5 py-1 text-[11px] font-semibold rounded-[4px] transition-colors duration-150 cursor-pointer
+                flex-1 flex items-center justify-center gap-1.5 py-1 text-[11px] font-semibold rounded-md transition-colors duration-150 cursor-pointer
                 ${activeTab === tab.id
-                  ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 shadow-sm border border-slate-200/80 dark:border-slate-700'
-                  : 'text-slate-500 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
+                  ? 'bg-background text-foreground shadow-sm border border-border'
+                  : 'text-muted-foreground hover:text-foreground'
                 }
               `}
             >
@@ -709,16 +711,16 @@ export const ModernChannelSidebar: React.FC = () => {
         {activeTab === 'messages' && (
           <div className="px-2 pb-2">
             <div className="relative">
-              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-400" />
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-muted-foreground" />
               <input
                 type="text"
                 placeholder="Tìm kiếm..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full h-7 pl-7 pr-7 text-[12px] bg-slate-200/60 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/50 rounded-[4px] text-slate-900 dark:text-slate-100 placeholder:text-slate-400 outline-none focus:ring-1 focus:ring-blue-500/50 transition-all"
+                className="w-full h-7 pl-7 pr-7 text-[12px] bg-sidebar-item-hover border border-sidebar-border rounded-md text-sidebar-foreground placeholder:text-muted-foreground outline-none focus:ring-1 focus:ring-blue-500/50 transition-all"
               />
               {searchQuery && (
-                <button onClick={() => setSearchQuery('')} className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer">
+                <button onClick={() => setSearchQuery('')} className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer">
                   <X size={11} />
                 </button>
               )}
@@ -754,7 +756,7 @@ export const ModernChannelSidebar: React.FC = () => {
                     <div className="space-y-px">
                       {filteredChannels.length === 0 ? (
                         <div className="px-2 py-3 text-center">
-                          <p className="text-[11px] text-slate-400 italic">Chưa có kênh nào.</p>
+                          <p className="text-[11px] text-muted-foreground italic">Chưa có kênh nào.</p>
                           <button
                             onClick={() => setShowBrowseModal(true)}
                             className="text-[11px] text-blue-600 font-semibold hover:underline mt-1 cursor-pointer"
@@ -785,7 +787,7 @@ export const ModernChannelSidebar: React.FC = () => {
             )}
 
             {/* Divider */}
-            <div className="mx-2 my-2 h-px bg-slate-200/80 dark:bg-white/[0.06]" />
+            <div className="mx-2 my-2 h-px bg-sidebar-border" />
 
             {/* ── GROUPS ── */}
             <div className="mb-1">
@@ -802,7 +804,7 @@ export const ModernChannelSidebar: React.FC = () => {
                 {groupsExpanded && (
                   <div className="space-y-px">
                     {filteredGroups.length === 0 ? (
-                      <p className="px-2 py-2 text-[11px] text-slate-400 italic">
+                      <p className="px-2 py-2 text-[11px] text-muted-foreground italic">
                         Chưa có nhóm.{' '}
                         <button onClick={() => setShowGroupModal(true)} className="text-blue-600 font-semibold hover:underline cursor-pointer">
                           Tạo mới
@@ -828,7 +830,7 @@ export const ModernChannelSidebar: React.FC = () => {
             </div>
 
             {/* Divider */}
-            <div className="mx-2 my-2 h-px bg-slate-200/80 dark:bg-white/[0.06]" />
+            <div className="mx-2 my-2 h-px bg-sidebar-border" />
 
             {/* ── DIRECT MESSAGES ── */}
             <div className="mb-1">
@@ -845,7 +847,7 @@ export const ModernChannelSidebar: React.FC = () => {
                 {dmsExpanded && (
                   <div className="space-y-px">
                     {filteredDMs.length === 0 ? (
-                      <p className="px-2 py-2 text-[11px] text-slate-400 italic">
+                      <p className="px-2 py-2 text-[11px] text-muted-foreground italic">
                         Chưa có tin nhắn.{' '}
                         <button onClick={() => setIsSearchModalOpen(true)} className="text-blue-600 font-semibold hover:underline cursor-pointer">
                           Bắt đầu chat
@@ -871,11 +873,11 @@ export const ModernChannelSidebar: React.FC = () => {
             </div>
 
             {/* ── Admin Links ── */}
-            <div className="mx-2 my-2 h-px bg-slate-200/80 dark:bg-white/[0.06]" />
+            <div className="mx-2 my-2 h-px bg-sidebar-border" />
             <div className="px-2 pb-2 space-y-px">
               <WorkspaceGuard allowedRoles={['WORKSPACE_OWNER', 'WORKSPACE_ADMIN']}>
                 <Link href="/workspace/settings">
-                  <button className="w-full flex items-center gap-2 px-2 py-[5px] text-xs text-slate-500 dark:text-slate-400 hover:bg-slate-200/60 dark:hover:bg-slate-700/50 hover:text-slate-900 dark:hover:text-slate-100 rounded-[4px] transition-colors cursor-pointer">
+                  <button className="w-full flex items-center gap-2 px-2 py-[5px] text-xs text-muted-foreground hover:bg-sidebar-item-hover hover:text-foreground rounded-md transition-colors cursor-pointer">
                     <Settings size={13} strokeWidth={1.5} />
                     Quản trị Workspace
                   </button>
@@ -885,7 +887,7 @@ export const ModernChannelSidebar: React.FC = () => {
               {!workspaceId && (
                 <RequirePermission anyRole={['SUPER_ADMIN', 'ADMIN']} silent>
                   <Link href="/admin">
-                    <button className="w-full flex items-center gap-2 px-2 py-[5px] text-xs text-blue-600 bg-blue-50/60 dark:bg-blue-950/30 hover:bg-blue-100 dark:hover:bg-blue-950/60 rounded-[4px] transition-colors cursor-pointer">
+                    <button className="w-full flex items-center gap-2 px-2 py-[5px] text-xs text-primary bg-sidebar-item-hover hover:bg-sidebar-item-active rounded-md transition-colors cursor-pointer">
                       <Shield size={13} strokeWidth={1.5} />
                       Quản trị Hệ thống
                     </button>
@@ -932,24 +934,24 @@ export const ModernChannelSidebar: React.FC = () => {
 
       {/* Owner Warning Dialog */}
       <Dialog open={isOwnerWarningOpen} onOpenChange={setIsOwnerWarningOpen}>
-        <DialogContent className="max-w-sm rounded-[6px]">
+        <DialogContent className="max-w-sm rounded-md bg-background text-foreground border-border">
           <DialogHeader>
             <DialogTitle className="text-sm font-bold flex items-center gap-2">
               <Shield className="w-4 h-4 text-amber-500" />
               Không thể rời Workspace
             </DialogTitle>
-            <DialogDescription className="text-xs text-slate-500 leading-relaxed">
+            <DialogDescription className="text-xs text-muted-foreground leading-relaxed">
               Bạn là <strong>Chủ sở hữu</strong> của <strong>{currentWorkspace?.name}</strong>.
               Vui lòng chuyển nhượng quyền sở hữu trước khi rời.
             </DialogDescription>
           </DialogHeader>
           <div className="flex justify-end gap-2 pt-2">
-            <Button variant="outline" size="sm" onClick={() => setIsOwnerWarningOpen(false)} className="h-7 text-xs rounded-[4px]">
+            <Button variant="outline" size="sm" onClick={() => setIsOwnerWarningOpen(false)} className="h-7 text-xs rounded-md">
               Đóng
             </Button>
             <WorkspaceGuard allowedRoles={['WORKSPACE_OWNER']}>
               <Link href="/workspace/settings?tab=members">
-                <Button size="sm" onClick={() => setIsOwnerWarningOpen(false)} className="h-7 text-xs rounded-[4px]">
+                <Button size="sm" onClick={() => setIsOwnerWarningOpen(false)} className="h-7 text-xs rounded-md">
                   Chuyển nhượng ngay
                 </Button>
               </Link>
@@ -960,18 +962,18 @@ export const ModernChannelSidebar: React.FC = () => {
 
       {/* Leave Confirmation Dialog */}
       <Dialog open={isLeaveConfirmOpen} onOpenChange={setIsLeaveConfirmOpen}>
-        <DialogContent className="max-w-sm rounded-[6px]">
+        <DialogContent className="max-w-sm rounded-md bg-background text-foreground border-border">
           <DialogHeader>
             <DialogTitle className="text-sm font-bold text-rose-600 flex items-center gap-2">
               <LogOut className="w-4 h-4" />
               Rời khỏi Workspace?
             </DialogTitle>
-            <DialogDescription className="text-xs text-slate-500 leading-relaxed">
+            <DialogDescription className="text-xs text-muted-foreground leading-relaxed">
               Bạn sẽ không thể xem lại tin nhắn và tài nguyên trừ khi được mời lại.
             </DialogDescription>
           </DialogHeader>
           <div className="flex justify-end gap-2 pt-2">
-            <Button variant="outline" size="sm" disabled={isLeavingWorkspace} onClick={() => setIsLeaveConfirmOpen(false)} className="h-7 text-xs rounded-[4px]">
+            <Button variant="outline" size="sm" disabled={isLeavingWorkspace} onClick={() => setIsLeaveConfirmOpen(false)} className="h-7 text-xs rounded-md">
               Hủy
             </Button>
             <Button
@@ -979,7 +981,7 @@ export const ModernChannelSidebar: React.FC = () => {
               size="sm"
               disabled={isLeavingWorkspace}
               onClick={handleLeaveWorkspaceConfirm}
-              className="h-7 text-xs rounded-[4px] gap-1.5"
+              className="h-7 text-xs rounded-md gap-1.5"
             >
               {isLeavingWorkspace ? <Loader2 size={12} className="animate-spin" /> : <LogOut size={12} />}
               Xác nhận rời đi

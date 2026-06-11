@@ -7,7 +7,7 @@ export default function AppLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-white dark:bg-gray-950">
+    <div className="flex h-screen w-full overflow-hidden bg-background">
       <ModernSidebarRail />
       <main className="flex-1 overflow-hidden relative">
         {children}

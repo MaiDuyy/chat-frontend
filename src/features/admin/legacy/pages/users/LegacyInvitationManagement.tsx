@@ -35,7 +35,7 @@ const STATUS_CONFIG: Record<string, { label: string, color: string, icon: any }>
   PENDING: { label: 'Chờ duyệt', color: 'bg-amber-100 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400', icon: Clock },
   ACCEPTED: { label: 'Đã chấp nhận', color: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400', icon: CheckCircle2 },
   EXPIRED: { label: 'Hết hạn', color: 'bg-red-100 text-red-700 dark:bg-red-950/30 dark:text-red-400', icon: XCircle },
-  CANCELLED: { label: 'Đã hủy', color: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400', icon: Trash2 },
+  CANCELLED: { label: 'Đã hủy', color: 'bg-muted text-muted-foreground dark:bg-slate-800 dark:text-muted-foreground', icon: Trash2 },
 }
 
 export function LegacyInvitationManagement() {
@@ -55,8 +55,8 @@ export function LegacyInvitationManagement() {
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Quản lý lời mời</h2>
-          <p className="text-sm text-slate-500">Gửi và quản lý lời mời tham gia tổ chức</p>
+          <h2 className="text-2xl font-bold text-foreground dark:text-white">Quản lý lời mời</h2>
+          <p className="text-sm text-muted-foreground">Gửi và quản lý lời mời tham gia tổ chức</p>
         </div>
         <Button 
           className="bg-primary hover:bg-primary/90"
@@ -68,12 +68,12 @@ export function LegacyInvitationManagement() {
       </div>
 
       <Card className="border-none shadow-sm bg-white dark:bg-slate-900 overflow-hidden">
-        <CardHeader className="p-4 border-b border-slate-100 dark:border-slate-800">
+        <CardHeader className="p-4 border-b border-border dark:border-border">
             <div className="relative w-full md:w-96">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
                 <Input
                     placeholder="Tìm kiếm theo email..."
-                    className="pl-10 h-10 border-slate-200 dark:border-slate-800"
+                    className="pl-10 h-10 border-border dark:border-border"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
@@ -81,7 +81,7 @@ export function LegacyInvitationManagement() {
         </CardHeader>
         <CardContent className="p-0">
           <Table>
-            <TableHeader className="bg-slate-50/50 dark:bg-slate-800/50">
+            <TableHeader className="bg-muted/50 dark:bg-slate-800/50">
               <TableRow>
                 <TableHead>Email</TableHead>
                 <TableHead>Vai trò</TableHead>
@@ -95,7 +95,7 @@ export function LegacyInvitationManagement() {
               {isLoading ? (
                 Array.from({ length: 3 }).map((_, i) => (
                   <TableRow key={i}>
-                    <TableCell colSpan={6} className="h-16 animate-pulse bg-slate-50/20" />
+                    <TableCell colSpan={6} className="h-16 animate-pulse bg-muted/20" />
                   </TableRow>
                 ))
               ) : filteredInvitations.length > 0 ? (
@@ -103,9 +103,9 @@ export function LegacyInvitationManagement() {
                   const status = STATUS_CONFIG[inv.status] || STATUS_CONFIG.PENDING;
                   return (
                     <TableRow key={inv.id}>
-                      <TableCell className="font-medium text-slate-900 dark:text-slate-100">
+                      <TableCell className="font-medium text-foreground">
                         <div className="flex items-center gap-2">
-                          <Mail className="w-4 h-4 text-slate-400" />
+                          <Mail className="w-4 h-4 text-muted-foreground" />
                           {inv.email}
                         </div>
                       </TableCell>
@@ -120,10 +120,10 @@ export function LegacyInvitationManagement() {
                           {status.label}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-sm text-slate-500">
+                      <TableCell className="text-sm text-muted-foreground">
                         {new Date(inv.createdAt).toLocaleDateString('vi-VN')}
                       </TableCell>
-                      <TableCell className="text-sm text-slate-600 dark:text-slate-400">
+                      <TableCell className="text-sm text-muted-foreground dark:text-muted-foreground">
                         {inv.inviterName || inv.invitedBy}
                       </TableCell>
                       <TableCell className="text-right">
@@ -153,7 +153,7 @@ export function LegacyInvitationManagement() {
                 })
               ) : (
                 <TableRow>
-                  <TableCell colSpan={6} className="h-32 text-center text-slate-500 italic">
+                  <TableCell colSpan={6} className="h-32 text-center text-muted-foreground italic">
                     Không có lời mời nào
                   </TableCell>
                 </TableRow>

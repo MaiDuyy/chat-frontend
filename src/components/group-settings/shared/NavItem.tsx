@@ -22,12 +22,12 @@ export function NavItem({
         <button
             onClick={onClick}
             className={cn(
-                "w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 text-left",
+                "w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-sm font-medium transition-all duration-150 text-left",
                 active
                     ? "bg-blue-50 text-blue-700"
                     : danger
                         ? "text-red-600 hover:bg-red-50"
-                        : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                        : "text-muted-foreground hover:bg-muted hover:text-foreground"
             )}
         >
             <Icon className="w-3.5 h-3.5 flex-shrink-0" />
@@ -43,7 +43,7 @@ export function NavItem({
                     `}</style>
                     <span 
                         key={badge}
-                        className="text-[10px] font-semibold bg-blue-600 text-white rounded-full px-1.5 py-0.5 leading-none"
+                        className="text-[10px] font-semibold bg-primary text-white rounded-full px-1.5 py-0.5 leading-none"
                         style={{
                             animation: 'pulseScale 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)'
                         }}

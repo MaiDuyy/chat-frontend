@@ -51,12 +51,14 @@ interface WikiAIChatPanelProps {
   /** Current wiki page title */
   currentPageTitle?: string;
   onClose: () => void;
+  /** Inline layout configuration for split screen */
+  inline?: boolean;
 }
 
 // ─── WIKI_CHAT_ID — synthetic chatId for wiki agent context ──────────────────
 const WIKI_CHAT_ID = "wiki-assistant";
 
-export function WikiAIChatPanel({ currentPageSlug, currentPageTitle, onClose }: WikiAIChatPanelProps) {
+export function WikiAIChatPanel({ currentPageSlug, currentPageTitle, onClose, inline = false }: WikiAIChatPanelProps) {
   const [agentMode, setAgentMode] = useState(true); // Wiki defaults to agent mode
   const [inputValue, setInputValue] = useState("");
   const [minimized, setMinimized] = useState(false);
@@ -162,11 +164,11 @@ export function WikiAIChatPanel({ currentPageSlug, currentPageTitle, onClose }: 
   const isEmpty = allMessages.length === 0 && !isLoadingHistory;
 
   // ── Minimized state ────────────────────────────────────────────────────────
-  if (minimized) {
+  if (minimized && !inline) {
     return (
       <button
         onClick={() => setMinimized(false)}
-        className="flex items-center gap-2 px-3.5 py-2 rounded-2xl shadow-xl bg-gradient-to-br from-indigo-600 to-purple-700 text-white text-xs font-bold border border-white/10 hover:scale-105 transition-transform"
+        className="flex items-center gap-2 px-3.5 py-2 rounded-xl shadow-xl bg-gradient-to-br from-blue-600 to-blue-700 text-white text-xs font-bold border border-white/10 hover:scale-105 transition-transform"
       >
         <Sparkles size={14} className="animate-pulse" />
         Trợ lý Wiki AI
@@ -177,27 +179,27 @@ export function WikiAIChatPanel({ currentPageSlug, currentPageTitle, onClose }: 
   return (
     <div
       className={cn(
-        "flex flex-col bg-background border border-border rounded-2xl shadow-2xl overflow-hidden transition-all duration-300",
-        "w-[360px] h-[580px]"
+        "flex flex-col bg-background border border-border overflow-hidden transition-all duration-300",
+        inline ? "w-full h-full rounded-lg shadow-sm" : "w-[360px] h-[580px] rounded-xl shadow-2xl"
       )}
-      style={{ boxShadow: "0 8px 40px -8px rgba(99,102,241,0.25), 0 0 0 1px rgba(0,0,0,0.06)" }}
+      style={inline ? undefined : { boxShadow: "0 8px 40px -8px rgba(99,102,241,0.25), 0 0 0 1px rgba(0,0,0,0.06)" }}
     >
       {/* ── Header ─────────────────────────────────────────────────────────── */}
       <div
         className={cn(
           "flex items-center justify-between px-4 py-3 border-b shrink-0 transition-colors duration-300",
           agentMode
-            ? "bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 border-amber-200/60 dark:border-amber-800/30"
-            : "bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-950/30 dark:to-purple-950/30 border-indigo-200/60 dark:border-indigo-800/30"
+            ? "bg-gradient-to-r from-amber-50 to-orange-50/50 dark:from-amber-950/20 dark:to-orange-950/20 border-amber-200/40 dark:border-amber-800/20"
+            : "bg-gradient-to-r from-emerald-50 to-emerald-100/50 dark:from-emerald-950/20 dark:to-emerald-900/20 border-emerald-200/40 dark:border-emerald-800/20"
         )}
       >
         <div className="flex items-center gap-2.5">
           <div
             className={cn(
-              "w-8 h-8 rounded-xl flex items-center justify-center shadow-md shrink-0",
+              "w-8 h-8 rounded-lg flex items-center justify-center shadow-md shrink-0",
               agentMode
                 ? "bg-gradient-to-br from-amber-400 to-orange-500"
-                : "bg-gradient-to-br from-indigo-500 to-purple-600"
+                : "bg-gradient-to-br from-emerald-500 to-emerald-600"
             )}
           >
             {agentMode ? <Zap size={15} className="text-white" /> : <Sparkles size={15} className="text-white" />}
@@ -221,10 +223,10 @@ export function WikiAIChatPanel({ currentPageSlug, currentPageTitle, onClose }: 
             onClick={() => setAgentMode((v) => !v)}
             title={agentMode ? "Chuyển về RAG Search" : "Bật Agent Mode (wiki tools)"}
             className={cn(
-              "w-7 h-7 rounded-lg flex items-center justify-center transition-all border",
+              "w-7 h-7 rounded-md flex items-center justify-center transition-all border",
               agentMode
                 ? "bg-amber-500 border-amber-400 text-white"
-                : "bg-background border-border text-muted-foreground hover:border-amber-300 hover:text-amber-500"
+                : "bg-background border-border text-muted-foreground hover:border-emerald-300 hover:text-emerald-500"
             )}
           >
             <Zap size={13} />
@@ -234,24 +236,27 @@ export function WikiAIChatPanel({ currentPageSlug, currentPageTitle, onClose }: 
           <button
             onClick={handleClear}
             title="Cuộc hội thoại mới"
-            className="w-7 h-7 rounded-lg flex items-center justify-center border border-border bg-background text-muted-foreground hover:text-foreground hover:border-border/80 transition-all"
+            className="w-7 h-7 rounded-md flex items-center justify-center border border-border bg-background text-muted-foreground hover:text-foreground hover:border-border/80 transition-all"
           >
             <RefreshCw size={12} />
           </button>
 
-          {/* Minimize */}
-          <button
-            onClick={() => setMinimized(true)}
-            title="Thu nhỏ"
-            className="w-7 h-7 rounded-lg flex items-center justify-center border border-border bg-background text-muted-foreground hover:text-foreground transition-all"
-          >
-            <Minimize2 size={12} />
-          </button>
+          {/* Minimize - only when not inline */}
+          {!inline && (
+            <button
+              onClick={() => setMinimized(true)}
+              title="Thu nhỏ"
+              className="w-7 h-7 rounded-md flex items-center justify-center border border-border bg-background text-muted-foreground hover:text-foreground transition-all"
+            >
+              <Minimize2 size={12} />
+            </button>
+          )}
 
           {/* Close */}
           <button
             onClick={onClose}
-            className="w-7 h-7 rounded-lg flex items-center justify-center border border-border bg-background text-muted-foreground hover:text-red-500 hover:border-red-200 transition-all"
+            title={inline ? "Đóng khung chat AI" : "Đóng"}
+            className="w-7 h-7 rounded-md flex items-center justify-center border border-border bg-background text-muted-foreground hover:text-red-500 hover:border-red-200 transition-all"
           >
             <X size={12} />
           </button>
@@ -274,7 +279,7 @@ export function WikiAIChatPanel({ currentPageSlug, currentPageTitle, onClose }: 
           "px-4 py-1.5 shrink-0 flex items-center gap-1.5 border-b transition-colors duration-300",
           agentMode
             ? "bg-amber-500/5 border-amber-200/40 dark:border-amber-800/20"
-            : "bg-indigo-500/5 border-indigo-200/40 dark:border-indigo-800/20"
+            : "bg-emerald-500/5 border-emerald-200/40 dark:border-emerald-800/20"
         )}
       >
         {agentMode ? (
@@ -286,8 +291,8 @@ export function WikiAIChatPanel({ currentPageSlug, currentPageTitle, onClose }: 
           </>
         ) : (
           <>
-            <Sparkles size={10} className="text-indigo-500 shrink-0" />
-            <span className="text-[9px] text-indigo-700 dark:text-indigo-400 font-bold uppercase tracking-wider">
+            <Sparkles size={10} className="text-emerald-500 shrink-0" />
+            <span className="text-[9px] text-emerald-700 dark:text-emerald-400 font-bold uppercase tracking-wider">
               RAG Mode · tìm kiếm ngữ nghĩa trong cơ sở tri thức
             </span>
           </>
@@ -306,13 +311,13 @@ export function WikiAIChatPanel({ currentPageSlug, currentPageTitle, onClose }: 
           <div className="flex flex-col items-center justify-center h-full gap-5 py-6 animate-in fade-in duration-500">
             <div
               className={cn(
-                "w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg",
+                "w-14 h-14 rounded-xl flex items-center justify-center shadow-lg",
                 agentMode
                   ? "bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-900/40 dark:to-orange-900/40"
-                  : "bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-900/40 dark:to-purple-900/40"
+                  : "bg-gradient-to-br from-emerald-100 to-emerald-200/30 dark:from-emerald-900/40 dark:to-emerald-900/20"
               )}
             >
-              <Bot size={28} className={agentMode ? "text-amber-500" : "text-indigo-500"} />
+              <Bot size={28} className={agentMode ? "text-amber-500" : "text-emerald-500"} />
             </div>
 
             <div className="text-center space-y-1">
@@ -332,10 +337,10 @@ export function WikiAIChatPanel({ currentPageSlug, currentPageTitle, onClose }: 
                   key={s.label}
                   onClick={() => handleSuggestion(s.query)}
                   className={cn(
-                    "w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-left text-xs font-medium border transition-all duration-200 group",
+                    "w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-left text-xs font-medium border transition-all duration-200 group cursor-pointer",
                     agentMode
                       ? "bg-amber-50/50 border-amber-200/60 text-amber-800 hover:bg-amber-100 hover:border-amber-300 dark:bg-amber-900/10 dark:border-amber-800/30 dark:text-amber-300"
-                      : "bg-indigo-50/50 border-indigo-200/60 text-indigo-800 hover:bg-indigo-100 hover:border-indigo-300 dark:bg-indigo-900/10 dark:border-indigo-800/30 dark:text-indigo-300"
+                      : "bg-emerald-50/50 border-emerald-200/60 text-emerald-800 hover:bg-emerald-100 hover:border-emerald-300 dark:bg-emerald-900/10 dark:border-emerald-800/30 dark:text-emerald-300"
                   )}
                   disabled={isStreaming}
                 >
@@ -378,24 +383,24 @@ export function WikiAIChatPanel({ currentPageSlug, currentPageTitle, onClose }: 
             disabled={isStreaming}
             rows={1}
             className={cn(
-              "w-full resize-none rounded-xl border py-3 pl-4 pr-12 text-xs font-medium leading-relaxed",
+              "w-full resize-none rounded-lg border py-3 pl-4 pr-12 text-xs font-medium leading-relaxed",
               "bg-muted/40 placeholder:text-muted-foreground/60",
               "focus:outline-none focus:ring-2 focus:bg-background transition-all duration-200",
               "max-h-[120px] min-h-[44px] custom-scrollbar",
               agentMode
                 ? "border-amber-200/60 focus:ring-amber-200 focus:border-amber-300 dark:border-amber-800/30"
-                : "border-indigo-200/60 focus:ring-indigo-200 focus:border-indigo-300 dark:border-indigo-800/30"
+                : "border-emerald-200/60 focus:ring-emerald-200 focus:border-emerald-300 dark:border-emerald-800/30"
             )}
           />
           <button
             onClick={handleSend}
             disabled={!inputValue.trim() || isStreaming}
             className={cn(
-              "absolute right-2 bottom-2 w-8 h-8 rounded-lg flex items-center justify-center shadow-md transition-all duration-200",
+              "absolute right-2 bottom-2 w-8 h-8 rounded-md flex items-center justify-center shadow-md transition-all duration-200 cursor-pointer",
               "disabled:opacity-40 disabled:cursor-not-allowed",
               agentMode
                 ? "bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600"
-                : "bg-gradient-to-br from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700"
+                : "bg-gradient-to-br from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700"
             )}
           >
             {isStreaming
@@ -425,11 +430,11 @@ export function WikiAIChatButton({ onClick, hasMessages }: WikiAIChatButtonProps
       onClick={onClick}
       id="wiki-ai-chat-button"
       className={cn(
-        "group relative flex items-center gap-2 px-4 py-2 rounded-xl shadow-lg transition-all duration-300",
-        "border text-xs font-bold uppercase tracking-wide",
-        "bg-gradient-to-br from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700",
-        "text-white border-indigo-400/30 hover:shadow-indigo-200/50 hover:shadow-xl",
-        "active:scale-95"
+        "group relative flex items-center gap-2 px-3 py-1.5 rounded-md transition-all duration-200",
+        "border text-xs font-mono font-bold uppercase tracking-wide select-none cursor-pointer",
+        "bg-emerald-600 hover:bg-emerald-500 text-white border-emerald-500/20 shadow-xs",
+        "dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/30 dark:hover:bg-emerald-500/20",
+        "active:scale-[0.97]"
       )}
     >
       <MessageSquarePlus size={14} className="shrink-0 group-hover:rotate-12 transition-transform duration-300" />

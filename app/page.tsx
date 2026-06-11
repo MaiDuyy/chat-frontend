@@ -27,7 +27,7 @@ export default function Home() {
     <div className="flex flex-col min-h-screen">
       <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
 
-      <main className="flex-grow flex items-center justify-center p-4 sm:p-8">
+      <main className="flex-grow w-full">
         <HeroSection />
       </main>
 

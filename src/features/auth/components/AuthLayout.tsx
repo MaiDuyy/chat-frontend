@@ -1,7 +1,8 @@
 "use client";
 
 import React from 'react';
-import { MessageSquare, Shield, Zap, Globe } from "lucide-react";
+import { Shield, Zap, Globe } from "lucide-react";
+import { HubNodeBrand } from '@/components/ui/hub-node-logo';
 
 interface AuthLayoutProps {
   children: React.ReactNode;
@@ -9,7 +10,7 @@ interface AuthLayoutProps {
 
 export const AuthLayout: React.FC<AuthLayoutProps> = ({ children }) => {
   return (
-    <div className="min-h-screen flex bg-slate-50 dark:bg-[#111113] font-sans antialiased selection:bg-blue-500/10 selection:text-blue-600 transition-colors duration-250">
+    <div className="min-h-screen flex bg-muted dark:bg-[#111113] font-sans antialiased selection:bg-blue-500/10 selection:text-blue-600 transition-colors duration-250">
       {/* Left Panel — Brand */}
       <div className="hidden lg:flex lg:w-[420px] bg-[#111113] border-r border-white/[0.04] relative overflow-hidden flex-col justify-between p-10 shrink-0 select-none">
         {/* Subtle dot grid */}
@@ -20,11 +21,8 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({ children }) => {
 
         {/* Top: Logo */}
         <div className="relative z-10">
-          <div className="flex items-center gap-2.5 mb-14">
-            <div className="w-8 h-8 bg-blue-600 rounded-[2px] flex items-center justify-center">
-              <MessageSquare className="w-4 h-4 text-white" />
-            </div>
-            <span className="text-sm font-mono font-bold text-white tracking-widest uppercase">NEXUS</span>
+          <div className="mb-14">
+            <HubNodeBrand size={26} textClassName="text-white" />
           </div>
 
           <div className="space-y-8 text-left">
@@ -57,12 +55,12 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({ children }) => {
 
         {/* Bottom: Testimonial */}
         <div className="relative z-10 text-left">
-          <div className="p-4 bg-white/[0.03] border border-white/[0.05] rounded-[2px]">
+          <div className="p-4 bg-white/[0.03] border border-white/[0.05] rounded-sm">
             <p className="text-white/60 text-[11px] leading-relaxed mb-3 italic">
               "Hệ thống đã giúp đội ngũ tối ưu quy trình làm việc và kết nối phòng ban liền mạch hơn."
             </p>
             <div className="flex items-center gap-2.5">
-              <div className="w-7 h-7 rounded-[2px] bg-white/10 border border-white/10 flex items-center justify-center text-[10px] font-mono font-bold text-white/50">CO</div>
+              <div className="w-7 h-7 rounded-sm bg-white/10 border border-white/10 flex items-center justify-center text-[10px] font-mono font-bold text-white/50">CO</div>
               <div>
                 <p className="text-white text-[11px] font-semibold">Nguyễn Văn A</p>
                 <p className="text-white/40 text-[9px] font-mono uppercase tracking-wider">Giám đốc vận hành @ ABC Corp</p>
@@ -73,21 +71,18 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({ children }) => {
       </div>
 
       {/* Right Panel — Form */}
-      <div className="flex-1 flex flex-col justify-center items-center p-6 sm:p-12 bg-slate-50 dark:bg-[#111113]">
+      <div className="flex-1 flex flex-col justify-center items-center p-6 sm:p-12 bg-muted dark:bg-[#111113]">
         <div className="w-full max-w-[400px]">
           {/* Mobile logo */}
-          <div className="lg:hidden flex items-center justify-center gap-2 mb-10 select-none">
-            <div className="w-8 h-8 bg-blue-600 rounded-[2px] flex items-center justify-center">
-              <MessageSquare className="w-4 h-4 text-white" />
-            </div>
-            <span className="text-sm font-mono font-bold text-slate-900 dark:text-slate-100 tracking-widest uppercase">NEXUS</span>
+          <div className="lg:hidden flex items-center justify-center mb-10">
+            <HubNodeBrand size={26} />
           </div>
 
-          <div className="bg-white dark:bg-[#19191B] p-8 rounded-[2px] border border-slate-200/80 dark:border-white/[0.06] shadow-none">
+          <div className="bg-background p-8 rounded-sm border border-border shadow-none">
             {children}
           </div>
 
-          <footer className="mt-8 text-center text-[10px] text-slate-400 dark:text-zinc-600 font-mono tracking-wider">
+          <footer className="mt-8 text-center text-[10px] text-muted-foreground dark:text-muted-foreground font-mono tracking-wider">
             <p>&copy; {new Date().getFullYear()} NEXUS Platform. Secure & Encrypted.</p>
           </footer>
         </div>
@@ -98,7 +93,7 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({ children }) => {
 
 const FeatureItem = ({ icon, title, description }: { icon: React.ReactNode; title: string; description: string }) => (
   <div className="flex gap-3">
-    <div className="flex-shrink-0 w-7 h-7 rounded-[2px] bg-white/[0.04] border border-white/[0.04] flex items-center justify-center text-white/70">
+    <div className="flex-shrink-0 w-7 h-7 rounded-sm bg-white/[0.04] border border-white/[0.04] flex items-center justify-center text-white/70">
       {icon}
     </div>
     <div className="text-left">

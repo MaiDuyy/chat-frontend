@@ -19,7 +19,7 @@ export default function AdminDocumentsPage() {
                     </p>
                 </div>
 
-                <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
+                <div className="bg-white rounded-3xl p-6 shadow-sm border border-border">
                     <DocumentManagement />
                 </div>
             </div>

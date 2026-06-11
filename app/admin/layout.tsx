@@ -1,7 +1,7 @@
 "use client";
 
 import React, { Suspense } from "react";
-import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
+import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { DashboardSidebar } from "@/src/features/admin/legacy/components/DashboardSidebar";
 import { useSearchParams } from "next/navigation";
 import { RequirePermission } from "@/src/components/guards/RequirePermission";
@@ -37,6 +37,7 @@ function AdminHeader() {
     return (
         <header className="bg-background/80 backdrop-blur-md border-b border-border h-12 px-4 flex items-center justify-between sticky top-0 z-20">
             <div className="flex items-center gap-2">
+                <SidebarTrigger className="md:hidden mr-2 text-foreground" />
                 <h2 className="text-sm font-bold text-foreground tracking-tight">
                     {pageTitle}
                 </h2>
@@ -55,20 +56,28 @@ function AdminHeader() {
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
     return (
         <RequirePermission anyRole={["SUPER_ADMIN", "ADMIN"]}>
-            <SidebarProvider defaultOpen={true}>
-                <div className="flex min-h-screen w-full bg-background overflow-hidden text-foreground">
-                    <Suspense fallback={<div className="w-64 h-full bg-background animate-pulse border-r border-border" />}>
-                        <DashboardSidebar />
+            <SidebarProvider
+                defaultOpen={true}
+                style={
+                    {
+                        "--sidebar-width": "14rem",
+                        "--sidebar-width-icon": "60px",
+                    } as React.CSSProperties
+                }
+            >
+                <Suspense fallback={<div className="w-[14rem] h-full bg-background animate-pulse border-r border-border" />}>
+                    <DashboardSidebar />
+                </Suspense>
+                <SidebarInset className="flex flex-col flex-1 overflow-hidden h-screen bg-background">
+                    <Suspense fallback={<div className="h-12 w-full bg-background animate-pulse border-b border-border" />}>
+                        <AdminHeader />
                     </Suspense>
-                    <SidebarInset className="flex flex-col flex-1 overflow-hidden h-screen bg-background">
-                        <Suspense fallback={<div className="h-12 w-full bg-background animate-pulse border-b border-border" />}>
-                            <AdminHeader />
-                        </Suspense>
-                        <main className="flex-1 overflow-auto p-4 no-scrollbar bg-background">
+                    <main className="flex-1 overflow-auto p-4 no-scrollbar bg-background">
+                        <div className="max-w-[1440px] mx-auto w-full">
                             {children}
-                        </main>
-                    </SidebarInset>
-                </div>
+                        </div>
+                    </main>
+                </SidebarInset>
             </SidebarProvider>
         </RequirePermission>
     );

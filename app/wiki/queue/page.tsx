@@ -195,7 +195,7 @@ export default function WikiQueuePage() {
         <div className="flex items-center gap-3">
           <Link
             href="/wiki"
-            className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+            className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
           </Link>
@@ -214,7 +214,7 @@ export default function WikiQueuePage() {
           <button
             onClick={() => refetch()}
             disabled={isLoading}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium border border-border bg-card text-foreground rounded-lg hover:bg-accent transition-colors disabled:opacity-50 cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium border border-border bg-card text-foreground rounded-md hover:bg-accent transition-colors disabled:opacity-50 cursor-pointer"
           >
             <RefreshCcw className="w-3.5 h-3.5" />
             Làm mới
@@ -223,7 +223,7 @@ export default function WikiQueuePage() {
             <button
               onClick={handleBulkApprove}
               disabled={isBulking || selected.size === 0}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-40 cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors disabled:opacity-40 cursor-pointer"
             >
               <CheckCheck className="w-3.5 h-3.5" />
               Phê duyệt{selected.size > 0 ? ` (${selected.size})` : " đã chọn"}
@@ -231,7 +231,7 @@ export default function WikiQueuePage() {
           )}
           <Link
             href="/wiki/review"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium border border-border bg-card text-foreground rounded-lg hover:bg-accent transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium border border-border bg-card text-foreground rounded-md hover:bg-accent transition-colors"
           >
             <FileText className="w-3.5 h-3.5" />
             Bảng kiểm duyệt
@@ -253,7 +253,7 @@ export default function WikiQueuePage() {
             label: "Chờ duyệt",
             value: pendingCount,
             icon: Clock,
-            color: "text-blue-600 dark:text-blue-400",
+            color: "text-primary",
             bg: "bg-blue-50 dark:bg-blue-950/30",
           },
           {
@@ -275,9 +275,9 @@ export default function WikiQueuePage() {
           return (
             <div
               key={stat.label}
-              className="rounded-xl border border-border bg-card p-3 flex items-center gap-3 shadow-sm"
+              className="rounded-lg border border-border bg-card p-3 flex items-center gap-3 shadow-sm"
             >
-              <div className={`p-2 rounded-lg ${stat.bg}`}>
+              <div className={`p-2 rounded-md ${stat.bg}`}>
                 <Icon className={`w-4 h-4 ${stat.color}`} />
               </div>
               <div>
@@ -296,7 +296,7 @@ export default function WikiQueuePage() {
       {/* ── Filters Row ─────────────────────────────────────── */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 border-b border-border pb-4">
         {/* Scope tabs */}
-        <div className="inline-flex rounded-lg border border-border bg-muted/40 p-0.5">
+        <div className="inline-flex rounded-md border border-border bg-muted/40 p-0.5">
           {(
             [
               {
@@ -346,7 +346,7 @@ export default function WikiQueuePage() {
                     setStatus(key);
                     setSelected(new Set());
                   }}
-                  className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all cursor-pointer ${
+                  className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-medium transition-all cursor-pointer ${
                     status === key
                       ? meta.badgeClass + " ring-2 ring-offset-1 ring-primary/30"
                       : "border border-border bg-card text-muted-foreground hover:bg-accent"
@@ -363,7 +363,7 @@ export default function WikiQueuePage() {
 
       {/* Bulk result notification */}
       {bulkResult && (
-        <div className="rounded-lg border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/30 px-4 py-3 text-sm flex items-center gap-2">
+        <div className="rounded-md border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/30 px-4 py-3 text-sm flex items-center gap-2">
           <CheckCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
           <span className="text-emerald-700 dark:text-emerald-300">
             Hoàn tất:{" "}
@@ -390,7 +390,7 @@ export default function WikiQueuePage() {
         </div>
       ) : drafts.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 gap-3">
-          <div className="w-14 h-14 rounded-2xl bg-muted/50 flex items-center justify-center">
+          <div className="w-14 h-14 rounded-xl bg-muted/50 flex items-center justify-center">
             <Inbox className="w-7 h-7 text-muted-foreground/50" />
           </div>
           <p className="text-sm font-semibold text-foreground">Hàng đợi trống</p>
@@ -400,7 +400,7 @@ export default function WikiQueuePage() {
           </p>
         </div>
       ) : (
-        <div className="rounded-xl border border-border overflow-hidden shadow-sm">
+        <div className="rounded-lg border border-border overflow-hidden shadow-sm">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border bg-muted/30">
@@ -567,7 +567,7 @@ export default function WikiQueuePage() {
       {/* Reject note dialog */}
       {rejectTargetId !== null && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-          <div className="bg-card border border-border rounded-2xl shadow-2xl p-6 w-full max-w-sm mx-4">
+          <div className="bg-card border border-border rounded-xl shadow-2xl p-6 w-full max-w-sm mx-4">
             <h3 className="text-sm font-bold text-foreground mb-1">
               Từ chối bản thảo
             </h3>
@@ -579,7 +579,7 @@ export default function WikiQueuePage() {
               onChange={(e) => setRejectNote(e.target.value)}
               placeholder="Lý do từ chối hoặc hướng dẫn sửa..."
               rows={3}
-              className="w-full rounded-lg border border-border bg-background text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+              className="w-full rounded-md border border-border bg-background text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary resize-none"
             />
             <div className="flex gap-2 mt-4 justify-end">
               <button
@@ -587,14 +587,14 @@ export default function WikiQueuePage() {
                   setRejectTargetId(null);
                   setRejectNote("");
                 }}
-                className="px-4 py-2 text-xs font-medium border border-border rounded-lg hover:bg-accent transition-colors cursor-pointer"
+                className="px-4 py-2 text-xs font-medium border border-border rounded-md hover:bg-accent transition-colors cursor-pointer"
               >
                 Hủy
               </button>
               <button
                 onClick={handleRejectOne}
                 disabled={isRejecting}
-                className="px-4 py-2 text-xs font-semibold bg-rose-600 hover:bg-rose-700 text-white rounded-lg transition-colors cursor-pointer disabled:opacity-50"
+                className="px-4 py-2 text-xs font-semibold bg-rose-600 hover:bg-rose-700 text-white rounded-md transition-colors cursor-pointer disabled:opacity-50"
               >
                 {isRejecting ? "Đang xử lý..." : "Xác nhận từ chối"}
               </button>

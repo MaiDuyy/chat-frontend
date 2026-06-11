@@ -154,25 +154,25 @@ export default function ForwardMessageModal() {
 
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
-            <DialogContent className="sm:max-w-[440px] rounded-[2px] border border-slate-200/80 dark:border-white/[0.06] bg-white dark:bg-[#19191B] p-0 shadow-2xl [&>button]:rounded-[2px] overflow-hidden flex flex-col max-h-[85vh]">
+            <DialogContent className="sm:max-w-[440px] rounded-sm border border-border bg-background p-0 shadow-2xl [&>button]:rounded-sm overflow-hidden flex flex-col max-h-[85vh]">
                 {/* Header & Sticky Search Bar */}
-                <div className="px-5 pt-5 pb-3 border-b border-slate-100 dark:border-white/[0.04] shrink-0">
-                    <DialogTitle className="text-sm font-bold uppercase font-mono tracking-wider text-slate-800 dark:text-slate-200">
+                <div className="px-5 pt-5 pb-3 border-b border-border dark:border-white/[0.04] shrink-0">
+                    <DialogTitle className="text-sm font-bold uppercase font-mono tracking-wider text-foreground dark:text-foreground">
                         Chuyển tiếp tin nhắn
                     </DialogTitle>
                     <div className="relative mt-3">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 dark:text-zinc-500" />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground dark:text-muted-foreground" />
                         <Input
                             placeholder="Tìm kiếm người hoặc nhóm..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="pl-9 pr-8 h-9 bg-slate-50 dark:bg-zinc-800/40 border border-slate-200 dark:border-white/[0.06] rounded-[2px] text-xs focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-blue-500 font-mono transition-colors text-slate-850 dark:text-slate-150"
+                            className="pl-9 pr-8 h-9 bg-muted dark:bg-muted/40 border border-border rounded-sm text-xs focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-blue-500 font-mono transition-colors text-slate-850 dark:text-slate-150"
                             autoFocus
                         />
                         {searchTerm && (
                             <button
                                 onClick={() => setSearchTerm('')}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-zinc-500 hover:text-slate-650 cursor-pointer"
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground dark:text-muted-foreground hover:text-muted-foreground cursor-pointer"
                             >
                                 <X size={12} />
                             </button>
@@ -184,13 +184,13 @@ export default function ForwardMessageModal() {
                 <div className="overflow-y-auto flex-1 custom-scrollbar p-1.5 min-h-[300px]">
                     {isLoading && (
                         <div className="flex items-center justify-center py-20">
-                            <Loader2 className="w-5 h-5 animate-spin text-slate-400 dark:text-zinc-550" />
+                            <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
                         </div>
                     )}
 
                     {!isLoading && showSearch && (
                         <div className="flex flex-col gap-0.5">
-                            <div className="px-3 py-1.5 text-[10px] font-mono font-bold text-slate-450 dark:text-zinc-500 uppercase tracking-wider">
+                            <div className="px-3 py-1.5 text-[10px] font-mono font-bold text-slate-450 dark:text-muted-foreground uppercase tracking-wider">
                                 Kết quả tìm kiếm
                             </div>
                             {searchUsers.length > 0 ? (
@@ -199,17 +199,17 @@ export default function ForwardMessageModal() {
                                     return (
                                         <div
                                             key={user.id}
-                                            className="flex items-center gap-3 w-full px-3 py-2 hover:bg-slate-50 dark:hover:bg-white/[0.02] border-b border-slate-100/50 dark:border-white/[0.03] last:border-0 rounded-[2px] transition-colors"
+                                            className="flex items-center gap-3 w-full px-3 py-2 hover:bg-muted dark:hover:bg-muted/10 border-b border-border/50 dark:border-white/[0.03] last:border-0 rounded-sm transition-colors"
                                         >
-                                            <Avatar className="h-8 w-8 rounded-[2px] border border-slate-200/80 dark:border-white/[0.06] shrink-0">
+                                            <Avatar className="h-8 w-8 rounded-sm border border-border shrink-0">
                                                 <AvatarImage className="object-cover" src={getAvatarUrl(user.avatar, user.name)} />
-                                                <AvatarFallback className="rounded-[2px] bg-slate-250 dark:bg-zinc-800 text-slate-650 dark:text-zinc-400 font-mono text-[10px] font-bold">
+                                                <AvatarFallback className="rounded-sm bg-slate-250 dark:bg-muted text-muted-foreground dark:text-muted-foreground font-mono text-[10px] font-bold">
                                                     {user.name ? user.name.slice(0, 2).toUpperCase() : 'U'}
                                                 </AvatarFallback>
                                             </Avatar>
                                             <div className="flex-1 min-w-0 text-left">
-                                                <p className="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate">{user.name}</p>
-                                                <p className="text-[10px] font-mono text-slate-400 dark:text-zinc-500 mt-0.5 truncate">{user.email}</p>
+                                                <p className="text-xs font-semibold text-foreground dark:text-foreground truncate">{user.name}</p>
+                                                <p className="text-[10px] font-mono text-muted-foreground dark:text-muted-foreground mt-0.5 truncate">{user.email}</p>
                                             </div>
                                             
                                             {/* Forward button with loading state */}
@@ -218,10 +218,10 @@ export default function ForwardMessageModal() {
                                                 variant={status === 'sent' ? 'outline' : 'default'}
                                                 onClick={() => handleSendForwardToSearchUser(user.id, user.name)}
                                                 disabled={status === 'sending' || status === 'sent'}
-                                                className={`h-7 px-3 text-xs font-mono font-bold transition-all rounded-[2px] ${
+                                                className={`h-7 px-3 text-xs font-mono font-bold transition-all rounded-sm ${
                                                     status === 'sent' 
                                                         ? 'border-emerald-500 text-emerald-500 bg-emerald-50/20 dark:bg-emerald-950/20' 
-                                                        : 'bg-blue-600 dark:bg-blue-700/90 text-white hover:bg-blue-700'
+                                                        : 'bg-primary dark:bg-primary/90/90 text-white hover:bg-primary/90'
                                                 }`}
                                             >
                                                 {status === 'idle' && (
@@ -241,7 +241,7 @@ export default function ForwardMessageModal() {
                                     );
                                 })
                             ) : (
-                                <div className="text-center py-12 text-slate-400 dark:text-zinc-600 font-mono text-xs">
+                                <div className="text-center py-12 text-muted-foreground dark:text-muted-foreground font-mono text-xs">
                                     Không tìm thấy thành viên phù hợp
                                 </div>
                             )}
@@ -250,7 +250,7 @@ export default function ForwardMessageModal() {
 
                     {!isLoading && !showSearch && (
                         <div className="flex flex-col gap-0.5">
-                            <div className="px-3 py-1.5 text-[10px] font-mono font-bold text-slate-450 dark:text-zinc-500 uppercase tracking-wider">
+                            <div className="px-3 py-1.5 text-[10px] font-mono font-bold text-slate-450 dark:text-muted-foreground uppercase tracking-wider">
                                 Cuộc trò chuyện gần đây
                             </div>
                             {recentChats.length > 0 ? (
@@ -260,17 +260,17 @@ export default function ForwardMessageModal() {
                                     return (
                                         <div
                                             key={chat.id}
-                                            className="flex items-center gap-3 w-full px-3 py-2 hover:bg-slate-50 dark:hover:bg-white/[0.02] border-b border-slate-100/50 dark:border-white/[0.03] last:border-0 rounded-[2px] transition-colors"
+                                            className="flex items-center gap-3 w-full px-3 py-2 hover:bg-muted dark:hover:bg-muted/10 border-b border-border/50 dark:border-white/[0.03] last:border-0 rounded-sm transition-colors"
                                         >
-                                            <Avatar className="h-8 w-8 rounded-[2px] border border-slate-200/80 dark:border-white/[0.06] shrink-0">
+                                            <Avatar className="h-8 w-8 rounded-sm border border-border shrink-0">
                                                 <AvatarImage className="object-cover" src={getAvatarUrl(chat.avatar, chatName)} />
-                                                <AvatarFallback className="rounded-[2px] bg-slate-250 dark:bg-zinc-800 text-slate-650 dark:text-zinc-400 font-mono text-[10px] font-bold">
+                                                <AvatarFallback className="rounded-sm bg-slate-250 dark:bg-muted text-muted-foreground dark:text-muted-foreground font-mono text-[10px] font-bold">
                                                     {chat.isGroup ? <Users size={12} /> : <MessageSquare size={12} />}
                                                 </AvatarFallback>
                                             </Avatar>
                                             <div className="flex-1 min-w-0 text-left">
-                                                <p className="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate">{chatName}</p>
-                                                <p className="text-[10px] font-mono text-slate-400 dark:text-zinc-500 mt-0.5 truncate">
+                                                <p className="text-xs font-semibold text-foreground dark:text-foreground truncate">{chatName}</p>
+                                                <p className="text-[10px] font-mono text-muted-foreground dark:text-muted-foreground mt-0.5 truncate">
                                                     {chat.isGroup ? 'Nhóm trò chuyện' : 'Trò chuyện cá nhân'}
                                                 </p>
                                             </div>
@@ -281,10 +281,10 @@ export default function ForwardMessageModal() {
                                                 variant={status === 'sent' ? 'outline' : 'default'}
                                                 onClick={() => handleSendForward(chat.id, chatName)}
                                                 disabled={status === 'sending' || status === 'sent'}
-                                                className={`h-7 px-3 text-xs font-mono font-bold transition-all rounded-[2px] ${
+                                                className={`h-7 px-3 text-xs font-mono font-bold transition-all rounded-sm ${
                                                     status === 'sent' 
                                                         ? 'border-emerald-500 text-emerald-500 bg-emerald-50/20 dark:bg-emerald-950/20' 
-                                                        : 'bg-blue-600 dark:bg-blue-700/90 text-white hover:bg-blue-700'
+                                                        : 'bg-primary dark:bg-primary/90/90 text-white hover:bg-primary/90'
                                                 }`}
                                             >
                                                 {status === 'idle' && (
@@ -304,7 +304,7 @@ export default function ForwardMessageModal() {
                                     );
                                 })
                             ) : (
-                                <div className="text-center py-12 text-slate-400 dark:text-zinc-600 font-mono text-xs">
+                                <div className="text-center py-12 text-muted-foreground dark:text-muted-foreground font-mono text-xs">
                                     Chưa có cuộc trò chuyện gần đây nào
                                 </div>
                             )}
@@ -313,12 +313,12 @@ export default function ForwardMessageModal() {
                 </div>
 
                 {/* Footer buttons */}
-                <div className="p-3 bg-slate-50 dark:bg-[#111113]/40 border-t border-slate-100 dark:border-white/[0.04] flex justify-end gap-2 shrink-0">
+                <div className="p-3 bg-muted dark:bg-[#111113]/40 border-t border-border dark:border-white/[0.04] flex justify-end gap-2 shrink-0">
                     <Button
                         variant="outline"
                         size="sm"
                         onClick={handleClose}
-                        className="h-8 px-4 text-xs font-mono rounded-[2px] hover:bg-slate-100 dark:hover:bg-zinc-800"
+                        className="h-8 px-4 text-xs font-mono rounded-sm hover:bg-muted dark:hover:bg-muted"
                     >
                         Đóng
                     </Button>

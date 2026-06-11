@@ -42,24 +42,24 @@ export function DocumentTable({ documents }: { documents: Document[] }) {
   };
 
   return (
-    <div className="overflow-x-auto shadow rounded-lg border border-gray-200">
+    <div className="overflow-x-auto shadow rounded-md border border-border">
       <table className="min-w-full divide-y divide-gray-200">
-        <thead className="bg-gray-50">
+        <thead className="bg-muted">
           <tr>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tên File</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Phân loại</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tags</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Trạng thái</th>
-            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Hành động</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">Tên File</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">Phân loại</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">Tags</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">Trạng thái</th>
+            <th className="px-6 py-3 text-right text-xs font-medium text-muted-foreground uppercase">Hành động</th>
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
           {documents.map((doc) => (
             <tr key={doc.id}>
-              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground">
                 {doc.fileName}
               </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
                 {editingId === doc.id ? (
                   <select 
                     value={editClass} 
@@ -75,7 +75,7 @@ export function DocumentTable({ documents }: { documents: Document[] }) {
                   <span className="font-semibold">{doc.securityClassification || 'N/A'}</span>
                 )}
               </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
                 {editingId === doc.id ? (
                   <input 
                     className="border rounded p-1 text-sm w-full"
@@ -86,7 +86,7 @@ export function DocumentTable({ documents }: { documents: Document[] }) {
                 ) : (
                   <div className="flex gap-1 flex-wrap">
                     {doc.tags?.length ? doc.tags.map(tag => (
-                      <span key={tag} className="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-xs">
+                      <span key={tag} className="bg-muted text-muted-foreground px-2 py-0.5 rounded text-xs">
                         {tag}
                       </span>
                     )) : 'No tags'}
@@ -100,7 +100,7 @@ export function DocumentTable({ documents }: { documents: Document[] }) {
                 {editingId === doc.id ? (
                   <>
                     <button onClick={() => handleSaveMetadata(doc.id)} className="text-green-600 hover:text-green-900">Lưu</button>
-                    <button onClick={() => setEditingId(null)} className="text-gray-600 hover:text-gray-900">Hủy</button>
+                    <button onClick={() => setEditingId(null)} className="text-muted-foreground hover:text-foreground">Hủy</button>
                   </>
                 ) : (
                   <button onClick={() => handleEditClick(doc)} className="text-blue-600 hover:text-blue-900">Edit</button>
@@ -109,7 +109,7 @@ export function DocumentTable({ documents }: { documents: Document[] }) {
                 {doc.status === 'PENDING' && (
                   <button 
                     onClick={() => handleApprove(doc.id)} 
-                    className="text-purple-600 hover:text-purple-900 font-semibold ml-2"
+                    className="text-emerald-600 hover:text-emerald-900 dark:text-accent-mint dark:hover:text-accent-emerald font-semibold ml-2"
                   >
                     Approve
                   </button>
@@ -119,7 +119,7 @@ export function DocumentTable({ documents }: { documents: Document[] }) {
           ))}
           {documents.length === 0 && (
             <tr>
-              <td colSpan={5} className="px-6 py-4 text-center text-gray-500">Không có tài liệu nào.</td>
+              <td colSpan={5} className="px-6 py-4 text-center text-muted-foreground">Không có tài liệu nào.</td>
             </tr>
           )}
         </tbody>

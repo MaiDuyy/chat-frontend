@@ -83,7 +83,7 @@ export function WikiDraftBanner({
   };
 
   return (
-    <div className={`border ${config.bgColor} rounded-xl p-3 font-sans shadow-sm flex flex-col gap-2.5 transition-all`}>
+    <div className={`border ${config.bgColor} rounded-lg p-3 font-sans shadow-sm flex flex-col gap-2.5 transition-all`}>
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-start gap-3">
           {config.icon}
@@ -104,13 +104,13 @@ export function WikiDraftBanner({
       </div>
 
       {draft.note && (
-        <div className="text-xs border border-border bg-background/50 p-2.5 rounded-lg font-medium text-foreground/85">
+        <div className="text-xs border border-border bg-background/50 p-2.5 rounded-md font-medium text-foreground/85">
           <span className="font-bold text-foreground">Ghi chú chỉnh sửa:</span> &quot;{draft.note}&quot;
         </div>
       )}
 
       {draft.reviewerNote && (
-        <div className="text-xs border border-border bg-muted/40 p-2.5 rounded-lg font-mono text-foreground/90 leading-relaxed">
+        <div className="text-xs border border-border bg-muted/40 p-2.5 rounded-md font-mono text-foreground/90 leading-relaxed">
           <span className="font-sans font-bold text-foreground">Nhận xét của người duyệt:</span> &quot;{draft.reviewerNote}&quot;
         </div>
       )}
@@ -120,7 +120,7 @@ export function WikiDraftBanner({
           <div className="flex items-center gap-2">
             <Link
               href={`/wiki/review?draftId=${draft.id}`}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono font-bold uppercase tracking-wide bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-200 rounded-lg shadow-sm active:scale-[0.98]"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono font-bold uppercase tracking-wide bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-200 rounded-md shadow-sm active:scale-[0.98]"
             >
               Xem so sánh chi tiết
               <ArrowRight className="w-3.5 h-3.5" />
@@ -133,7 +133,7 @@ export function WikiDraftBanner({
                 type="button"
                 onClick={onApprove}
                 disabled={isActionsLoading}
-                className="px-3 py-1 text-xs font-mono font-bold uppercase tracking-wide bg-emerald-600 hover:bg-emerald-700 text-white transition-all duration-200 rounded-lg shadow-sm active:scale-[0.98]"
+                className="px-3 py-1 text-xs font-mono font-bold uppercase tracking-wide bg-emerald-600 hover:bg-emerald-700 text-white transition-all duration-200 rounded-md shadow-sm active:scale-[0.98]"
               >
                 Duyệt & Ghi đè
               </button>
@@ -141,7 +141,7 @@ export function WikiDraftBanner({
                 type="button"
                 onClick={() => setShowFeedbackInput(showFeedbackInput === "changes" ? null : "changes")}
                 disabled={isActionsLoading}
-                className="px-3 py-1 text-xs font-mono font-bold uppercase tracking-wide bg-amber-500 hover:bg-amber-600 text-white transition-all duration-200 rounded-lg shadow-sm active:scale-[0.98]"
+                className="px-3 py-1 text-xs font-mono font-bold uppercase tracking-wide bg-amber-500 hover:bg-amber-600 text-white transition-all duration-200 rounded-md shadow-sm active:scale-[0.98]"
               >
                 Yêu cầu sửa
               </button>
@@ -149,7 +149,7 @@ export function WikiDraftBanner({
                 type="button"
                 onClick={() => setShowFeedbackInput(showFeedbackInput === "reject" ? null : "reject")}
                 disabled={isActionsLoading}
-                className="px-3 py-1 text-xs font-mono font-bold uppercase tracking-wide bg-rose-600 hover:bg-rose-700 text-white transition-all duration-200 rounded-lg shadow-sm active:scale-[0.98]"
+                className="px-3 py-1 text-xs font-mono font-bold uppercase tracking-wide bg-rose-600 hover:bg-rose-700 text-white transition-all duration-200 rounded-md shadow-sm active:scale-[0.98]"
               >
                 Từ chối
               </button>
@@ -170,19 +170,19 @@ export function WikiDraftBanner({
               placeholder="Nhập nhận xét/lý do..."
               rows={2}
               required
-              className="flex-1 text-xs border border-border bg-background rounded-lg p-2 font-sans focus:outline-none focus:ring-1 focus:ring-primary/20 focus:border-primary transition-all"
+              className="flex-1 text-xs border border-border bg-background rounded-md p-2 font-sans focus:outline-none focus:ring-1 focus:ring-primary/20 focus:border-primary transition-all"
             />
             <div className="flex flex-col gap-1.5 justify-end">
               <button
                 type="submit"
-                className="px-3 py-1 text-[10px] font-mono font-bold uppercase bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-200 rounded-lg shadow-sm active:scale-[0.98]"
+                className="px-3 py-1 text-[10px] font-mono font-bold uppercase bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-200 rounded-md shadow-sm active:scale-[0.98]"
               >
                 Xác nhận
               </button>
               <button
                 type="button"
                 onClick={() => setShowFeedbackInput(null)}
-                className="px-3 py-1 text-[10px] font-mono font-bold uppercase border border-border bg-secondary hover:bg-secondary/80 text-secondary-foreground transition-all duration-200 rounded-lg shadow-sm active:scale-[0.98]"
+                className="px-3 py-1 text-[10px] font-mono font-bold uppercase border border-border bg-secondary hover:bg-secondary/80 text-secondary-foreground transition-all duration-200 rounded-md shadow-sm active:scale-[0.98]"
               >
                 Hủy
               </button>

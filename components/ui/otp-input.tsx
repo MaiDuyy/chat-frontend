@@ -110,7 +110,7 @@ export function OTPInput({
                     onFocus={(e) => e.target.select()}
                     disabled={disabled}
                     className={cn(
-                        "w-12 h-14 text-center text-2xl font-bold rounded-lg border-2",
+                        "w-12 h-14 text-center text-2xl font-bold rounded-md border-2",
                         "transition-all duration-200 outline-none",
                         "focus:border-primary focus:ring-2 focus:ring-primary/20",
                         "disabled:opacity-50 disabled:cursor-not-allowed",

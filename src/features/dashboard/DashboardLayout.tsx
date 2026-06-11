@@ -12,7 +12,7 @@ export const DashboardLayout: React.FC = () => {
   const [hasEmergencyPing, setHasEmergencyPing] = useState(false);
 
   return (
-    <div className={`h-full w-full bg-[#030303] text-zinc-200 transition-colors duration-500 overflow-y-auto custom-scrollbar relative font-sans ${isFocusMode ? 'bg-[#000000]' : ''}`}>
+    <div className={`h-full w-full bg-[#030303] text-foreground transition-colors duration-500 overflow-y-auto custom-scrollbar relative font-sans ${isFocusMode ? 'bg-[#000000]' : ''}`}>
       <AIOnboardingTour />
       {/* Background Graphic elements */}
       <div className="absolute top-0 left-0 w-full h-[300px] bg-gradient-to-b from-zinc-900/40 to-transparent pointer-events-none"></div>
@@ -38,16 +38,16 @@ export const DashboardLayout: React.FC = () => {
         </div>
       )}
 
-      <div className="max-w-[1600px] mx-auto p-4 md:p-6 lg:p-8 flex flex-col gap-6 relative z-10">
+      <div className="max-w-[1200px] mx-auto p-4 md:p-6 lg:p-8 flex flex-col gap-6 relative z-10">
         
         {/* Top Header */}
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-zinc-800 pb-4">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-border pb-4">
           <div>
-            <h1 className="text-2xl font-light text-zinc-100 tracking-tight flex items-center gap-2">
+            <h1 className="text-2xl font-light text-foreground tracking-tight flex items-center gap-2">
               <span className="w-3 h-3 bg-[#ccff00] block mt-1"></span>
               COMMAND CENTER
             </h1>
-            <p className="text-xs text-zinc-500 uppercase tracking-widest mt-1 ml-5">
+            <p className="text-xs text-muted-foreground uppercase tracking-widest mt-1 ml-5">
               Live Systems Active • {(new Date()).toLocaleDateString()}
             </p>
           </div>

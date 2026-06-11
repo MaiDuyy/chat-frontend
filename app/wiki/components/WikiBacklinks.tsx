@@ -105,7 +105,7 @@ export function WikiBacklinks({ currentPageTitle, currentPageSlug, allWikiPages 
   }, [currentPageTitle, currentPageSlug, allWikiPages]);
 
   return (
-    <div className="border border-border bg-card text-card-foreground rounded-xl p-3 shadow-sm">
+    <div className="border border-border bg-card text-card-foreground rounded-lg p-3 shadow-sm">
       <div className="flex items-center gap-2 border-b border-border pb-2 mb-2.5">
         <Link2 className="w-4 h-4 text-primary shrink-0" />
         <span className="font-mono text-xs uppercase font-extrabold tracking-wide text-foreground">
@@ -114,7 +114,7 @@ export function WikiBacklinks({ currentPageTitle, currentPageSlug, allWikiPages 
       </div>
 
       {backlinks.length === 0 ? (
-        <div className="flex flex-col items-center justify-center p-4 text-center border border-dashed border-border bg-muted/10 rounded-lg min-h-[100px]">
+        <div className="flex flex-col items-center justify-center p-4 text-center border border-dashed border-border bg-muted/10 rounded-md min-h-[100px]">
           <Compass className="w-6 h-6 text-muted-foreground/60 mb-1.5" />
           <p className="text-[11px] font-medium text-foreground/80 leading-normal">
             Chưa có liên kết nội bộ nào trỏ tới trang này.
@@ -130,7 +130,7 @@ export function WikiBacklinks({ currentPageTitle, currentPageSlug, allWikiPages 
               <Link
                 key={page.id}
                 href={`/wiki/${page.slug}`}
-                className="flex items-center gap-2 p-2 border border-border hover:border-primary/30 bg-muted/15 hover:bg-primary/5 transition-all rounded-lg group"
+                className="flex items-center gap-2 p-2 border border-border hover:border-primary/30 bg-muted/15 hover:bg-primary/5 hover:-translate-y-[0.5px] active:scale-[0.98] transition-all duration-200 rounded-md group"
               >
                 <FileText className="w-3.5 h-3.5 text-muted-foreground group-hover:text-primary shrink-0 transition-colors" />
                 <span className="text-xs font-bold text-foreground group-hover:text-primary transition-colors truncate">

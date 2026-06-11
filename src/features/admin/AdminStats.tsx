@@ -41,7 +41,7 @@ export function AdminStats() {
             title: 'Tổng người dùng',
             value: formatNumber(data.totalUsers),
             icon: Users,
-            iconClass: 'text-blue-600 dark:text-blue-400',
+            iconClass: 'text-primary',
             bgClass: 'bg-blue-50 dark:bg-blue-950/30',
         },
         {
@@ -55,8 +55,8 @@ export function AdminStats() {
             title: 'Tổng tin nhắn',
             value: formatNumber(data.totalMessages),
             icon: MessageSquare,
-            iconClass: 'text-indigo-600 dark:text-indigo-400',
-            bgClass: 'bg-indigo-50 dark:bg-indigo-950/30',
+            iconClass: 'text-cyan-600 dark:text-cyan-400',
+            bgClass: 'bg-cyan-50 dark:bg-cyan-950/30',
         },
         {
             title: 'Đoạn chat',
@@ -90,12 +90,12 @@ export function AdminStats() {
                 {stats.map((stat) => {
                     const Icon = stat.icon;
                     return (
-                        <Card key={stat.title} className="border border-border rounded-xl shadow-sm hover:shadow-md transition-all bg-card">
+                        <Card key={stat.title} className="border border-border rounded-lg shadow-sm hover:shadow-md transition-all bg-card">
                             <CardHeader className="flex flex-row items-center justify-between pb-1 pt-3 px-3 space-y-0">
                                 <CardTitle className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
                                     {stat.title}
                                 </CardTitle>
-                                <div className={cn('p-1.5 rounded-lg', stat.bgClass)}>
+                                <div className={cn('p-1.5 rounded-md', stat.bgClass)}>
                                     <Icon className={cn('h-3.5 w-3.5', stat.iconClass)} />
                                 </div>
                             </CardHeader>
@@ -122,7 +122,7 @@ export function AdminStats() {
             </div>
 
             {/* Recent Activity */}
-            <Card className="border border-border rounded-xl shadow-sm bg-card">
+            <Card className="border border-border rounded-lg shadow-sm bg-card">
                 <CardHeader className="p-4 pb-2">
                     <CardTitle className="flex items-center gap-2 text-sm font-semibold">
                         <Activity className="w-4 h-4 text-primary" />
@@ -133,12 +133,12 @@ export function AdminStats() {
                 <CardContent className="p-4 pt-0">
                     <div className="space-y-3">
                         {data.recentActivity?.length > 0 ? (
-                            <div className="relative space-y-3 before:absolute before:inset-0 before:ml-4 before:-translate-x-px before:h-full before:w-0.5 before:bg-slate-200 dark:before:bg-slate-800">
+                            <div className="relative space-y-3 before:absolute before:inset-0 before:ml-4 before:-translate-x-px before:h-full before:w-0.5 before:bg-muted dark:before:bg-slate-800">
                                 {data.recentActivity.slice(0, 10).map((activity, index) => (
                                     <div key={index} className="relative flex items-center justify-between gap-3">
                                         <div className="flex items-center gap-3">
-                                            <div className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 border-4 border-white dark:border-slate-900 shadow-sm z-10">
-                                                <Activity className="h-3.5 w-3.5 text-slate-500" />
+                                            <div className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-muted dark:bg-slate-800 border-4 border-white dark:border-slate-900 shadow-sm z-10">
+                                                <Activity className="h-3.5 w-3.5 text-muted-foreground" />
                                             </div>
                                             <div>
                                                 <p className="text-xs font-semibold text-foreground">{activity.description}</p>

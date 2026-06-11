@@ -53,28 +53,28 @@ export default function JoinGroupPage() {
     }, [chatId, joinGroup, router]);
 
     return (
-        <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
-            <div className="max-w-md w-full bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 p-8 flex flex-col items-center text-center">
+        <div className="min-h-screen bg-muted flex items-center justify-center p-4">
+            <div className="max-w-md w-full bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-border p-8 flex flex-col items-center text-center">
                 {status === "loading" && (
                     <>
-                        <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mb-6 animate-pulse">
+                        <div className="w-16 h-16 bg-blue-50 rounded-xl flex items-center justify-center mb-6 animate-pulse">
                             <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
                         </div>
-                        <h1 className="text-xl font-bold text-slate-800 mb-2">Đang xử lý...</h1>
-                        <p className="text-slate-500 text-sm">Vui lòng chờ trong giây lát khi chúng tôi xử lý yêu cầu tham gia của bạn.</p>
+                        <h1 className="text-xl font-bold text-foreground mb-2">Đang xử lý...</h1>
+                        <p className="text-muted-foreground text-sm">Vui lòng chờ trong giây lát khi chúng tôi xử lý yêu cầu tham gia của bạn.</p>
                     </>
                 )}
 
                 {status === "success" && (
                     <>
-                        <div className="w-16 h-16 bg-green-50 rounded-2xl flex items-center justify-center mb-6">
+                        <div className="w-16 h-16 bg-green-50 rounded-xl flex items-center justify-center mb-6">
                             <CheckCircle2 className="w-10 h-10 text-green-500" />
                         </div>
-                        <h1 className="text-xl font-bold text-slate-800 mb-2">Tuyệt vời!</h1>
-                        <p className="text-slate-500 text-sm mb-8">{message}</p>
+                        <h1 className="text-xl font-bold text-foreground mb-2">Tuyệt vời!</h1>
+                        <p className="text-muted-foreground text-sm mb-8">{message}</p>
                         <Button 
                             onClick={() => router.push(`/chat?id=${chatId}`)}
-                            className="w-full bg-blue-600 hover:bg-blue-700 h-12 rounded-xl font-bold"
+                            className="w-full bg-primary hover:bg-primary/90 h-12 rounded-lg font-bold"
                         >
                             Vào nhóm ngay
                         </Button>
@@ -83,17 +83,17 @@ export default function JoinGroupPage() {
 
                 {status === "pending" && (
                     <>
-                        <div className="w-16 h-16 bg-amber-50 rounded-2xl flex items-center justify-center mb-6">
+                        <div className="w-16 h-16 bg-amber-50 rounded-xl flex items-center justify-center mb-6">
                             <Users className="w-10 h-10 text-amber-500" />
                         </div>
-                        <h1 className="text-xl font-bold text-slate-800 mb-2">Yêu cầu đã gửi</h1>
-                        <p className="text-slate-500 text-sm mb-8">
+                        <h1 className="text-xl font-bold text-foreground mb-2">Yêu cầu đã gửi</h1>
+                        <p className="text-muted-foreground text-sm mb-8">
                             Nhóm này yêu cầu phê duyệt từ quản trị viên. Chúng tôi sẽ thông báo cho bạn khi yêu cầu được chấp nhận.
                         </p>
                         <Button 
                             variant="outline"
                             onClick={() => router.push("/chat")}
-                            className="w-full h-12 rounded-xl font-bold border-slate-200"
+                            className="w-full h-12 rounded-lg font-bold border-border"
                         >
                             Quay lại trang chủ
                         </Button>
@@ -102,22 +102,22 @@ export default function JoinGroupPage() {
 
                 {status === "error" && (
                     <>
-                        <div className="w-16 h-16 bg-red-50 rounded-2xl flex items-center justify-center mb-6">
+                        <div className="w-16 h-16 bg-red-50 rounded-xl flex items-center justify-center mb-6">
                             <ShieldAlert className="w-10 h-10 text-red-500" />
                         </div>
-                        <h1 className="text-xl font-bold text-slate-800 mb-2">Rất tiếc!</h1>
-                        <p className="text-slate-500 text-sm mb-8">{message}</p>
+                        <h1 className="text-xl font-bold text-foreground mb-2">Rất tiếc!</h1>
+                        <p className="text-muted-foreground text-sm mb-8">{message}</p>
                         <div className="flex flex-col gap-3 w-full">
                             <Button 
                                 onClick={() => router.push("/chat")}
-                                className="w-full bg-slate-800 hover:bg-slate-900 h-12 rounded-xl font-bold"
+                                className="w-full bg-slate-800 hover:bg-slate-900 h-12 rounded-lg font-bold"
                             >
                                 Quay lại trang chủ
                             </Button>
                             <Button 
                                 variant="ghost"
                                 onClick={() => window.location.reload()}
-                                className="w-full h-12 rounded-xl font-semibold text-slate-500"
+                                className="w-full h-12 rounded-lg font-semibold text-muted-foreground"
                             >
                                 Thử lại
                             </Button>
@@ -128,7 +128,7 @@ export default function JoinGroupPage() {
                 <div className="mt-10 pt-6 border-t border-slate-50 w-full flex items-center justify-center">
                     <button 
                         onClick={() => router.push("/chat")}
-                        className="flex items-center gap-2 text-xs font-semibold text-slate-400 hover:text-blue-600 transition-colors"
+                        className="flex items-center gap-2 text-xs font-semibold text-muted-foreground hover:text-blue-600 transition-colors"
                     >
                         <ArrowLeft className="w-3 h-3" />
                         Quay lại ứng dụng Chat

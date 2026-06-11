@@ -85,13 +85,13 @@ const ROLE_LABELS: Record<string, string> = {
 };
 
 const ROLE_COLORS: Record<string, string> = {
-    SUPER_ADMIN: 'bg-purple-100 text-purple-700 border-purple-200 dark:bg-purple-950/30 dark:text-purple-400 dark:border-purple-900/30',
-    ADMIN: 'bg-indigo-100 text-indigo-700 border-indigo-200 dark:bg-indigo-950/30 dark:text-indigo-400 dark:border-indigo-900/30',
+    SUPER_ADMIN: 'bg-amber-100/80 text-amber-800 border-amber-200 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-900/40',
+    ADMIN: 'bg-emerald-100/80 text-emerald-800 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-900/30',
     WORKSPACE_MANAGER: 'bg-orange-100 text-orange-700 border-orange-200 dark:bg-orange-950/30 dark:text-orange-400 dark:border-orange-900/30',
     WORKSPACE_OWNER: 'bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-900/30',
     WORKSPACE_ADMIN: 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-950/30 dark:text-blue-400 dark:border-blue-900/30',
-    WORKSPACE_MEMBER: 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800/40 dark:text-slate-300 dark:border-slate-700/50',
-    WORKSPACE_GUEST: 'bg-gray-100 text-gray-700 border-gray-200 dark:bg-gray-800/30 dark:text-gray-400 dark:border-gray-700/50',
+    WORKSPACE_MEMBER: 'bg-muted text-muted-foreground border-border dark:bg-slate-800/40 dark:text-muted-foreground dark:border-border/50',
+    WORKSPACE_GUEST: 'bg-muted text-muted-foreground border-border dark:bg-gray-800/30 dark:text-muted-foreground dark:border-border/50',
     EMPLOYEE: 'bg-green-100 text-green-700 border-green-200 dark:bg-green-950/30 dark:text-green-400 dark:border-green-900/30',
 };
 
@@ -102,7 +102,7 @@ function UserRow({ user, isOnline, currentUser, onEdit, onRole, onQuota, onSuspe
     };
 
     return (
-        <TableRow className="hover:bg-slate-50/50 dark:hover:bg-slate-800/40 transition-colors border-b border-border">
+        <TableRow className="hover:bg-muted/50 dark:hover:bg-slate-800/40 transition-colors border-b border-border">
             <TableCell className="py-2.5">
                 <div className="flex items-center gap-2">
                     <div className="relative">
@@ -124,12 +124,12 @@ function UserRow({ user, isOnline, currentUser, onEdit, onRole, onQuota, onSuspe
                 {user.role ? (
                     <Badge
                         variant="outline"
-                        className={cn("font-medium text-[10px] py-0 px-1.5 rounded-md", ROLE_COLORS[user.role] || "bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400")}
+                        className={cn("font-medium text-[10px] py-0 px-1.5 rounded-md", ROLE_COLORS[user.role] || "bg-muted dark:bg-slate-800 text-muted-foreground dark:text-muted-foreground")}
                     >
                         {ROLE_LABELS[user.role] || user.role}
                     </Badge>
                 ) : (
-                    <span className="text-xs text-slate-400">-</span>
+                    <span className="text-xs text-muted-foreground">-</span>
                 )}
             </TableCell>
             <TableCell className="py-2.5">
@@ -147,7 +147,7 @@ function UserRow({ user, isOnline, currentUser, onEdit, onRole, onQuota, onSuspe
             </TableCell>
             <TableCell className="py-2.5">
                 <div className="flex flex-col">
-                    <span className="text-[10px] font-medium text-slate-500 dark:text-slate-400">
+                    <span className="text-[10px] font-medium text-muted-foreground dark:text-muted-foreground">
                         {isOnline ? 'Đang trực tuyến' : user.lastSeen
                             ? `Lần cuối ${format(new Date(user.lastSeen), 'HH:mm dd/MM')}`
                             : 'Chưa truy cập'
@@ -156,14 +156,14 @@ function UserRow({ user, isOnline, currentUser, onEdit, onRole, onQuota, onSuspe
                 </div>
             </TableCell>
             <TableCell className="py-2.5">
-                <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">
+                <span className="text-[10px] text-muted-foreground dark:text-muted-foreground font-medium">
                     {format(new Date(user.createdAt), 'dd/MM/yyyy')}
                 </span>
             </TableCell>
             <TableCell className="py-2.5">
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-7 w-7 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg">
+                        <Button variant="ghost" size="icon" className="h-7 w-7 hover:bg-muted dark:hover:bg-slate-800 rounded-md">
                             <MoreHorizontal className="h-3.5 w-3.5" />
                         </Button>
                     </DropdownMenuTrigger>
@@ -389,7 +389,7 @@ export function UserTable({ onInviteUser, onEditUser }: UserTableProps) {
                             placeholder="Tìm kiếm người dùng..."
                             value={searchQuery}
                             onChange={(e) => handleSearch(e.target.value)}
-                            className="pl-8 h-8 text-xs rounded-lg"
+                            className="pl-8 h-8 text-xs rounded-md"
                         />
                     </div>
                     <Select
@@ -399,7 +399,7 @@ export function UserTable({ onInviteUser, onEditUser }: UserTableProps) {
                             setPage(0);
                         }}
                     >
-                        <SelectTrigger className="w-[140px] h-8 text-xs rounded-lg">
+                        <SelectTrigger className="w-[140px] h-8 text-xs rounded-md">
                             <Filter className="w-3 h-3 mr-1.5" />
                             <SelectValue placeholder="Vai trò" />
                         </SelectTrigger>
@@ -413,7 +413,7 @@ export function UserTable({ onInviteUser, onEditUser }: UserTableProps) {
                 </div>
                 <Button 
                     onClick={() => setShowInviteDialog(true)} 
-                    className="h-8.5 text-xs rounded-lg bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold shadow-sm transition-all active:scale-[0.98] cursor-pointer"
+                    className="h-8.5 text-xs rounded-md bg-primary hover:bg-primary/90 active:bg-blue-800 text-white font-semibold shadow-sm transition-all active:scale-[0.98] cursor-pointer"
                 >
                     <UserPlus className="w-3.5 h-3.5 mr-1.5" />
                     Thêm nhân sự
@@ -421,9 +421,9 @@ export function UserTable({ onInviteUser, onEditUser }: UserTableProps) {
             </div>
 
             {/* Table */}
-            <div className="border border-border rounded-xl overflow-hidden bg-background shadow-sm">
+            <div className="border border-border rounded-lg overflow-hidden bg-background shadow-sm">
                 <Table>
-                    <TableHeader className="bg-slate-50/50 dark:bg-slate-800/30 border-b border-border">
+                    <TableHeader className="bg-muted/50 dark:bg-slate-800/30 border-b border-border">
                         <TableRow>
                             <TableHead className="w-[280px] h-8 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Người dùng</TableHead>
                             <TableHead className="h-8 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Vai trò</TableHead>
@@ -498,10 +498,10 @@ export function UserTable({ onInviteUser, onEditUser }: UserTableProps) {
                     <div className="py-4 space-y-6">
                         <RadioGroup value={deleteMode} onValueChange={(val: any) => setDeleteMode(val)} className="space-y-2">
                             <div className={cn(
-                                "flex items-start gap-2.5 p-2.5 rounded-lg border transition-colors cursor-pointer",
+                                "flex items-start gap-2.5 p-2.5 rounded-md border transition-colors cursor-pointer",
                                 deleteMode === 'anonymize' 
-                                    ? "bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-700" 
-                                    : "border-transparent border-slate-100 dark:border-slate-800/50"
+                                    ? "bg-muted dark:bg-slate-800/40 border-border dark:border-border" 
+                                    : "border-transparent border-border dark:border-border/50"
                             )}>
                                 <RadioGroupItem value="anonymize" id="anonymize" className="mt-1" />
                                 <Label htmlFor="anonymize" className="flex-1 cursor-pointer">
@@ -513,10 +513,10 @@ export function UserTable({ onInviteUser, onEditUser }: UserTableProps) {
                             </div>
 
                             <div className={cn(
-                                "flex items-start gap-2.5 p-2.5 rounded-lg border transition-colors cursor-pointer",
+                                "flex items-start gap-2.5 p-2.5 rounded-md border transition-colors cursor-pointer",
                                 deleteMode === 'hard' 
                                     ? "bg-red-50/60 dark:bg-red-950/20 border-red-200 dark:border-red-900/30" 
-                                    : "border-transparent border-slate-100 dark:border-slate-800/50"
+                                    : "border-transparent border-border dark:border-border/50"
                             )}>
                                 <RadioGroupItem value="hard" id="hard" className="mt-1" />
                                 <Label htmlFor="hard" className="flex-1 cursor-pointer">
@@ -528,7 +528,7 @@ export function UserTable({ onInviteUser, onEditUser }: UserTableProps) {
                             </div>
                         </RadioGroup>
 
-                        <div className="space-y-2 p-3 bg-amber-50/60 dark:bg-amber-950/10 border border-amber-200 dark:border-amber-900/30 rounded-lg">
+                        <div className="space-y-2 p-3 bg-amber-50/60 dark:bg-amber-950/10 border border-amber-200 dark:border-amber-900/30 rounded-md">
                             <div className="flex items-center gap-1.5 text-amber-800 dark:text-amber-400 font-bold text-xs">
                                 <Info className="w-3.5 h-3.5" />
                                 Xác nhận danh tính người dùng
@@ -540,7 +540,7 @@ export function UserTable({ onInviteUser, onEditUser }: UserTableProps) {
                                 placeholder="Nhập email để xác nhận..."
                                 value={deleteConfirmEmail}
                                 onChange={(e) => setDeleteConfirmEmail(e.target.value)}
-                                className="bg-white dark:bg-slate-900 h-8 text-xs rounded-lg"
+                                className="bg-white dark:bg-slate-900 h-8 text-xs rounded-md"
                             />
                         </div>
                     </div>
@@ -637,7 +637,7 @@ export function UserTable({ onInviteUser, onEditUser }: UserTableProps) {
                     </DialogHeader>
 
                     <div className="py-3 space-y-3">
-                        <div className="p-2.5 bg-green-50/60 dark:bg-green-950/10 border border-green-200 dark:border-green-900/30 rounded-lg space-y-0.5">
+                        <div className="p-2.5 bg-green-50/60 dark:bg-green-950/10 border border-green-200 dark:border-green-900/30 rounded-md space-y-0.5">
                             <p className="text-[11px] font-bold text-green-800 dark:text-green-400">Thông tin đình chỉ trước đó:</p>
                             <p className="text-[11px] text-green-700 dark:text-green-300 italic">&quot;{selectedUser?.suspendReason || 'Không có dữ liệu'}&quot;</p>
                         </div>
@@ -648,7 +648,7 @@ export function UserTable({ onInviteUser, onEditUser }: UserTableProps) {
                                 placeholder="Nhập lý do cho việc khôi phục tài khoản này..."
                                 value={unsuspendReason}
                                 onChange={(e) => setUnsuspendReason(e.target.value)}
-                                className="min-h-[80px] resize-none text-xs rounded-lg border-green-200 dark:border-green-900/40 focus-visible:ring-green-500 bg-white dark:bg-slate-900"
+                                className="min-h-[80px] resize-none text-xs rounded-md border-green-200 dark:border-green-900/40 focus-visible:ring-green-500 bg-white dark:bg-slate-900"
                             />
                         </div>
                     </div>
@@ -731,10 +731,10 @@ export function UserTable({ onInviteUser, onEditUser }: UserTableProps) {
                                 onChange={(e) => setQuotaValue(parseInt(e.target.value))}
                                 min={1}
                                 max={100}
-                                className="h-9 text-xs rounded-lg"
+                                className="h-9 text-xs rounded-md"
                             />
                         </div>
-                        <div className="p-2.5 bg-blue-50/60 dark:bg-blue-950/10 border border-blue-200 dark:border-blue-900/30 rounded-lg flex gap-2">
+                        <div className="p-2.5 bg-blue-50/60 dark:bg-blue-950/10 border border-blue-200 dark:border-blue-900/30 rounded-md flex gap-2">
                             <Building2 className="w-4 h-4 text-blue-500 dark:text-blue-400 shrink-0 mt-0.5" />
                             <p className="text-[10px] text-blue-700 dark:text-blue-300 leading-normal">
                                 Giới hạn này sẽ ghi đè lên giới hạn mặc định của hệ thống hoặc của tổ chức (nếu có).

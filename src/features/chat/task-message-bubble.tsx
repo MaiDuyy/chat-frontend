@@ -104,8 +104,8 @@ export default function TaskMessageBubble({ taskId, chatId, isMe }: TaskMessageB
     if (task.status === "CANCELLED") {
       return {
         label: "Đã hủy",
-        color: "bg-white/10 text-slate-300 border-white/10",
-        lightColor: "bg-slate-100 text-slate-500 border-slate-200"
+        color: "bg-white/10 text-muted-foreground border-white/10",
+        lightColor: "bg-muted text-muted-foreground border-border"
       };
     }
     if (isOverdue) {
@@ -125,7 +125,7 @@ export default function TaskMessageBubble({ taskId, chatId, isMe }: TaskMessageB
     return {
       label: "Chưa bắt đầu",
       color: "bg-white/5 text-blue-200 border-white/10",
-      lightColor: "bg-slate-50/50 text-slate-400 border-slate-100"
+      lightColor: "bg-muted/50 text-muted-foreground border-border"
     };
   };
 
@@ -143,14 +143,14 @@ export default function TaskMessageBubble({ taskId, chatId, isMe }: TaskMessageB
         </span>
         <h4 className={cn(
           "text-sm font-extrabold leading-snug break-words",
-          isMe ? "text-white" : "text-slate-800 dark:text-white"
+          isMe ? "text-white" : "text-foreground dark:text-white"
         )}>
           {task.title}
         </h4>
         {task.description && (
           <p className={cn(
             "text-xs mt-0.5 break-words line-clamp-2",
-            isMe ? "text-blue-100/80" : "text-slate-500 dark:text-slate-400"
+            isMe ? "text-blue-100/80" : "text-muted-foreground dark:text-muted-foreground"
           )}>
             {task.description}
           </p>
@@ -159,10 +159,10 @@ export default function TaskMessageBubble({ taskId, chatId, isMe }: TaskMessageB
 
       {/* Main Card */}
       <div className={cn(
-        "p-3 rounded-lg border flex flex-col gap-2.5 shadow-sm",
+        "p-3 rounded-md border flex flex-col gap-2.5 shadow-sm",
         isMe
           ? "bg-white/10 border-white/15 text-white"
-          : "bg-slate-50/50 dark:bg-slate-900/50 border-slate-100 dark:border-slate-800 text-slate-800 dark:text-slate-100"
+          : "bg-muted/50 dark:bg-slate-900/50 border-border dark:border-border text-foreground dark:text-foreground"
       )}>
         {/* Toggle Checkbox & Status */}
         <div className="flex items-center justify-between gap-3">
@@ -173,8 +173,8 @@ export default function TaskMessageBubble({ taskId, chatId, isMe }: TaskMessageB
               className={cn(
                 "w-4 h-4 rounded border flex items-center justify-center flex-shrink-0 transition-all",
                 task.status === "DONE"
-                  ? isMe ? "bg-white text-blue-600 border-white" : "bg-blue-600 text-white border-blue-600"
-                  : isMe ? "border-white/40 hover:border-white" : "border-slate-300 hover:border-blue-400",
+                  ? isMe ? "bg-white text-blue-600 border-white" : "bg-primary text-white border-blue-600"
+                  : isMe ? "border-white/40 hover:border-white" : "border-border hover:border-blue-400",
                 isCancelled && "opacity-50 cursor-not-allowed",
                 (!canUpdate && !isCancelled) && "opacity-50 cursor-not-allowed"
               )}
@@ -210,7 +210,7 @@ export default function TaskMessageBubble({ taskId, chatId, isMe }: TaskMessageB
                   disabled={isUpdating}
                   className={cn(
                     "px-1.5 py-0.5 rounded text-[9px] font-bold flex items-center gap-0.5 transition-colors",
-                    isMe ? "bg-white/20 hover:bg-white/30 text-white" : "bg-slate-200 text-slate-700 hover:bg-slate-300"
+                    isMe ? "bg-white/20 hover:bg-white/30 text-white" : "bg-muted text-muted-foreground hover:bg-muted"
                   )}
                 >
                   <Pause size={8} /> Tạm dừng

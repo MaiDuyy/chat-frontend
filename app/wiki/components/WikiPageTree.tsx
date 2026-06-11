@@ -100,10 +100,10 @@ export function WikiPageTree({
 
   if (collapsed) {
     return (
-      <div className="w-12 border border-border bg-card flex flex-col items-center pt-4 gap-3 shrink-0 rounded-xl min-h-[500px] select-none shadow-sm">
+      <div className="w-12 border border-border bg-card flex flex-col items-center pt-4 gap-3 shrink-0 rounded-lg min-h-[500px] select-none shadow-sm">
         <button
           onClick={() => setCollapsed(false)}
-          className="p-1.5 border border-border hover:bg-muted text-foreground transition-all rounded-lg hover:border-primary/20"
+          className="p-1.5 border border-border hover:bg-muted text-foreground transition-all rounded-md hover:border-primary/20"
           title="Mở rộng danh mục"
         >
           <PanelLeft className="w-4 h-4" />
@@ -113,7 +113,7 @@ export function WikiPageTree({
   }
 
   return (
-    <div className="w-64 shrink-0 border border-border bg-card flex flex-col overflow-hidden rounded-xl min-h-[500px] shadow-sm">
+    <div className="w-64 shrink-0 border border-border bg-card flex flex-col overflow-hidden rounded-lg min-h-[500px] shadow-sm">
       {/* Sidebar Header */}
       <div className="flex items-center justify-between px-3 py-1.5 border-b border-border bg-muted select-none">
         <span className="text-[10px] font-mono font-extrabold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
@@ -125,7 +125,7 @@ export function WikiPageTree({
           </span>
           <button
             onClick={() => setCollapsed(true)}
-            className="p-1 hover:bg-foreground/5 text-muted-foreground hover:text-foreground rounded-lg transition-colors"
+            className="p-1 hover:bg-foreground/5 text-muted-foreground hover:text-foreground rounded-md transition-colors"
             title="Thu gọn"
           >
             <PanelLeftClose className="w-3.5 h-3.5" />
@@ -135,7 +135,7 @@ export function WikiPageTree({
 
       {/* Local Filter input */}
       <div className="px-2.5 py-1.5 border-b border-border bg-background">
-        <div className="flex items-center gap-1.5 bg-card border border-border px-2 py-1 rounded-lg focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/20 transition-all">
+        <div className="flex items-center gap-1.5 bg-card border border-border px-2 py-1 rounded-md focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/20 transition-all">
           <Search className="w-3.5 h-3.5 text-muted-foreground" />
           <input
             type="text"
@@ -162,7 +162,7 @@ export function WikiPageTree({
             {Array.from({ length: 5 }).map((_, i) => (
               <div
                 key={i}
-                className="h-7 border border-border bg-muted animate-pulse rounded-lg"
+                className="h-7 border border-border bg-muted animate-pulse rounded-md"
                 style={{ opacity: 1 - i * 0.15 }}
               />
             ))}
@@ -187,7 +187,7 @@ export function WikiPageTree({
                 {/* Section header toggle button */}
                 <button
                   onClick={() => toggleGroup(type)}
-                  className={`w-full flex items-center gap-1.5 px-2 py-1 hover:bg-muted/50 rounded-lg transition-all text-left select-none border border-transparent hover:border-border`}
+                  className={`w-full flex items-center gap-1.5 px-2 py-1 hover:bg-muted/50 rounded-md transition-all text-left select-none border border-transparent hover:border-border`}
                 >
                   {isExpanded ? (
                     <ChevronDown className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
@@ -211,7 +211,7 @@ export function WikiPageTree({
                       return (
                         <div
                           key={page.id}
-                          className={`group flex items-center gap-1 rounded-lg transition-all border ${
+                          className={`group flex items-center gap-1 rounded-md transition-all border ${
                             isActive 
                               ? "bg-primary/10 text-primary border-primary/20 font-bold" 
                               : "hover:bg-muted/50 border-transparent hover:border-border"

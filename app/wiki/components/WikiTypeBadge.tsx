@@ -11,8 +11,8 @@ const TYPE_CONFIG: Record<
   concept: { icon: Lightbulb, label: "Khái niệm", color: "text-emerald-600 dark:text-emerald-400", bg: "bg-emerald-50 dark:bg-emerald-950/30", borderColor: "border-emerald-200 dark:border-emerald-800" },
   topic: { icon: Tag, label: "Chủ đề", color: "text-amber-600 dark:text-amber-400", bg: "bg-amber-50 dark:bg-amber-950/30", borderColor: "border-amber-200 dark:border-amber-800" },
   source: { icon: FileText, label: "Nguồn tin", color: "text-rose-600 dark:text-rose-400", bg: "bg-rose-50 dark:bg-rose-950/30", borderColor: "border-rose-200 dark:border-rose-800" },
-  index: { icon: List, label: "Chỉ mục", color: "text-slate-600 dark:text-slate-400", bg: "bg-slate-50 dark:bg-slate-950/30", borderColor: "border-slate-200 dark:border-slate-800" },
-  log: { icon: History, label: "Nhật ký", color: "text-slate-600 dark:text-slate-400", bg: "bg-slate-50 dark:bg-slate-950/30", borderColor: "border-slate-200 dark:border-slate-800" },
+  index: { icon: List, label: "Chỉ mục", color: "text-muted-foreground dark:text-muted-foreground", bg: "bg-muted dark:bg-slate-950/30", borderColor: "border-border dark:border-border" },
+  log: { icon: History, label: "Nhật ký", color: "text-muted-foreground dark:text-muted-foreground", bg: "bg-muted dark:bg-slate-950/30", borderColor: "border-border dark:border-border" },
 };
 
 export function WikiTypeBadge({ type }: { type: string }) {
@@ -20,9 +20,9 @@ export function WikiTypeBadge({ type }: { type: string }) {
   const cfg = TYPE_CONFIG[normType] ?? {
     icon: HelpCircle,
     label: type || "Wiki",
-    color: "text-slate-600 dark:text-slate-400",
-    bg: "bg-slate-50 dark:bg-slate-950/30",
-    borderColor: "border-slate-200 dark:border-slate-800",
+    color: "text-muted-foreground dark:text-muted-foreground",
+    bg: "bg-muted dark:bg-slate-950/30",
+    borderColor: "border-border dark:border-border",
   };
   const Icon = cfg.icon;
 

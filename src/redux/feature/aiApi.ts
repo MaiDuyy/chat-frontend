@@ -65,11 +65,12 @@ export const aiApi = apiSlice.injectEndpoints({
       providesTags: ['AIHistory'],
     }),
 
-    chatWithRag: builder.mutation<ChatMessage, ChatRequest>({
-      query: (body) => ({
+    chatWithRag: builder.mutation<ChatMessage, ChatRequest & { headers?: Record<string, string> }>({
+      query: ({ headers, ...body }) => ({
         url: '/chat/messages',
         method: 'POST',
         body,
+        headers,
       }),
       invalidatesTags: ['AIHistory'],
     }),

@@ -75,7 +75,7 @@ export function CitationList({
                             rel="noopener noreferrer"
                             title={`Mở: ${citation.title}${isWikiLink ? ' (Wiki)' : ' (Tài liệu)'}`}
                             className={cn(
-                                'group flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-left no-underline',
+                                'group flex items-center gap-2 px-2.5 py-1.5 rounded-md text-left no-underline',
                                 'transition-colors duration-150 cursor-pointer',
                                 'bg-card border border-border',
                                 'hover:border-primary/40 hover:bg-primary/5',

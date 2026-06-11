@@ -26,8 +26,8 @@ export default function InvitePage() {
     <Suspense fallback={
       <div className="min-h-screen bg-[#0F0F11] flex items-center justify-center font-mono">
         <div className="flex flex-col items-center gap-3">
-          <Loader2 className="w-6 h-6 animate-spin text-slate-100" />
-          <p className="text-[10px] text-slate-500 uppercase tracking-widest">Initialising setup...</p>
+          <Loader2 className="w-6 h-6 animate-spin text-foreground" />
+          <p className="text-[10px] text-muted-foreground uppercase tracking-widest">Initialising setup...</p>
         </div>
       </div>
     }>
@@ -147,20 +147,20 @@ function InvitePageContent() {
 
   if (!token) {
     return renderWrapper(
-      <Card className="w-full max-w-md shadow-2xl border border-red-500/30 dark:border-red-950/40 bg-white dark:bg-[#19191B] rounded-[2px] overflow-hidden animate-in fade-in duration-300">
+      <Card className="w-full max-w-md shadow-2xl border border-red-500/30 dark:border-red-950/40 bg-background rounded-sm overflow-hidden animate-in fade-in duration-300">
         <div className="h-1 bg-red-600 w-full" />
         <CardHeader className="text-center pb-2">
-          <div className="mx-auto w-12 h-12 bg-red-100/50 dark:bg-red-950/30 border border-red-200/40 dark:border-red-900/25 flex items-center justify-center mb-3 rounded-[2px]">
+          <div className="mx-auto w-12 h-12 bg-red-100/50 dark:bg-red-950/30 border border-red-200/40 dark:border-red-900/25 flex items-center justify-center mb-3 rounded-sm">
             <AlertCircle className="w-6 h-6 text-red-600 dark:text-red-500" />
           </div>
-          <CardTitle className="text-sm font-bold uppercase tracking-wider text-slate-900 dark:text-slate-100">Liên kết không hợp lệ</CardTitle>
-          <CardDescription className="text-[10px] font-mono text-slate-500 dark:text-zinc-500 leading-normal pt-1.5">
+          <CardTitle className="text-sm font-bold uppercase tracking-wider text-foreground">Liên kết không hợp lệ</CardTitle>
+          <CardDescription className="text-[10px] font-mono text-muted-foreground dark:text-muted-foreground leading-normal pt-1.5">
             Đường dẫn lời mời này bị thiếu khóa xác thực hệ thống.
           </CardDescription>
         </CardHeader>
         <CardFooter className="pt-4 pb-6">
           <Button 
-            className="w-full border border-slate-200 dark:border-white/[0.08] hover:bg-slate-50 dark:hover:bg-zinc-800 rounded-[2px] h-9 text-xs font-mono font-bold text-slate-700 dark:text-zinc-300 shadow-none bg-transparent"
+            className="w-full border border-border hover:bg-muted dark:hover:bg-muted rounded-sm h-9 text-xs font-mono font-bold text-muted-foreground shadow-none bg-transparent"
             variant="outline" 
             onClick={() => router.push("/")}
           >
@@ -174,12 +174,12 @@ function InvitePageContent() {
   if (isValidating || isCheckingAuth) {
     return renderWrapper(
       <div className="text-center space-y-4">
-        <div className="relative w-14 h-14 mx-auto flex items-center justify-center border border-slate-800/80 dark:border-white/[0.06] rounded-[2px] bg-slate-950/20">
-          <Loader2 className="w-6 h-6 animate-spin text-slate-100" />
+        <div className="relative w-14 h-14 mx-auto flex items-center justify-center border border-border/80 dark:border-white/[0.06] rounded-sm bg-slate-950/20">
+          <Loader2 className="w-6 h-6 animate-spin text-foreground" />
         </div>
         <div className="space-y-1">
-          <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">SECURE_GATEWAY_VALIDATION</p>
-          <p className="text-[9px] text-slate-500 font-mono">Đang kiểm tra tính toàn vẹn của mã thông báo...</p>
+          <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">SECURE_GATEWAY_VALIDATION</p>
+          <p className="text-[9px] text-muted-foreground font-mono">Đang kiểm tra tính toàn vẹn của mã thông báo...</p>
         </div>
       </div>
     );
@@ -187,20 +187,20 @@ function InvitePageContent() {
 
   if (validationError || !inviteData?.success) {
     return renderWrapper(
-      <Card className="w-full max-w-md shadow-2xl border border-amber-500/30 dark:border-amber-950/40 bg-white dark:bg-[#19191B] rounded-[2px] overflow-hidden animate-in fade-in duration-300">
+      <Card className="w-full max-w-md shadow-2xl border border-amber-500/30 dark:border-amber-950/40 bg-background rounded-sm overflow-hidden animate-in fade-in duration-300">
         <div className="h-1 bg-amber-500 w-full" />
         <CardHeader className="text-center pb-2">
-          <div className="mx-auto w-12 h-12 bg-amber-100/50 dark:bg-amber-950/30 border border-amber-200/40 dark:border-amber-900/25 flex items-center justify-center mb-3 rounded-[2px]">
+          <div className="mx-auto w-12 h-12 bg-amber-100/50 dark:bg-amber-950/30 border border-amber-200/40 dark:border-amber-900/25 flex items-center justify-center mb-3 rounded-sm">
             <AlertCircle className="w-6 h-6 text-amber-600 dark:text-amber-500" />
           </div>
-          <CardTitle className="text-sm font-bold uppercase tracking-wider text-slate-900 dark:text-slate-100">Lời mời hết hiệu lực</CardTitle>
-          <CardDescription className="text-[10px] font-mono text-slate-500 dark:text-zinc-500 leading-normal pt-1.5">
+          <CardTitle className="text-sm font-bold uppercase tracking-wider text-foreground">Lời mời hết hiệu lực</CardTitle>
+          <CardDescription className="text-[10px] font-mono text-muted-foreground dark:text-muted-foreground leading-normal pt-1.5">
             {(validationError as any)?.data?.message || "Đường dẫn lời mời này đã hết hạn hoặc đã được sử dụng trước đó."}
           </CardDescription>
         </CardHeader>
         <CardFooter className="pt-4 pb-6">
           <Button 
-            className="w-full bg-slate-900 hover:bg-slate-800 text-white dark:bg-slate-100 dark:hover:bg-slate-200 dark:text-slate-900 rounded-[2px] h-9 text-xs font-mono font-bold shadow-none" 
+            className="w-full bg-slate-900 hover:bg-slate-800 text-white dark:bg-muted dark:hover:bg-muted dark:text-foreground rounded-sm h-9 text-xs font-mono font-bold shadow-none" 
             onClick={() => router.push("/")}
           >
             Quay lại trang chủ
@@ -215,59 +215,59 @@ function InvitePageContent() {
   const emailMismatch = profile && userProfileEmail?.toLowerCase() !== invitation.email.toLowerCase();
 
   return renderWrapper(
-    <Card className="w-full max-w-[500px] shadow-2xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#19191B] overflow-hidden rounded-[2px] animate-in fade-in duration-500">
-      <div className="h-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-teal-500 w-full" />
+    <Card className="w-full max-w-[500px] shadow-2xl border border-border bg-background overflow-hidden rounded-sm animate-in fade-in duration-500">
+      <div className="h-1 bg-gradient-to-r from-blue-500 via-cyan-500 to-teal-500 w-full" />
 
       <CardHeader className="text-center pb-4 pt-6">
         <div className="mx-auto w-16 h-16 relative mb-4">
-          <div className="absolute inset-0 border border-slate-200 dark:border-white/[0.08] rounded-[2px] bg-slate-50 dark:bg-zinc-900 flex items-center justify-center shadow-sm">
+          <div className="absolute inset-0 border border-border rounded-sm bg-muted dark:bg-muted flex items-center justify-center shadow-sm">
             {invitation.workspace?.icon ? (
-              <Avatar className="h-14 w-14 rounded-[2px]">
-                <AvatarImage src={invitation.workspace.icon} className="rounded-[2px]" />
-                <AvatarFallback className="rounded-[2px] text-lg font-bold bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 font-mono">
+              <Avatar className="h-14 w-14 rounded-sm">
+                <AvatarImage src={invitation.workspace.icon} className="rounded-sm" />
+                <AvatarFallback className="rounded-sm text-lg font-bold bg-slate-900 text-white dark:bg-muted dark:text-foreground font-mono">
                   {invitation.workspace.name[0].toUpperCase()}
                 </AvatarFallback>
               </Avatar>
             ) : (
-              <div className="w-14 h-14 bg-slate-100 dark:bg-zinc-800 rounded-[2px] flex items-center justify-center">
-                <UserPlus className="w-6 h-6 text-slate-700 dark:text-zinc-300" />
+              <div className="w-14 h-14 bg-muted dark:bg-muted rounded-sm flex items-center justify-center">
+                <UserPlus className="w-6 h-6 text-muted-foreground" />
               </div>
             )}
           </div>
         </div>
 
-        <CardTitle className="text-lg font-bold uppercase tracking-tight text-slate-900 dark:text-slate-100 font-mono">
+        <CardTitle className="text-lg font-bold uppercase tracking-tight text-foreground font-mono">
           Yêu cầu gia nhập
         </CardTitle>
-        <CardDescription className="text-[10px] font-mono text-slate-500 dark:text-zinc-500 leading-normal mt-1">
-          Lời mời chính thức tham gia tổ chức <span className="text-slate-800 dark:text-slate-200 font-bold">&quot;{invitation.workspace?.name}&quot;</span>
+        <CardDescription className="text-[10px] font-mono text-muted-foreground dark:text-muted-foreground leading-normal mt-1">
+          Lời mời chính thức tham gia tổ chức <span className="text-foreground dark:text-foreground font-bold">&quot;{invitation.workspace?.name}&quot;</span>
         </CardDescription>
       </CardHeader>
 
       <CardContent className="space-y-4 pt-2">
         {/* Core Metadata Info Grid */}
         <div className="grid grid-cols-2 gap-3">
-          <div className="p-3 rounded-[2px] bg-slate-50/50 dark:bg-zinc-900/40 border border-slate-200/80 dark:border-white/[0.04] flex items-center gap-2.5">
+          <div className="p-3 rounded-sm bg-muted/50 dark:bg-muted/40 border border-border flex items-center gap-2.5">
             <Mail className="w-4 h-4 text-blue-500 shrink-0" />
             <div className="min-w-0">
-              <p className="text-[8px] uppercase font-bold text-slate-400 dark:text-zinc-500 tracking-widest font-mono">Gửi đến</p>
-              <p className="text-[10px] font-bold text-slate-700 dark:text-zinc-300 truncate">{invitation.email}</p>
+              <p className="text-[8px] uppercase font-bold text-muted-foreground dark:text-muted-foreground tracking-widest font-mono">Gửi đến</p>
+              <p className="text-[10px] font-bold text-muted-foreground truncate">{invitation.email}</p>
             </div>
           </div>
-          <div className="p-3 rounded-[2px] bg-slate-50/50 dark:bg-zinc-900/40 border border-slate-200/80 dark:border-white/[0.04] flex items-center gap-2.5">
+          <div className="p-3 rounded-sm bg-muted/50 dark:bg-muted/40 border border-border flex items-center gap-2.5">
             <ShieldCheck className="w-4 h-4 text-emerald-500 shrink-0" />
             <div className="min-w-0">
-              <p className="text-[8px] uppercase font-bold text-slate-400 dark:text-zinc-500 tracking-widest font-mono">Vai trò</p>
-              <p className="text-[10px] font-bold text-slate-700 dark:text-zinc-300 truncate uppercase">{invitation.role}</p>
+              <p className="text-[8px] uppercase font-bold text-muted-foreground dark:text-muted-foreground tracking-widest font-mono">Vai trò</p>
+              <p className="text-[10px] font-bold text-muted-foreground truncate uppercase">{invitation.role}</p>
             </div>
           </div>
           {invitation.department && (
-            <div className="p-3 rounded-[2px] bg-slate-50/50 dark:bg-zinc-900/40 border border-slate-200/80 dark:border-white/[0.04] flex items-center gap-2.5 col-span-2">
+            <div className="p-3 rounded-sm bg-muted/50 dark:bg-muted/40 border border-border flex items-center gap-2.5 col-span-2">
               <Building2 className="w-4 h-4 text-amber-500 shrink-0" />
               <div className="min-w-0 flex-1">
-                <p className="text-[8px] uppercase font-bold text-slate-400 dark:text-zinc-500 tracking-widest font-mono">Phòng ban liên kết</p>
+                <p className="text-[8px] uppercase font-bold text-muted-foreground dark:text-muted-foreground tracking-widest font-mono">Phòng ban liên kết</p>
                 <div className="flex justify-between items-center mt-0.5">
-                  <p className="text-[10px] font-bold text-slate-700 dark:text-zinc-300">{invitation.department.name}</p>
+                  <p className="text-[10px] font-bold text-muted-foreground">{invitation.department.name}</p>
                   <p className="text-[8px] font-mono text-amber-600 dark:text-amber-500 font-bold uppercase tracking-wide">
                     Vai trò: {invitation.departmentRole}
                   </p>
@@ -279,7 +279,7 @@ function InvitePageContent() {
 
         {profile ? (
           emailMismatch ? (
-            <div className="p-3 rounded-[2px] bg-red-50/10 dark:bg-red-950/10 border border-red-200/40 dark:border-red-950/20 flex gap-2.5 animate-in slide-in-from-top-1 duration-300">
+            <div className="p-3 rounded-sm bg-red-50/10 dark:bg-red-950/10 border border-red-200/40 dark:border-red-950/20 flex gap-2.5 animate-in slide-in-from-top-1 duration-300">
               <AlertCircle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
               <div className="space-y-1">
                 <p className="text-[10px] text-red-900 dark:text-red-400 font-bold uppercase tracking-wider font-mono">
@@ -298,33 +298,33 @@ function InvitePageContent() {
               </div>
             </div>
           ) : (
-            <div className="p-3 rounded-[2px] bg-emerald-50/10 dark:bg-emerald-950/10 border border-emerald-250/20 dark:border-emerald-900/20 flex items-center gap-2.5">
+            <div className="p-3 rounded-sm bg-emerald-50/10 dark:bg-emerald-950/10 border border-emerald-250/20 dark:border-emerald-900/20 flex items-center gap-2.5">
               <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
               <div>
                 <p className="text-[10px] text-emerald-900 dark:text-emerald-450 font-bold uppercase tracking-wider font-mono">
                   Sẵn sàng gia nhập
                 </p>
-                <p className="text-[9px] text-slate-500 dark:text-zinc-500">Hệ thống đã nhận diện được tài khoản của bạn.</p>
+                <p className="text-[9px] text-muted-foreground dark:text-muted-foreground">Hệ thống đã nhận diện được tài khoản của bạn.</p>
               </div>
             </div>
           )
         ) : (
           <div className="space-y-3.5 pt-2 animate-in slide-in-from-bottom-2 duration-500">
             <div className="flex items-center gap-2">
-              <div className="h-[1px] bg-slate-200 dark:bg-white/[0.08] flex-1" />
-              <span className="text-[8px] uppercase font-bold text-slate-400 dark:text-zinc-550 tracking-widest font-mono">Đăng ký tài khoản mới</span>
-              <div className="h-[1px] bg-slate-200 dark:bg-white/[0.08] flex-1" />
+              <div className="h-[1px] bg-muted dark:bg-white/[0.08] flex-1" />
+              <span className="text-[8px] uppercase font-bold text-muted-foreground tracking-widest font-mono">Đăng ký tài khoản mới</span>
+              <div className="h-[1px] bg-muted dark:bg-white/[0.08] flex-1" />
             </div>
 
             <div className="space-y-3">
               <div className="space-y-1">
-                <Label htmlFor="name" className="text-[10px] font-bold font-mono uppercase tracking-wider text-slate-800 dark:text-slate-200">Họ và tên</Label>
+                <Label htmlFor="name" className="text-[10px] font-bold font-mono uppercase tracking-wider text-foreground dark:text-foreground">Họ và tên</Label>
                 <div className="relative">
-                  <User className="absolute left-3 top-2.5 w-3.5 h-3.5 text-slate-400 dark:text-zinc-550" />
+                  <User className="absolute left-3 top-2.5 w-3.5 h-3.5 text-muted-foreground" />
                   <Input
                     id="name"
                     placeholder="NGUYEN VAN A"
-                    className="pl-9 h-9 rounded-[2px] border-slate-200 dark:border-white/[0.08] bg-slate-50/20 dark:bg-zinc-900/50 focus-visible:ring-0 focus-visible:border-slate-800 dark:focus-visible:border-slate-200 text-xs font-mono uppercase"
+                    className="pl-9 h-9 rounded-sm border-border bg-muted/20 dark:bg-muted/50 focus-visible:ring-0 focus-visible:border-border dark:focus-visible:border-border text-xs font-mono uppercase"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                   />
@@ -332,14 +332,14 @@ function InvitePageContent() {
               </div>
 
               <div className="space-y-1">
-                <Label htmlFor="password" className="text-[10px] font-bold font-mono uppercase tracking-wider text-slate-800 dark:text-slate-200">Mật khẩu bảo mật</Label>
+                <Label htmlFor="password" className="text-[10px] font-bold font-mono uppercase tracking-wider text-foreground dark:text-foreground">Mật khẩu bảo mật</Label>
                 <div className="relative">
-                  <Terminal className="absolute left-3 top-2.5 w-3.5 h-3.5 text-slate-400 dark:text-zinc-550" />
+                  <Terminal className="absolute left-3 top-2.5 w-3.5 h-3.5 text-muted-foreground" />
                   <Input
                     id="password"
                     type="password"
                     placeholder="••••••••"
-                    className="pl-9 h-9 rounded-[2px] border-slate-200 dark:border-white/[0.08] bg-slate-50/20 dark:bg-zinc-900/50 focus-visible:ring-0 focus-visible:border-slate-800 dark:focus-visible:border-slate-200 text-xs font-mono"
+                    className="pl-9 h-9 rounded-sm border-border bg-muted/20 dark:bg-muted/50 focus-visible:ring-0 focus-visible:border-border dark:focus-visible:border-border text-xs font-mono"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                   />
@@ -347,13 +347,13 @@ function InvitePageContent() {
               </div>
 
               <div className="space-y-1.5">
-                <Label className="text-[10px] font-bold font-mono uppercase tracking-wider text-slate-800 dark:text-slate-200">Giới tính</Label>
+                <Label className="text-[10px] font-bold font-mono uppercase tracking-wider text-foreground dark:text-foreground">Giới tính</Label>
                 <RadioGroup defaultValue="male" className="flex gap-3" onValueChange={setGender}>
-                  <div className="flex items-center space-x-2 bg-slate-50/50 dark:bg-zinc-900/30 border border-slate-200/80 dark:border-white/[0.04] px-4 py-2 rounded-[2px] flex-1 cursor-pointer hover:bg-slate-100 dark:hover:bg-zinc-800/60 transition-colors">
+                  <div className="flex items-center space-x-2 bg-muted/50 dark:bg-muted/30 border border-border px-4 py-2 rounded-sm flex-1 cursor-pointer hover:bg-muted dark:hover:bg-muted/60 transition-colors">
                     <RadioGroupItem value="male" id="male" />
                     <Label htmlFor="male" className="cursor-pointer text-xs font-mono">Nam</Label>
                   </div>
-                  <div className="flex items-center space-x-2 bg-slate-50/50 dark:bg-zinc-900/30 border border-slate-200/80 dark:border-white/[0.04] px-4 py-2 rounded-[2px] flex-1 cursor-pointer hover:bg-slate-100 dark:hover:bg-zinc-800/60 transition-colors">
+                  <div className="flex items-center space-x-2 bg-muted/50 dark:bg-muted/30 border border-border px-4 py-2 rounded-sm flex-1 cursor-pointer hover:bg-muted dark:hover:bg-muted/60 transition-colors">
                     <RadioGroupItem value="female" id="female" />
                     <Label htmlFor="female" className="cursor-pointer text-xs font-mono">Nữ</Label>
                   </div>
@@ -364,11 +364,11 @@ function InvitePageContent() {
         )}
       </CardContent>
 
-      <CardFooter className="flex flex-col gap-4 pt-4 pb-6 border-t border-slate-100 dark:border-white/[0.04]">
+      <CardFooter className="flex flex-col gap-4 pt-4 pb-6 border-t border-border dark:border-white/[0.04]">
         <div className="grid grid-cols-2 gap-3 w-full">
           <Button
             variant="outline"
-            className="h-10 rounded-[2px] border border-slate-200 dark:border-white/[0.08] hover:bg-slate-50 dark:hover:bg-zinc-800 text-slate-700 dark:text-zinc-300 font-bold font-mono text-xs shadow-none transition-all active:scale-[0.98] bg-transparent"
+            className="h-10 rounded-sm border border-border hover:bg-muted dark:hover:bg-muted text-muted-foreground font-bold font-mono text-xs shadow-none transition-all active:scale-[0.98] bg-transparent"
             onClick={handleReject}
             disabled={isRejecting || isAccepting || isJoining}
           >
@@ -376,7 +376,7 @@ function InvitePageContent() {
           </Button>
 
           <Button
-            className="h-10 rounded-[2px] bg-slate-900 hover:bg-slate-800 text-white dark:bg-slate-100 dark:hover:bg-slate-200 dark:text-slate-900 shadow-none font-bold font-mono text-xs transition-all active:scale-[0.98] border border-transparent disabled:opacity-50"
+            className="h-10 rounded-sm bg-slate-900 hover:bg-slate-800 text-white dark:bg-muted dark:hover:bg-muted dark:text-foreground shadow-none font-bold font-mono text-xs transition-all active:scale-[0.98] border border-transparent disabled:opacity-50"
             onClick={handleAction}
             disabled={isAccepting || isJoining || isRejecting || !!emailMismatch}
           >
@@ -391,7 +391,7 @@ function InvitePageContent() {
           </Button>
         </div>
 
-        <p className="text-[8px] text-center text-slate-400 dark:text-zinc-550 font-mono tracking-wide leading-relaxed px-4">
+        <p className="text-[8px] text-center text-muted-foreground font-mono tracking-wide leading-relaxed px-4">
           Bằng cách gia nhập, bạn đồng ý tuân thủ các quy tắc tổ chức, điều khoản dịch vụ và chính sách bảo mật dữ liệu của Nexus.
         </p>
       </CardFooter>

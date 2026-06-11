@@ -142,7 +142,7 @@ export function WikiDraftDiff({
 
   if (oldText === newText) {
     return (
-      <div className="flex flex-col items-center justify-center p-8 border rounded-xl bg-muted/20 text-center">
+      <div className="flex flex-col items-center justify-center p-8 border rounded-lg bg-muted/20 text-center">
         <Check className="w-8 h-8 text-emerald-500 mb-2" />
         <p className="text-sm font-medium text-foreground">Không có thay đổi</p>
         <p className="text-xs text-muted-foreground mt-1">Bản thảo trùng khớp hoàn toàn với phiên bản chính thức.</p>
@@ -208,7 +208,7 @@ function SplitDiff({ oldText, newText }: { oldText: string; newText: string }) {
 
   return (
     <div className="grid grid-cols-2 gap-2 font-mono text-xs leading-relaxed overflow-x-auto">
-      <div className="border rounded-xl p-3 bg-muted/10">
+      <div className="border rounded-lg p-3 bg-muted/10">
         <div className="text-[10px] uppercase font-semibold text-muted-foreground mb-2 pb-1 border-b border-border flex items-center gap-1.5">
           <Minus className="w-3 h-3 text-rose-500" /> Bản chính thức
         </div>
@@ -230,7 +230,7 @@ function SplitDiff({ oldText, newText }: { oldText: string; newText: string }) {
           })}
         </div>
       </div>
-      <div className="border rounded-xl p-3 bg-muted/10">
+      <div className="border rounded-lg p-3 bg-muted/10">
         <div className="text-[10px] uppercase font-semibold text-muted-foreground mb-2 pb-1 border-b border-border flex items-center gap-1.5">
           <Plus className="w-3 h-3 text-emerald-500" /> Bản thảo đề xuất
         </div>
@@ -317,7 +317,7 @@ function SectionedDiff({ sections }: { sections: DiffSection[] }) {
         return (
           <section
             key={i}
-            className={`rounded-xl border ${
+            className={`rounded-lg border ${
               sec.hasChanges
                 ? "border-amber-500/25 bg-amber-500/5"
                 : "border-border bg-card/25"

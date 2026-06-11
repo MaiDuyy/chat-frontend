@@ -180,7 +180,7 @@ export function WikiContent({
     <div className="relative flex flex-col gap-6">
       {/* Table of Contents — only show when enough headings */}
       {headings.length >= 3 && (
-        <div className="rounded-xl border border-border bg-card p-2.5 shadow-sm">
+        <div className="rounded-lg border border-border bg-card p-2.5 shadow-sm">
           <p className="text-xs font-mono font-extrabold text-foreground uppercase tracking-wider mb-2 flex items-center gap-1.5 border-b pb-1.5">
             <List className="w-4 h-4 text-primary" />
             Mục lục tài liệu
@@ -328,7 +328,7 @@ export function WikiContent({
                 .join("");
               return (
                 <div className="relative group/code my-4">
-                  <pre className="bg-muted/50 border rounded-xl p-4 overflow-x-auto text-xs font-mono">
+                  <pre className="bg-muted/50 border rounded-lg p-4 overflow-x-auto text-xs font-mono">
                     {children}
                   </pre>
                   <CopyButton text={codeText} />
@@ -368,7 +368,7 @@ export function WikiContent({
                     src={srcStr}
                     alt={altStr}
                     loading="lazy"
-                    className="rounded-xl border border-border max-w-full my-4 mx-auto"
+                    className="rounded-lg border border-border max-w-full my-4 mx-auto"
                   />
                 );
               }
@@ -382,7 +382,7 @@ export function WikiContent({
               return <WikiImage alt={altStr} status="missing" />;
             },
             table: ({ children }) => (
-              <div className="my-4 rounded-xl border border-border overflow-hidden shadow-sm bg-card">
+              <div className="my-4 rounded-lg border border-border overflow-hidden shadow-sm bg-card">
                 <Table>{children}</Table>
               </div>
             ),

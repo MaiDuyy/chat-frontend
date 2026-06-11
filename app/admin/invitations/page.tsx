@@ -24,13 +24,13 @@ export default function AdminInvitationsPage() {
                             Quản lý các lời mời tham gia tổ chức đang chờ xử lý
                         </p>
                     </div>
-                    <Button onClick={() => setShowInviteDialog(true)} className="rounded-xl h-11 px-6 shadow-lg shadow-primary/20">
+                    <Button onClick={() => setShowInviteDialog(true)} className="rounded-lg h-11 px-6 shadow-lg shadow-primary/20">
                         <Plus className="w-4 h-4 mr-2" />
                         Mời thành viên mới
                     </Button>
                 </div>
 
-                <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
+                <div className="bg-white rounded-3xl p-6 shadow-sm border border-border">
                     <InvitationsTable />
                 </div>
 

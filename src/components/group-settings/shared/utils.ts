@@ -12,7 +12,7 @@ export const getInitials = (name: string) =>
 export const AVATAR_COLORS = [
     "bg-blue-100 text-blue-800",
     "bg-teal-100 text-teal-800",
-    "bg-violet-100 text-violet-800",
+    "bg-cyan-100 text-cyan-800",
     "bg-orange-100 text-orange-800",
     "bg-amber-100 text-amber-800",
     "bg-pink-100 text-pink-800",

@@ -167,7 +167,7 @@ export function RoleEditor() {
                         Định nghĩa và quản lý các vai trò trong hệ thống cùng các quyền tương ứng.
                     </p>
                 </div>
-                <Button size="sm" className="h-8 rounded-lg shadow-sm font-medium text-xs bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => setShowCreateDialog(true)}>
+                <Button size="sm" className="h-8 rounded-md shadow-sm font-medium text-xs bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => setShowCreateDialog(true)}>
                     <Plus className="w-3.5 h-3.5 mr-1.5" />
                     Tạo vai trò mới
                 </Button>
@@ -177,7 +177,7 @@ export function RoleEditor() {
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                 {Array.isArray(roles) && roles.map((role) => (
                     <Card key={role.id} className={cn(
-                        "rounded-xl border transition-all hover:shadow-md bg-card text-card-foreground shadow-sm relative overflow-hidden flex flex-col justify-between",
+                        "rounded-lg border transition-all hover:shadow-md bg-card text-card-foreground shadow-sm relative overflow-hidden flex flex-col justify-between",
                         role.isSystem 
                             ? "border-blue-200/50 bg-blue-50/5 dark:border-blue-900/30 dark:bg-blue-950/5" 
                             : "border-border"
@@ -187,9 +187,9 @@ export function RoleEditor() {
                                 <div className="space-y-1.5">
                                     <div className="flex items-center gap-2">
                                         <div className={cn(
-                                            "p-1.5 rounded-lg flex items-center justify-center",
+                                            "p-1.5 rounded-md flex items-center justify-center",
                                             role.isSystem 
-                                                ? "bg-blue-100 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400" 
+                                                ? "bg-blue-100 dark:bg-blue-950/50 text-primary" 
                                                 : "bg-muted text-muted-foreground"
                                         )}>
                                             <Shield className="w-4 h-4" />
@@ -202,7 +202,7 @@ export function RoleEditor() {
                                 </div>
                                 <div className="flex items-center gap-1">
                                     {role.isSystem ? (
-                                        <Badge variant="outline" className="h-5 gap-1 bg-background text-[10px] px-1.5 py-0 font-medium border-blue-200/50 dark:border-blue-900/30 text-blue-600 dark:text-blue-400">
+                                        <Badge variant="outline" className="h-5 gap-1 bg-background text-[10px] px-1.5 py-0 font-medium border-blue-200/50 dark:border-blue-900/30 text-primary">
                                             <Lock className="w-2.5 h-2.5" />
                                             Hệ thống
                                         </Badge>
@@ -280,10 +280,10 @@ export function RoleEditor() {
 
             {/* Manage Permissions Dialog */}
             <Dialog open={!!selectedRoleForPermissions} onOpenChange={() => setSelectedRoleForPermissions(null)}>
-                <DialogContent className="max-w-2xl max-h-[85vh] flex flex-col rounded-xl border border-border p-4 bg-background">
+                <DialogContent className="max-w-2xl max-h-[85vh] flex flex-col rounded-lg border border-border p-4 bg-background">
                     <DialogHeader className="pb-2 border-b border-border">
                         <DialogTitle className="flex items-center gap-2 text-base font-bold text-foreground">
-                            <Settings2 className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                            <Settings2 className="w-4 h-4 text-primary" />
                             Quyền hạn: {selectedRoleForPermissions?.displayName}
                         </DialogTitle>
                         <DialogDescription className="text-xs text-muted-foreground">
@@ -307,7 +307,7 @@ export function RoleEditor() {
                                                 <div 
                                                     key={permission.id} 
                                                     className={cn(
-                                                        "flex items-center space-x-3 p-2.5 rounded-lg border transition-all cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/40",
+                                                        "flex items-center space-x-3 p-2.5 rounded-md border transition-all cursor-pointer hover:bg-muted dark:hover:bg-slate-800/40",
                                                         isActive 
                                                             ? "border-blue-200 bg-blue-50/10 dark:border-blue-900/30 dark:bg-blue-950/10" 
                                                             : "border-border bg-card"
@@ -317,7 +317,7 @@ export function RoleEditor() {
                                                     <Checkbox 
                                                         id={permission.id} 
                                                         checked={isActive}
-                                                        className="rounded border-border data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
+                                                        className="rounded border-border data-[state=checked]:bg-primary data-[state=checked]:border-blue-600"
                                                         onCheckedChange={() => selectedRoleForPermissions && togglePermission(selectedRoleForPermissions, permission)}
                                                     />
                                                     <div className="grid gap-0.5 leading-none">
@@ -341,7 +341,7 @@ export function RoleEditor() {
                     </div>
                     
                     <DialogFooter className="mt-auto border-t border-border pt-3 flex justify-end">
-                        <Button size="sm" className="h-8 text-xs rounded-lg border border-border bg-secondary text-secondary-foreground hover:bg-secondary/80" onClick={() => setSelectedRoleForPermissions(null)}>
+                        <Button size="sm" className="h-8 text-xs rounded-md border border-border bg-secondary text-secondary-foreground hover:bg-secondary/80" onClick={() => setSelectedRoleForPermissions(null)}>
                             Đóng
                         </Button>
                     </DialogFooter>
@@ -350,7 +350,7 @@ export function RoleEditor() {
 
             {/* Create Role Dialog */}
             <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
-                <DialogContent className="max-w-md rounded-xl border border-border p-4 bg-background">
+                <DialogContent className="max-w-md rounded-lg border border-border p-4 bg-background">
                     <DialogHeader>
                         <DialogTitle className="text-base font-bold text-foreground">Tạo vai trò mới</DialogTitle>
                         <DialogDescription className="text-xs text-muted-foreground">
@@ -365,7 +365,7 @@ export function RoleEditor() {
                                     id="name"
                                     placeholder="VD: moderator"
                                     value={name}
-                                    className="h-8 rounded-lg text-xs"
+                                    className="h-8 rounded-md text-xs"
                                     onChange={(e) => setName(e.target.value)}
                                 />
                             </div>
@@ -377,7 +377,7 @@ export function RoleEditor() {
                                     min="0"
                                     max="100"
                                     value={level}
-                                    className="h-8 rounded-lg text-xs"
+                                    className="h-8 rounded-md text-xs"
                                     onChange={(e) => setLevel(parseInt(e.target.value))}
                                 />
                             </div>
@@ -388,7 +388,7 @@ export function RoleEditor() {
                                 id="displayName"
                                 placeholder="VD: Quản trị viên cộng đồng"
                                 value={displayName}
-                                className="h-8 rounded-lg text-xs"
+                                className="h-8 rounded-md text-xs"
                                 onChange={(e) => setDisplayName(e.target.value)}
                             />
                         </div>
@@ -398,17 +398,17 @@ export function RoleEditor() {
                                 id="description"
                                 placeholder="Mô tả mục đích của vai trò này..."
                                 value={description}
-                                className="rounded-lg text-xs min-h-[60px] py-1.5"
+                                className="rounded-md text-xs min-h-[60px] py-1.5"
                                 onChange={(e) => setDescription(e.target.value)}
                                 rows={3}
                             />
                         </div>
                     </div>
                     <DialogFooter className="gap-2 sm:gap-0">
-                        <Button variant="outline" size="sm" className="h-8 rounded-lg text-xs border-border bg-secondary text-secondary-foreground hover:bg-secondary/80" onClick={() => setShowCreateDialog(false)}>
+                        <Button variant="outline" size="sm" className="h-8 rounded-md text-xs border-border bg-secondary text-secondary-foreground hover:bg-secondary/80" onClick={() => setShowCreateDialog(false)}>
                             Hủy
                         </Button>
-                        <Button size="sm" className="h-8 rounded-lg text-xs bg-primary text-primary-foreground hover:bg-primary/90" onClick={handleCreate} disabled={!name || !displayName || isCreating}>
+                        <Button size="sm" className="h-8 rounded-md text-xs bg-primary text-primary-foreground hover:bg-primary/90" onClick={handleCreate} disabled={!name || !displayName || isCreating}>
                             {isCreating && <Loader2 className="w-3 h-3 mr-1.5 animate-spin" />}
                             Tạo vai trò
                         </Button>
@@ -418,7 +418,7 @@ export function RoleEditor() {
 
             {/* Edit Role Dialog */}
             <Dialog open={!!editingRole} onOpenChange={() => setEditingRole(null)}>
-                <DialogContent className="max-w-md rounded-xl border border-border p-4 bg-background">
+                <DialogContent className="max-w-md rounded-lg border border-border p-4 bg-background">
                     <DialogHeader>
                         <DialogTitle className="text-base font-bold text-foreground">Sửa vai trò: {editingRole?.name}</DialogTitle>
                         <DialogDescription className="text-xs text-muted-foreground">
@@ -431,7 +431,7 @@ export function RoleEditor() {
                             <Input
                                 id="editDisplayName"
                                 value={displayName}
-                                className="h-8 rounded-lg text-xs"
+                                className="h-8 rounded-md text-xs"
                                 onChange={(e) => setDisplayName(e.target.value)}
                             />
                         </div>
@@ -443,7 +443,7 @@ export function RoleEditor() {
                                 min="0"
                                 max="100"
                                 value={level}
-                                className="h-8 rounded-lg text-xs"
+                                className="h-8 rounded-md text-xs"
                                 onChange={(e) => setLevel(parseInt(e.target.value))}
                             />
                         </div>
@@ -452,17 +452,17 @@ export function RoleEditor() {
                             <Textarea
                                 id="editDescription"
                                 value={description}
-                                className="rounded-lg text-xs min-h-[60px] py-1.5"
+                                className="rounded-md text-xs min-h-[60px] py-1.5"
                                 onChange={(e) => setDescription(e.target.value)}
                                 rows={3}
                             />
                         </div>
                     </div>
                     <DialogFooter className="gap-2 sm:gap-0">
-                        <Button variant="outline" size="sm" className="h-8 rounded-lg text-xs border-border bg-secondary text-secondary-foreground hover:bg-secondary/80" onClick={() => setEditingRole(null)}>
+                        <Button variant="outline" size="sm" className="h-8 rounded-md text-xs border-border bg-secondary text-secondary-foreground hover:bg-secondary/80" onClick={() => setEditingRole(null)}>
                             Hủy
                         </Button>
-                        <Button size="sm" className="h-8 rounded-lg text-xs bg-primary text-primary-foreground hover:bg-primary/90" onClick={handleUpdate} disabled={!displayName || isUpdating}>
+                        <Button size="sm" className="h-8 rounded-md text-xs bg-primary text-primary-foreground hover:bg-primary/90" onClick={handleUpdate} disabled={!displayName || isUpdating}>
                             {isUpdating && <Loader2 className="w-3 h-3 mr-1.5 animate-spin" />}
                             Lưu thay đổi
                         </Button>
@@ -472,7 +472,7 @@ export function RoleEditor() {
 
             {/* Delete Confirmation Dialog */}
             <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-                <DialogContent className="max-w-md rounded-xl border border-border p-4 bg-background">
+                <DialogContent className="max-w-md rounded-lg border border-border p-4 bg-background">
                     <DialogHeader>
                         <DialogTitle className="text-rose-600 dark:text-rose-400 text-base font-bold">Xác nhận xóa vai trò</DialogTitle>
                         <DialogDescription className="text-xs text-muted-foreground">
@@ -480,16 +480,16 @@ export function RoleEditor() {
                         </DialogDescription>
                     </DialogHeader>
                     
-                    <div className="border border-rose-200 dark:border-rose-950/30 bg-rose-50/50 dark:bg-rose-950/20 p-3 rounded-lg text-xs text-rose-800 dark:text-rose-300 my-2 leading-relaxed">
+                    <div className="border border-rose-200 dark:border-rose-950/30 bg-rose-50/50 dark:bg-rose-950/20 p-3 rounded-md text-xs text-rose-800 dark:text-rose-300 my-2 leading-relaxed">
                         Bạn sắp xóa vai trò <strong>{selectedRole?.displayName}</strong>.
                         Hành động này <strong>không thể hoàn tác</strong>. Người dùng đang được gán vai trò này sẽ mất toàn bộ quyền hạn tương ứng ngay lập tức.
                     </div>
                     
                     <DialogFooter className="gap-2 sm:gap-0">
-                        <Button variant="outline" size="sm" className="h-8 rounded-lg text-xs border-border bg-secondary text-secondary-foreground hover:bg-secondary/80" onClick={() => setShowDeleteDialog(false)}>
+                        <Button variant="outline" size="sm" className="h-8 rounded-md text-xs border-border bg-secondary text-secondary-foreground hover:bg-secondary/80" onClick={() => setShowDeleteDialog(false)}>
                             Hủy
                         </Button>
-                        <Button size="sm" className="h-8 rounded-lg text-xs bg-rose-600 hover:bg-rose-700 text-white shadow-sm font-medium" onClick={handleDelete} disabled={isDeleting}>
+                        <Button size="sm" className="h-8 rounded-md text-xs bg-rose-600 hover:bg-rose-700 text-white shadow-sm font-medium" onClick={handleDelete} disabled={isDeleting}>
                             {isDeleting && <Loader2 className="w-3 h-3 mr-1.5 animate-spin" />}
                             Xác nhận xóa
                         </Button>

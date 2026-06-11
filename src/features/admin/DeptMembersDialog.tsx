@@ -66,8 +66,8 @@ const ROLE_CONFIG: Record<
     label: 'Quản lý',
     short: 'Manager',
     badgeCls:
-      'bg-indigo-50 text-indigo-800 border-indigo-200 dark:bg-indigo-500/10 dark:text-indigo-300 dark:border-indigo-500/20',
-    dotCls: 'bg-indigo-500',
+      'bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-300 dark:border-emerald-500/20',
+    dotCls: 'bg-emerald-500',
     icon: <ShieldAlert className="w-3 h-3" />,
     priority: 1,
   },
@@ -84,7 +84,7 @@ const ROLE_CONFIG: Record<
     label: 'Khách',
     short: 'Guest',
     badgeCls:
-      'bg-slate-50 text-slate-600 border-slate-200 dark:bg-slate-500/10 dark:text-slate-400 dark:border-slate-500/20',
+      'bg-muted text-muted-foreground border-border dark:bg-muted0/10 dark:text-muted-foreground dark:border-slate-500/20',
     dotCls: 'bg-slate-400',
     icon: <UserCheck className="w-3 h-3" />,
     priority: 3,
@@ -307,21 +307,21 @@ export function DeptMembersDialog({
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-3xl w-full p-0 gap-0 overflow-hidden rounded-xl border border-slate-200 dark:border-slate-800 shadow-2xl bg-white dark:bg-slate-950">
+      <DialogContent className="sm:max-w-3xl w-full p-0 gap-0 overflow-hidden rounded-lg border border-border dark:border-border shadow-2xl bg-white dark:bg-slate-950">
 
         {/* ── Header ─────────────────────────────────────────────────────── */}
-        <div className="px-6 pt-5 pb-4 border-b border-slate-100 dark:border-slate-800/80 bg-slate-50/60 dark:bg-slate-900/40">
+        <div className="px-6 pt-5 pb-4 border-b border-border dark:border-border/80 bg-muted/60 dark:bg-slate-900/40">
           <DialogTitle asChild>
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-center gap-3 min-w-0">
-                <div className="w-9 h-9 rounded-lg bg-blue-600 dark:bg-blue-500 flex items-center justify-center shrink-0 shadow-sm">
+                <div className="w-9 h-9 rounded-md bg-primary dark:bg-blue-500 flex items-center justify-center shrink-0 shadow-sm">
                   <Building2 className="w-4.5 h-4.5 text-white" />
                 </div>
                 <div className="min-w-0">
-                  <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100 leading-tight truncate">
+                  <h2 className="text-sm font-semibold text-foreground leading-tight truncate">
                     Quản lý nhân sự phòng ban
                   </h2>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 font-medium truncate">
+                  <p className="text-xs text-muted-foreground dark:text-muted-foreground mt-0.5 font-medium truncate">
                     {departmentName}
                   </p>
                 </div>
@@ -343,7 +343,7 @@ export function DeptMembersDialog({
                   );
                 })}
                 {currentMembers.length === 0 && (
-                  <span className="text-[10px] text-slate-400 font-medium">Chưa có thành viên</span>
+                  <span className="text-[10px] text-muted-foreground font-medium">Chưa có thành viên</span>
                 )}
               </div>
             </div>
@@ -360,18 +360,18 @@ export function DeptMembersDialog({
           {canManage && (
             <section>
               <div className="flex items-center justify-between mb-2.5">
-                <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
+                <span className="text-[10px] font-bold text-muted-foreground dark:text-muted-foreground uppercase tracking-widest">
                   Bổ sung nhân sự
                 </span>
                 {isUsersLoading && (
-                  <Loader2 className="w-3 h-3 animate-spin text-slate-400" />
+                  <Loader2 className="w-3 h-3 animate-spin text-muted-foreground" />
                 )}
               </div>
 
               <div className="flex flex-col sm:flex-row gap-2.5">
                 <div className="flex-1 relative min-w-0 sm:min-w-[280px]" ref={comboRef}>
                   {isProvisioningFormOpen ? (
-                    <div className="flex items-center gap-2 h-9 px-3 rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50/20 dark:bg-amber-950/10">
+                    <div className="flex items-center gap-2 h-9 px-3 rounded-md border border-amber-200 dark:border-amber-800 bg-amber-50/20 dark:bg-amber-950/10">
                       <span className="text-[10px] font-semibold text-amber-700 dark:text-amber-400 bg-amber-100 dark:bg-amber-900/50 px-1.5 py-0.5 rounded shrink-0">
                         Cấp TK (A)
                       </span>
@@ -380,7 +380,7 @@ export function DeptMembersDialog({
                         placeholder="Nhập họ & tên nhân viên..."
                         value={provisionName}
                         onChange={(e) => setProvisionName(e.target.value)}
-                        className="h-7 text-xs border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 px-1 py-0 flex-1 placeholder:text-slate-400"
+                        className="h-7 text-xs border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 px-1 py-0 flex-1 placeholder:text-muted-foreground"
                       />
                       <div className="flex gap-1 shrink-0">
                         <Button
@@ -390,7 +390,7 @@ export function DeptMembersDialog({
                             setIsProvisioningFormOpen(false);
                             setProvisionName('');
                           }}
-                          className="h-6 px-2 text-[10px] text-slate-500 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+                          className="h-6 px-2 text-[10px] text-muted-foreground hover:text-muted-foreground hover:bg-muted dark:hover:bg-slate-800 cursor-pointer"
                         >
                           Hủy
                         </Button>
@@ -405,7 +405,7 @@ export function DeptMembersDialog({
                       </div>
                     </div>
                   ) : isValidSelection ? (
-                    <div className="flex items-center justify-between h-9 text-xs px-3 rounded-lg border border-blue-200 dark:border-blue-800/80 bg-blue-50/40 dark:bg-blue-950/20 text-blue-900 dark:text-blue-200 font-medium">
+                    <div className="flex items-center justify-between h-9 text-xs px-3 rounded-md border border-blue-200 dark:border-blue-800/80 bg-blue-50/40 dark:bg-blue-950/20 text-blue-900 dark:text-blue-200 font-medium">
                       <div className="flex items-center gap-2 min-w-0">
                         <Avatar className="h-5.5 w-5.5 rounded-full shrink-0">
                           <AvatarImage src={selectedUserAvatar ? getAvatarUrl(selectedUserAvatar) : undefined} />
@@ -429,7 +429,7 @@ export function DeptMembersDialog({
                     </div>
                   ) : (
                     <div className="relative">
-                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none" />
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
                       <Input
                         id="dept-member-search"
                         autoComplete="off"
@@ -440,12 +440,12 @@ export function DeptMembersDialog({
                           setComboOpen(true);
                         }}
                         onFocus={() => setComboOpen(true)}
-                        className="h-9 text-xs pl-9 pr-8 rounded-lg transition-colors border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 focus-visible:ring-1 focus-visible:ring-blue-500"
+                        className="h-9 text-xs pl-9 pr-8 rounded-md transition-colors border-border dark:border-border bg-white dark:bg-slate-900 focus-visible:ring-1 focus-visible:ring-blue-500"
                       />
                       {searchQuery && (
                         <button
                           onClick={clearSelection}
-                          className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
+                          className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-muted-foreground cursor-pointer"
                         >
                           <X size={12} />
                         </button>
@@ -455,16 +455,16 @@ export function DeptMembersDialog({
 
                   {/* Dropdown */}
                   {comboOpen && !isValidSelection && (
-                    <div className="absolute z-50 top-full left-0 right-0 mt-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-xl overflow-hidden">
+                    <div className="absolute z-50 top-full left-0 right-0 mt-1.5 bg-white dark:bg-slate-900 border border-border dark:border-border rounded-md shadow-xl overflow-hidden">
                       {isUsersLoading ? (
-                        <div className="flex items-center gap-2 justify-center py-5 text-xs text-slate-400">
+                        <div className="flex items-center gap-2 justify-center py-5 text-xs text-muted-foreground">
                           <Loader2 className="w-3.5 h-3.5 animate-spin" />
                           Đang tải danh sách nhân sự...
                         </div>
                       ) : filteredUsers.length === 0 ? (
                         <div className="py-4 px-3 flex flex-col gap-2.5">
-                          <div className="text-center text-xs text-slate-400 py-1 flex flex-col items-center gap-1.5">
-                            <User className="w-6 h-6 text-slate-300 dark:text-slate-700 opacity-40" />
+                          <div className="text-center text-xs text-muted-foreground py-1 flex flex-col items-center gap-1.5">
+                            <User className="w-6 h-6 text-muted-foreground dark:text-muted-foreground opacity-40" />
                             <span>
                               {searchQuery.trim()
                                 ? 'Không tìm thấy thành viên nào trùng khớp.'
@@ -472,8 +472,8 @@ export function DeptMembersDialog({
                             </span>
                           </div>
                           {isQueryEmail && (
-                            <div className="border-t border-slate-100 dark:border-slate-800/80 pt-2.5 flex flex-col gap-2">
-                              <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider text-left">Mời thành viên mới</span>
+                            <div className="border-t border-border dark:border-border/80 pt-2.5 flex flex-col gap-2">
+                              <span className="text-[10px] font-bold text-muted-foreground dark:text-muted-foreground uppercase tracking-wider text-left">Mời thành viên mới</span>
                               <div className="flex gap-2">
                                 <button
                                   type="button"
@@ -506,31 +506,31 @@ export function DeptMembersDialog({
                               <li key={u.id} role="option" aria-selected={false}>
                                 <button
                                   type="button"
-                                  className="w-full flex items-center gap-2.5 px-3 py-2.5 text-left hover:bg-slate-50 dark:hover:bg-white/[0.03] transition-colors cursor-pointer group"
+                                  className="w-full flex items-center gap-2.5 px-3 py-2.5 text-left hover:bg-muted dark:hover:bg-white/[0.03] transition-colors cursor-pointer group"
                                   onMouseDown={(e) => {
                                     e.preventDefault(); // fire before blur
                                     selectUser(u.id, u.name, u.avatar);
                                   }}
                                 >
-                                  <Avatar className="h-7 w-7 rounded-[4px] border border-slate-200 dark:border-slate-800 shrink-0">
+                                  <Avatar className="h-7 w-7 rounded-md border border-border dark:border-border shrink-0">
                                     <AvatarImage src={getAvatarUrl(u.avatar, u.name)} />
-                                    <AvatarFallback className="text-[9px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold rounded-[4px]">
+                                    <AvatarFallback className="text-[9px] bg-muted dark:bg-slate-800 text-muted-foreground dark:text-muted-foreground font-bold rounded-md">
                                       {u.name ? u.name.slice(0, 2).toUpperCase() : 'U'}
                                     </AvatarFallback>
                                   </Avatar>
                                   <div className="flex flex-col min-w-0 flex-1">
-                                    <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate group-hover:text-blue-700 dark:group-hover:text-blue-300 transition-colors">
+                                    <span className="text-xs font-semibold text-foreground dark:text-foreground truncate group-hover:text-blue-700 dark:group-hover:text-blue-300 transition-colors">
                                       {u.name}
                                     </span>
-                                    <span className="text-[10px] text-slate-400 truncate">{u.email}</span>
+                                    <span className="text-[10px] text-muted-foreground truncate">{u.email}</span>
                                   </div>
                                 </button>
                               </li>
                             ))}
                           </ul>
                           {isQueryEmail && (
-                            <div className="border-t border-slate-100 dark:border-slate-800/80 p-3 flex flex-col gap-2 bg-slate-50/50 dark:bg-slate-900/50">
-                              <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider text-left">Mời thành viên mới</span>
+                            <div className="border-t border-border dark:border-border/80 p-3 flex flex-col gap-2 bg-muted/50 dark:bg-slate-900/50">
+                              <span className="text-[10px] font-bold text-muted-foreground dark:text-muted-foreground uppercase tracking-wider text-left">Mời thành viên mới</span>
                               <div className="flex gap-2">
                                 <button
                                   type="button"
@@ -555,8 +555,8 @@ export function DeptMembersDialog({
                               </div>
                             </div>
                           )}
-                          <div className="px-3 py-1.5 border-t border-slate-100 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/40">
-                            <p className="text-[9px] text-slate-400">
+                          <div className="px-3 py-1.5 border-t border-border dark:border-border bg-muted/60 dark:bg-slate-900/40">
+                            <p className="text-[9px] text-muted-foreground">
                               {filteredUsers.length} kết quả • Click để chọn
                             </p>
                           </div>
@@ -568,7 +568,7 @@ export function DeptMembersDialog({
 
                 {/* ── Role selector ───────────────────────────────────────── */}
                 <Select value={selectedRole} onValueChange={setSelectedRole}>
-                  <SelectTrigger className="h-9 w-full sm:w-44 text-xs rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 cursor-pointer">
+                  <SelectTrigger className="h-9 w-full sm:w-44 text-xs rounded-md border-border dark:border-border bg-white dark:bg-slate-900 cursor-pointer">
                     <div className="flex items-center gap-1.5">
                       {ROLE_CONFIG[selectedRole]?.icon}
                       <SelectValue />
@@ -598,7 +598,7 @@ export function DeptMembersDialog({
                   onClick={handleAddMember}
                   disabled={!isValidSelection || isAdding}
                   size="sm"
-                  className="h-9 px-4 rounded-lg bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-xs font-semibold shrink-0 transition-all duration-150 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="h-9 px-4 rounded-md bg-primary hover:bg-primary/90 active:bg-blue-800 text-white text-xs font-semibold shrink-0 transition-all duration-150 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isAdding ? (
                     <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -615,38 +615,38 @@ export function DeptMembersDialog({
           <section>
             <div className="flex items-center justify-between mb-2.5">
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
+                <span className="text-[10px] font-bold text-muted-foreground dark:text-muted-foreground uppercase tracking-widest">
                   Danh sách nhân sự
                 </span>
-                <span className="text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 px-1.5 py-0.5 rounded-full">
+                <span className="text-[10px] font-bold bg-muted dark:bg-slate-800 text-muted-foreground dark:text-muted-foreground px-1.5 py-0.5 rounded-full">
                   {currentMembers.length}
                 </span>
               </div>
-              {isDeptLoading && <Loader2 className="w-3 h-3 animate-spin text-slate-400" />}
+              {isDeptLoading && <Loader2 className="w-3 h-3 animate-spin text-muted-foreground" />}
             </div>
 
-            <div className="border border-slate-200 dark:border-slate-800 rounded-lg overflow-hidden">
+            <div className="border border-border dark:border-border rounded-md overflow-hidden">
               {/* Table header */}
-              <div className="grid grid-cols-[1fr_auto_auto] items-center px-4 py-2 bg-slate-50 dark:bg-slate-900/60 border-b border-slate-200 dark:border-slate-800">
-                <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Nhân sự</span>
-                <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mr-10">Vai trò</span>
-                <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Xóa</span>
+              <div className="grid grid-cols-[1fr_auto_auto] items-center px-4 py-2 bg-muted dark:bg-slate-900/60 border-b border-border dark:border-border">
+                <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">Nhân sự</span>
+                <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest mr-10">Vai trò</span>
+                <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">Xóa</span>
               </div>
 
               {/* Rows */}
               {isDeptLoading ? (
-                <div className="flex items-center justify-center py-10 text-xs text-slate-400 gap-2">
+                <div className="flex items-center justify-center py-10 text-xs text-muted-foreground gap-2">
                   <Loader2 className="w-4 h-4 animate-spin" />
                   Đang tải dữ liệu...
                 </div>
               ) : currentMembers.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-10 gap-2 text-slate-400">
+                <div className="flex flex-col items-center justify-center py-10 gap-2 text-muted-foreground">
                   <Users className="w-8 h-8 opacity-30" />
                   <p className="text-xs">Phòng ban chưa có thành viên nào.</p>
-                  <p className="text-[10px] text-slate-300 dark:text-slate-600">Sử dụng form trên để bổ sung nhân sự.</p>
+                  <p className="text-[10px] text-muted-foreground dark:text-muted-foreground">Sử dụng form trên để bổ sung nhân sự.</p>
                 </div>
               ) : (
-                <div className="divide-y divide-slate-100 dark:divide-slate-800/80">
+                <div className="divide-y divide-border/80">
                   {currentMembers.map((m) => {
                     const user = m.user;
                     const roleCfg = ROLE_CONFIG[m.role as string] || ROLE_CONFIG.MEMBER;
@@ -663,14 +663,14 @@ export function DeptMembersDialog({
                     return (
                       <div
                         key={m.id}
-                        className="grid grid-cols-[1fr_auto_auto] items-center px-4 py-2.5 hover:bg-slate-50/60 dark:hover:bg-slate-900/30 transition-colors"
+                        className="grid grid-cols-[1fr_auto_auto] items-center px-4 py-2.5 hover:bg-muted/60 dark:hover:bg-slate-900/30 transition-colors"
                       >
                         {/* User info */}
                         <div className="flex items-center gap-2.5 min-w-0">
                           <div className="relative shrink-0">
-                            <Avatar className="h-7 w-7 rounded-full border border-slate-200 dark:border-slate-700">
+                            <Avatar className="h-7 w-7 rounded-full border border-border dark:border-border">
                               <AvatarImage src={user?.avatar ? getAvatarUrl(user.avatar) : undefined} />
-                              <AvatarFallback className="text-[9px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-bold">
+                              <AvatarFallback className="text-[9px] bg-muted dark:bg-slate-800 text-muted-foreground dark:text-muted-foreground font-bold">
                                 {(user?.name || 'TV').slice(0, 2).toUpperCase()}
                               </AvatarFallback>
                             </Avatar>
@@ -678,10 +678,10 @@ export function DeptMembersDialog({
                             <span className={`absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full border border-white dark:border-slate-950 ${roleCfg.dotCls}`} />
                           </div>
                           <div className="flex flex-col min-w-0">
-                            <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate leading-tight">
+                            <span className="text-xs font-semibold text-foreground dark:text-foreground truncate leading-tight">
                               {user?.name || 'Người dùng ẩn'}
                             </span>
-                            <span className="text-[10px] text-slate-400 dark:text-slate-500 truncate">
+                            <span className="text-[10px] text-muted-foreground dark:text-muted-foreground truncate">
                               {user?.email || '—'}
                             </span>
                           </div>
@@ -739,8 +739,8 @@ export function DeptMembersDialog({
                           disabled={!isDeletable || isRemoving}
                           className={`h-7 w-7 rounded-md transition-colors cursor-pointer ${
                             isDeletable 
-                              ? 'text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20' 
-                              : 'text-slate-300 dark:text-slate-700 opacity-40 cursor-not-allowed'
+                              ? 'text-muted-foreground hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20' 
+                              : 'text-muted-foreground dark:text-muted-foreground opacity-40 cursor-not-allowed'
                           }`}
                           aria-label={`Xóa ${user?.name || 'thành viên'} khỏi phòng ban`}
                         >
@@ -756,15 +756,15 @@ export function DeptMembersDialog({
         </div>
 
         {/* ── Footer ─────────────────────────────────────────────────────── */}
-        <div className="px-6 py-3 border-t border-slate-100 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/40 flex items-center justify-between">
-          <p className="text-[10px] text-slate-400 dark:text-slate-500">
+        <div className="px-6 py-3 border-t border-border dark:border-border bg-muted/60 dark:bg-slate-900/40 flex items-center justify-between">
+          <p className="text-[10px] text-muted-foreground dark:text-muted-foreground">
             Thay đổi vai trò có hiệu lực ngay lập tức
           </p>
           <Button
             variant="outline"
             size="sm"
             onClick={() => onOpenChange(false)}
-            className="h-7 text-xs rounded-md border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+            className="h-7 text-xs rounded-md border-border dark:border-border text-muted-foreground dark:text-muted-foreground hover:bg-muted dark:hover:bg-slate-800 cursor-pointer"
           >
             Đóng
           </Button>

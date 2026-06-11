@@ -71,7 +71,7 @@ export function AuditLogTable({ className }: AuditLogTableProps) {
                     description="Try adjusting your filters or check back later"
                 />
             ) : (
-                <div className="border rounded-lg overflow-hidden">
+                <div className="border rounded-md overflow-hidden">
                     <table className="w-full">
                         <thead className="bg-muted/50">
                             <tr className="text-left text-sm">

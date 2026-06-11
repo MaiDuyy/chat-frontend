@@ -176,7 +176,7 @@ export default function WikiGraphPage() {
         <div className="flex items-center gap-2.5 min-w-0">
           <Link
             href="/wiki"
-            className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors shrink-0"
+            className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors shrink-0"
           >
             <ArrowLeft className="w-4 h-4" />
           </Link>
@@ -212,7 +212,7 @@ export default function WikiGraphPage() {
               );
               setHighlightSlug(match?.slug ?? null);
             }}
-            className="w-full h-8 bg-background border border-border rounded-lg pl-8 pr-8 text-xs focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all"
+            className="w-full h-8 bg-background border border-border rounded-md pl-8 pr-8 text-xs focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all"
           />
           {searchQuery && (
             <button
@@ -232,7 +232,7 @@ export default function WikiGraphPage() {
           {/* Filter toggle */}
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium border transition-colors cursor-pointer ${
+            className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium border transition-colors cursor-pointer ${
               showFilters
                 ? "border-primary bg-primary/10 text-primary"
                 : "border-border bg-card text-muted-foreground hover:bg-accent hover:text-foreground"
@@ -250,7 +250,7 @@ export default function WikiGraphPage() {
             <button
               onClick={resetFilters}
               title="Đặt lại bộ lọc"
-              className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors border border-border cursor-pointer"
+              className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors border border-border cursor-pointer"
             >
               <RotateCcw className="w-3.5 h-3.5" />
             </button>
@@ -259,7 +259,7 @@ export default function WikiGraphPage() {
           {/* Fullscreen */}
           <button
             onClick={() => setIsFullscreen(!isFullscreen)}
-            className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors border border-border cursor-pointer"
+            className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors border border-border cursor-pointer"
             title={isFullscreen ? "Thu nhỏ" : "Toàn màn hình"}
           >
             <Maximize2 className="w-3.5 h-3.5" />
@@ -282,7 +282,7 @@ export default function WikiGraphPage() {
                 <button
                   key={type}
                   onClick={() => toggleType(type)}
-                  className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs border transition-all cursor-pointer"
+                  className="flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs border transition-all cursor-pointer"
                   style={{
                     background: active ? `${color}15` : "transparent",
                     color: active ? color : "var(--muted-foreground)",
@@ -309,7 +309,7 @@ export default function WikiGraphPage() {
 
       {/* Search results dropdown */}
       {searchQuery && searchMatches.length > 0 && (
-        <div className="absolute top-[52px] left-1/2 -translate-x-1/2 z-30 bg-card border border-border rounded-xl shadow-xl py-1 max-h-56 overflow-y-auto w-72 mt-2">
+        <div className="absolute top-[52px] left-1/2 -translate-x-1/2 z-30 bg-card border border-border rounded-lg shadow-xl py-1 max-h-56 overflow-y-auto w-72 mt-2">
           {searchMatches.slice(0, 8).map((n) => (
             <button
               key={n.slug}
@@ -361,7 +361,7 @@ export default function WikiGraphPage() {
             </div>
           ) : !filteredData || filteredData.nodes.length === 0 ? (
             <div className="w-full h-full flex flex-col items-center justify-center gap-4 bg-background">
-              <div className="w-16 h-16 rounded-2xl bg-muted/50 flex items-center justify-center">
+              <div className="w-16 h-16 rounded-xl bg-muted/50 flex items-center justify-center">
                 <Network className="w-8 h-8 text-muted-foreground/40" />
               </div>
               <div className="text-center">
@@ -396,7 +396,7 @@ export default function WikiGraphPage() {
 
           {/* Legend overlay */}
           {filteredData && filteredData.nodes.length > 0 && (
-            <div className="absolute bottom-4 left-4 bg-card/90 backdrop-blur-sm border border-border rounded-xl px-3 py-2 shadow-lg">
+            <div className="absolute bottom-4 left-4 bg-card/90 backdrop-blur-sm border border-border rounded-lg px-3 py-2 shadow-lg">
               <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground mb-2">
                 Chú thích
               </p>
@@ -421,7 +421,7 @@ export default function WikiGraphPage() {
 
           {/* Hint when no selection */}
           {filteredData && filteredData.nodes.length > 0 && !previewSlug && (
-            <div className="absolute bottom-4 right-4 bg-card/90 backdrop-blur-sm border border-border rounded-lg px-3 py-2 shadow text-[10px] text-muted-foreground">
+            <div className="absolute bottom-4 right-4 bg-card/90 backdrop-blur-sm border border-border rounded-md px-3 py-2 shadow text-[10px] text-muted-foreground">
               Click vào node để xem chi tiết
             </div>
           )}
@@ -449,7 +449,7 @@ export default function WikiGraphPage() {
                 {previewSlug && (
                   <Link
                     href={`/wiki/${previewSlug}`}
-                    className="inline-flex items-center gap-1 px-2 py-1 text-[10px] font-medium border border-border rounded-lg hover:bg-accent transition-colors"
+                    className="inline-flex items-center gap-1 px-2 py-1 text-[10px] font-medium border border-border rounded-md hover:bg-accent transition-colors"
                   >
                     <ExternalLink className="w-3 h-3" />
                     Mở
@@ -457,7 +457,7 @@ export default function WikiGraphPage() {
                 )}
                 <button
                   onClick={() => setPreviewSlug(null)}
-                  className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-accent rounded-lg transition-colors cursor-pointer"
+                  className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-accent rounded-md transition-colors cursor-pointer"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -525,7 +525,7 @@ export default function WikiGraphPage() {
                         <button
                           key={slug}
                           onClick={() => setPreviewSlug(slug)}
-                          className="flex items-center gap-2 text-left px-2 py-1.5 rounded-lg hover:bg-accent transition-colors cursor-pointer group"
+                          className="flex items-center gap-2 text-left px-2 py-1.5 rounded-md hover:bg-accent transition-colors cursor-pointer group"
                         >
                           <span
                             className="w-2 h-2 rounded-full shrink-0"

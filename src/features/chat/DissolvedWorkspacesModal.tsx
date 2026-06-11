@@ -55,13 +55,13 @@ export function DissolvedWorkspacesModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[560px] max-h-[80vh] flex flex-col p-0 overflow-hidden rounded-[4px]">
-        <DialogHeader className="px-5 pt-5 pb-3 border-b border-slate-200/80 dark:border-white/[0.06] shrink-0">
+      <DialogContent className="sm:max-w-[560px] max-h-[80vh] flex flex-col p-0 overflow-hidden rounded-md">
+        <DialogHeader className="px-5 pt-5 pb-3 border-b border-border shrink-0">
           <DialogTitle className="text-sm font-bold flex items-center gap-2">
             <Archive className="w-4 h-4 text-amber-600" />
             Kho lưu trữ Workspace
           </DialogTitle>
-          <DialogDescription className="text-[11px] text-slate-500 mt-0.5">
+          <DialogDescription className="text-[11px] text-muted-foreground mt-0.5">
             Danh sách Workspace đã giải tán. Khôi phục trước khi bị xóa vĩnh viễn.
           </DialogDescription>
         </DialogHeader>
@@ -70,12 +70,12 @@ export function DissolvedWorkspacesModal({
           {isLoading ? (
             <div className="flex flex-col items-center justify-center py-16">
               <Loader2 className="w-6 h-6 animate-spin text-amber-500 mb-2" />
-              <p className="text-xs text-slate-400">Đang tải...</p>
+              <p className="text-xs text-muted-foreground">Đang tải...</p>
             </div>
           ) : !workspaces || workspaces.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16 border border-dashed border-slate-200 dark:border-slate-700 rounded-[4px]">
-              <Archive className="w-8 h-8 text-slate-200 dark:text-slate-700 mb-2" />
-              <p className="text-xs text-slate-500 text-center">
+            <div className="flex flex-col items-center justify-center py-16 border border-dashed border-border dark:border-border rounded-md">
+              <Archive className="w-8 h-8 text-foreground dark:text-muted-foreground mb-2" />
+              <p className="text-xs text-muted-foreground text-center">
                 Không có Workspace nào bị giải tán gần đây.
               </p>
             </div>
@@ -84,19 +84,19 @@ export function DissolvedWorkspacesModal({
               {workspaces.map((ws) => (
                 <div
                   key={ws.id}
-                  className="flex items-center justify-between p-3 rounded-[4px] bg-white dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/50 hover:border-slate-300 transition-colors"
+                  className="flex items-center justify-between p-3 rounded-md bg-white dark:bg-slate-800/60 border border-border/80 dark:border-border/50 hover:border-border transition-colors"
                 >
                   <div className="flex items-center gap-3">
-                    <Avatar className="h-9 w-9 rounded-[4px] border border-slate-200 opacity-60">
+                    <Avatar className="h-9 w-9 rounded-md border border-border opacity-60">
                       <AvatarImage src={ws.icon} />
-                      <AvatarFallback className="bg-slate-100 text-slate-500 text-xs font-bold rounded-[4px]">
+                      <AvatarFallback className="bg-muted text-muted-foreground text-xs font-bold rounded-md">
                         {ws.name[0]}
                       </AvatarFallback>
                     </Avatar>
                     <div>
-                      <h4 className="text-xs font-semibold text-slate-700 dark:text-slate-300">{ws.name}</h4>
+                      <h4 className="text-xs font-semibold text-muted-foreground dark:text-muted-foreground">{ws.name}</h4>
                       <div className="space-y-0.5 mt-0.5">
-                        <p className="text-[10px] text-slate-400 flex items-center gap-1">
+                        <p className="text-[10px] text-muted-foreground flex items-center gap-1">
                           <Clock className="w-2.5 h-2.5" />
                           Giải tán {(ws as any).dissolvedAt ? formatDistanceToNow(new Date((ws as any).dissolvedAt), { addSuffix: true, locale: vi }) : 'không rõ'}
                         </p>
@@ -109,7 +109,7 @@ export function DissolvedWorkspacesModal({
                   </div>
                   <Button
                     size="sm"
-                    className="h-7 px-3 bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold rounded-[4px] gap-1.5"
+                    className="h-7 px-3 bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold rounded-md gap-1.5"
                     onClick={() => handleRestore(ws.id, ws.name)}
                     disabled={isRestoring}
                   >
@@ -122,8 +122,8 @@ export function DissolvedWorkspacesModal({
           )}
         </div>
 
-        <div className="px-4 py-3 border-t border-slate-200/80 dark:border-white/[0.06] flex justify-end">
-          <Button variant="outline" size="sm" className="h-7 text-xs rounded-[4px]" onClick={onClose}>
+        <div className="px-4 py-3 border-t border-border flex justify-end">
+          <Button variant="outline" size="sm" className="h-7 text-xs rounded-md" onClick={onClose}>
             Đóng
           </Button>
         </div>

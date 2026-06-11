@@ -38,11 +38,11 @@ import { toast } from 'sonner';
 
 const ACTION_COLORS: Record<string, string> = {
     'LOGIN': 'bg-blue-100 text-blue-600',
-    'LOGOUT': 'bg-gray-100 text-gray-600',
+    'LOGOUT': 'bg-muted text-muted-foreground',
     'CREATE': 'bg-green-100 text-green-600',
     'UPDATE': 'bg-yellow-100 text-yellow-600',
     'DELETE': 'bg-red-100 text-red-600',
-    'INVITE': 'bg-purple-100 text-purple-600',
+    'INVITE': 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400',
     'SUSPEND': 'bg-orange-100 text-orange-600',
 };
 
@@ -164,14 +164,14 @@ export function AuditLogsPage() {
                                 placeholder="Tìm kiếm theo người dùng, hành động..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="pl-10 h-10 rounded-xl"
+                                className="pl-10 h-10 rounded-lg"
                             />
                         </div>
                         <Select 
                             value={filters.status || 'all'} 
                             onValueChange={(val) => setFilters(prev => ({ ...prev, status: val === 'all' ? undefined : val }))}
                         >
-                            <SelectTrigger className="w-[180px] h-10 rounded-xl">
+                            <SelectTrigger className="w-[180px] h-10 rounded-lg">
                                 <Filter className="w-4 h-4 mr-2" />
                                 <SelectValue placeholder="Trạng thái" />
                             </SelectTrigger>
@@ -186,7 +186,7 @@ export function AuditLogsPage() {
                             value={filters.resource || 'all'} 
                             onValueChange={(val) => setFilters(prev => ({ ...prev, resource: val === 'all' ? undefined : val }))}
                         >
-                            <SelectTrigger className="w-[180px] h-10 rounded-xl">
+                            <SelectTrigger className="w-[180px] h-10 rounded-lg">
                                 <SelectValue placeholder="Tài nguyên" />
                             </SelectTrigger>
                             <SelectContent>
@@ -203,7 +203,7 @@ export function AuditLogsPage() {
 
             {/* Activity List */}
             <Card className="border-none shadow-sm overflow-hidden">
-                <CardHeader className="bg-slate-50/50">
+                <CardHeader className="bg-muted/50">
                     <div className="flex items-center justify-between">
                         <div>
                             <CardTitle className="text-lg">Hoạt động gần đây</CardTitle>
@@ -230,23 +230,23 @@ export function AuditLogsPage() {
                         <div className="divide-y divide-slate-100">
                             {logs.map((log) => {
                                 const ResourceIcon = RESOURCE_ICONS[log.resource] || ActivityIcon;
-                                const actionColor = ACTION_COLORS[log.action] || 'bg-slate-100 text-slate-600';
+                                const actionColor = ACTION_COLORS[log.action] || 'bg-muted text-muted-foreground';
                                 
                                 return (
                                     <div
                                         key={log.id}
-                                        className="group flex items-start gap-4 p-5 hover:bg-slate-50/50 transition-all duration-200"
+                                        className="group flex items-start gap-4 p-5 hover:bg-muted/50 transition-all duration-200"
                                     >
-                                        <div className={cn("p-2.5 rounded-2xl shadow-sm ring-1 ring-slate-200/50", actionColor)}>
+                                        <div className={cn("p-2.5 rounded-xl shadow-sm ring-1 ring-slate-200/50", actionColor)}>
                                             <ResourceIcon className="w-5 h-5" />
                                         </div>
 
                                         <div className="flex-1 min-w-0">
                                             <div className="flex items-center gap-2 flex-wrap mb-1">
-                                                <span className="font-bold text-slate-900">
+                                                <span className="font-bold text-foreground">
                                                     {log.userName || 'System'}
                                                 </span>
-                                                <span className="text-slate-300">•</span>
+                                                <span className="text-muted-foreground">•</span>
                                                 <Badge variant="outline" className={cn("text-[10px] font-bold uppercase tracking-tight rounded-full", actionColor)}>
                                                     {log.action}
                                                 </Badge>
@@ -254,21 +254,21 @@ export function AuditLogsPage() {
                                                     <Badge variant="destructive" className="text-[10px] rounded-full">FAILED</Badge>
                                                 )}
                                             </div>
-                                            <p className="text-sm text-slate-600 leading-relaxed">
-                                                <span className="font-medium text-slate-900">{log.action}</span> {log.resource.toLowerCase()} 
-                                                {log.resourceId && <span className="text-slate-400 text-xs ml-1 font-mono">({log.resourceId})</span>}
+                                            <p className="text-sm text-muted-foreground leading-relaxed">
+                                                <span className="font-medium text-foreground">{log.action}</span> {log.resource.toLowerCase()} 
+                                                {log.resourceId && <span className="text-muted-foreground text-xs ml-1 font-mono">({log.resourceId})</span>}
                                             </p>
                                             
-                                            <div className="flex items-center gap-4 mt-3 text-[11px] font-medium text-slate-400">
-                                                <span className="flex items-center gap-1.5 px-2 py-0.5 bg-slate-100 rounded-md">
+                                            <div className="flex items-center gap-4 mt-3 text-[11px] font-medium text-muted-foreground">
+                                                <span className="flex items-center gap-1.5 px-2 py-0.5 bg-muted rounded-md">
                                                     <Clock className="w-3.5 h-3.5" />
                                                     {formatDistanceToNow(new Date(log.timestamp), {
                                                         addSuffix: true,
                                                         locale: vi,
                                                     })}
                                                 </span>
-                                                <span className="px-2 py-0.5 bg-slate-100 rounded-md">IP: {log.ipAddress || 'Internal'}</span>
-                                                {log.userAgent && <span className="hidden md:inline truncate max-w-[200px] px-2 py-0.5 bg-slate-100 rounded-md">{log.userAgent}</span>}
+                                                <span className="px-2 py-0.5 bg-muted rounded-md">IP: {log.ipAddress || 'Internal'}</span>
+                                                {log.userAgent && <span className="hidden md:inline truncate max-w-[200px] px-2 py-0.5 bg-muted rounded-md">{log.userAgent}</span>}
                                             </div>
                                         </div>
 
@@ -291,7 +291,7 @@ export function AuditLogsPage() {
 
                     {/* Pagination */}
                     {data && (
-                        <div className="p-4 bg-slate-50/50 border-t">
+                        <div className="p-4 bg-muted/50 border-t">
                             <WikiPagination
                                 page={page}
                                 size={size}

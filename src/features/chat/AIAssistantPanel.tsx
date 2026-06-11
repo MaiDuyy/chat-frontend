@@ -159,30 +159,30 @@ export function AIAssistantPanel({ chatId, initialQuery, onClose }: AIAssistantP
     : ['Tìm tài liệu liên quan', 'Giải thích quy trình', 'Chính sách nghỉ phép'];
 
   return (
-    <div className="flex flex-col h-full bg-[#fdfdfd] border-l border-slate-200/60 w-[360px] shrink-0 shadow-2xl relative overflow-hidden transition-all duration-300">
+    <div className="flex flex-col h-full bg-background border-l border-border w-[360px] shrink-0 shadow-2xl relative overflow-hidden transition-all duration-300">
       {/* Header with Glassmorphism */}
       <div className={cn(
         'sticky top-0 z-20 flex items-center justify-between px-5 py-4 border-b backdrop-blur-md transition-all duration-500',
         agentMode
-          ? 'bg-amber-50/80 border-amber-100/50'
-          : 'bg-white/80 border-slate-100'
+          ? 'bg-amber-50/80 dark:bg-amber-950/20 border-amber-100/50 dark:border-amber-900/30'
+          : 'bg-background/80 border-border'
       )}>
         <div className="flex items-center gap-3">
           <div className={cn(
-            'w-9 h-9 rounded-xl flex items-center justify-center shadow-lg transition-transform duration-300 hover:scale-105',
+            'w-9 h-9 rounded-md flex items-center justify-center shadow-lg transition-transform duration-300 hover:scale-105',
             agentMode
               ? 'bg-gradient-to-br from-amber-400 to-orange-500 shadow-amber-200/50'
-              : 'bg-gradient-to-br from-indigo-500 to-purple-600 shadow-indigo-200/50'
+              : 'bg-gradient-to-br from-accent-emerald to-accent-mint shadow-emerald-500/20'
           )}>
-            {agentMode ? <Zap size={18} className="text-white" /> : <Sparkles size={18} className="text-white" />}
+            {agentMode ? <Zap size={18} className="text-white" /> : <Sparkles size={18} className="text-slate-950" />}
           </div>
           <div>
-            <h3 className="text-sm font-bold text-slate-800 tracking-tight leading-none mb-1">
+            <h3 className="text-sm font-bold text-foreground tracking-tight leading-none mb-1">
               {view === 'history' ? 'Lịch sử AI' : (agentMode ? 'Trợ lý Agent' : 'Trợ lý AI')}
             </h3>
             <div className="flex items-center gap-1.5">
               <div className={cn("w-1.5 h-1.5 rounded-full animate-pulse", agentMode ? "bg-amber-500" : "bg-emerald-500")} />
-              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+              <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">
                 {view === 'history' ? 'Gần đây' : 'Sẵn sàng'}
               </span>
             </div>
@@ -194,10 +194,9 @@ export function AIAssistantPanel({ chatId, initialQuery, onClose }: AIAssistantP
           <button
             onClick={() => setView(v => v === 'chat' ? 'history' : 'chat')}
             className={cn(
-              'flex items-center justify-center w-8 h-8 rounded-lg transition-all duration-300 border shadow-sm',
               view === 'history'
-                ? 'bg-indigo-600 border-indigo-500 text-white shadow-indigo-100'
-                : 'bg-white border-slate-200 text-slate-400 hover:border-indigo-300 hover:text-indigo-600'
+                ? 'bg-primary border-primary text-primary-foreground shadow-sm'
+                : 'bg-background hover:bg-muted border-border text-muted-foreground hover:text-foreground'
             )}
             title={view === 'chat' ? 'Xem lịch sử hội thoại' : 'Quay lại Chat'}
           >
@@ -209,10 +208,10 @@ export function AIAssistantPanel({ chatId, initialQuery, onClose }: AIAssistantP
             <button
               onClick={() => setAgentMode(prev => !prev)}
               className={cn(
-                'group relative flex items-center justify-center w-8 h-8 rounded-lg transition-all duration-300 border shadow-sm',
+                'group relative flex items-center justify-center w-8 h-8 rounded-md transition-all duration-300 border shadow-sm',
                 agentMode
                   ? 'bg-amber-500 border-amber-400 text-white shadow-amber-100'
-                  : 'bg-white border-slate-200 text-slate-400 hover:border-amber-300 hover:text-amber-500'
+                  : 'bg-background hover:bg-muted border-border text-muted-foreground hover:text-amber-500'
               )}
               title={agentMode ? 'Chuyển về chế độ RAG' : 'Bật Chế độ Agent (Tool Calling)'}
             >
@@ -220,10 +219,10 @@ export function AIAssistantPanel({ chatId, initialQuery, onClose }: AIAssistantP
             </button>
           )}
 
-          <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg" onClick={handleClear} title="Làm mới">
+          <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary hover:bg-muted rounded-md" onClick={handleClear} title="Làm mới">
             <RefreshCw size={14} />
           </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg" onClick={onClose}>
+          <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-md" onClick={onClose}>
             <X size={14} />
           </Button>
         </div>
@@ -238,16 +237,16 @@ export function AIAssistantPanel({ chatId, initialQuery, onClose }: AIAssistantP
               {allMessages.length === 0 && !isLoadingHistoryMessages && (
                 <div className="flex flex-col items-center justify-center min-h-[400px] text-center py-8 animate-in fade-in zoom-in duration-700">
                   <div className={cn(
-                    'w-16 h-16 rounded-3xl flex items-center justify-center mb-6 shadow-xl transform -rotate-3 transition-transform hover:rotate-0 duration-300',
-                    agentMode ? 'bg-amber-50 shadow-amber-100' : 'bg-indigo-50 shadow-indigo-100'
+                    'w-16 h-16 rounded-md flex items-center justify-center mb-6 shadow-xl transform -rotate-3 transition-transform hover:rotate-0 duration-300',
+                    agentMode ? 'bg-amber-50 shadow-amber-100' : 'bg-muted shadow-sm'
                   )}>
-                    <Bot size={32} className={agentMode ? 'text-amber-500' : 'text-indigo-500'} />
+                    <Bot size={32} className={agentMode ? 'text-amber-500' : 'text-primary'} />
                   </div>
                   <div className="space-y-2 mb-8">
-                    <h4 className="text-lg font-bold text-slate-800 tracking-tight">
+                    <h4 className="text-lg font-bold text-foreground tracking-tight">
                       {agentMode ? 'Agent đã sẵn sàng' : 'Tôi có thể giúp gì cho bạn?'}
                     </h4>
-                    <p className="text-xs text-slate-500 max-w-[240px] leading-relaxed mx-auto font-medium">
+                    <p className="text-xs text-muted-foreground max-w-[240px] leading-relaxed mx-auto font-medium">
                       {agentMode
                         ? 'Tôi có thể tóm tắt chat, tạo công việc, tìm tài liệu và thực thi các hành động thông minh.'
                         : 'Hãy hỏi bất cứ điều gì về tài liệu nội bộ và quy trình của tổ chức bạn.'}
@@ -260,10 +259,10 @@ export function AIAssistantPanel({ chatId, initialQuery, onClose }: AIAssistantP
                         key={q}
                         onClick={() => agentMode ? sendAgentQuery(q) : sendAIQuery(q)}
                         className={cn(
-                          'group flex items-center justify-between px-4 py-2.5 text-xs font-semibold rounded-xl transition-all duration-200 border text-left',
+                          'group flex items-center justify-between px-4 py-2.5 text-xs font-semibold rounded-md transition-all duration-200 border text-left',
                           agentMode
                             ? 'bg-white border-amber-100 text-amber-700 hover:border-amber-400 hover:bg-amber-50 shadow-sm'
-                            : 'bg-white border-slate-100 text-slate-600 hover:border-indigo-400 hover:bg-indigo-50/30 shadow-sm'
+                            : 'bg-white border-border text-muted-foreground hover:border-primary hover:bg-primary/5 shadow-sm'
                         )}
                       >
                         <span className="truncate">{q}</span>
@@ -275,8 +274,8 @@ export function AIAssistantPanel({ chatId, initialQuery, onClose }: AIAssistantP
               )}
 
               {isLoadingHistoryMessages && (
-                <div className="flex flex-col items-center justify-center py-12 text-slate-400 gap-3">
-                  <Loader2 size={24} className="animate-spin text-indigo-400" />
+                <div className="flex flex-col items-center justify-center py-12 text-muted-foreground gap-3">
+                  <Loader2 size={24} className="animate-spin text-primary" />
                   <span className="text-xs font-medium">Đang tải tin nhắn cũ...</span>
                 </div>
               )}
@@ -298,18 +297,18 @@ export function AIAssistantPanel({ chatId, initialQuery, onClose }: AIAssistantP
           <ScrollArea className="flex-1 h-full px-5 py-6 custom-scrollbar">
             <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500 pb-4">
               <div className="flex items-center justify-between px-1">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Hội thoại gần đây</span>
-                <Clock size={12} className="text-slate-300" />
+                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em]">Hội thoại gần đây</span>
+                <Clock size={12} className="text-muted-foreground" />
               </div>
               
               {isLoadingConv ? (
-                <div className="flex flex-col items-center justify-center py-12 text-slate-400 gap-3">
-                  <Loader2 size={24} className="animate-spin text-indigo-400" />
+                <div className="flex flex-col items-center justify-center py-12 text-muted-foreground gap-3">
+                  <Loader2 size={24} className="animate-spin text-primary" />
                   <span className="text-xs font-medium">Đang tải lịch sử...</span>
                 </div>
               ) : conversations?.length === 0 ? (
                 <div className="text-center py-12">
-                  <p className="text-sm text-slate-500 font-medium">Chưa có lịch sử hội thoại.</p>
+                  <p className="text-sm text-muted-foreground font-medium">Chưa có lịch sử hội thoại.</p>
                 </div>
               ) : (
                 <div className="space-y-2">
@@ -317,20 +316,20 @@ export function AIAssistantPanel({ chatId, initialQuery, onClose }: AIAssistantP
                     <button
                       key={conv.id}
                       onClick={() => setView('chat')}
-                      className="w-full flex items-center gap-3 p-3 rounded-xl bg-white border border-slate-100 hover:border-indigo-200 hover:bg-indigo-50/30 transition-all duration-200 group text-left shadow-sm"
+                      className="w-full flex items-center gap-3 p-3 rounded-md bg-background border border-border hover:border-primary/50 hover:bg-muted transition-all duration-200 group text-left shadow-sm"
                     >
-                      <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center shrink-0 group-hover:bg-white transition-colors">
-                        <MessageSquare size={14} className="text-slate-400 group-hover:text-indigo-600" />
+                      <div className="w-8 h-8 rounded-md bg-muted flex items-center justify-center shrink-0 group-hover:bg-background transition-colors">
+                        <MessageSquare size={14} className="text-muted-foreground group-hover:text-primary" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs font-bold text-slate-700 truncate group-hover:text-indigo-900 transition-colors">
+                        <p className="text-xs font-bold text-muted-foreground truncate group-hover:text-foreground font-bold transition-colors">
                           {formatTitle(conv.title)}
                         </p>
-                        <p className="text-[10px] text-slate-400 font-medium">
+                        <p className="text-[10px] text-muted-foreground font-medium">
                           {new Date(conv.createdAt).toLocaleDateString('vi-VN')}
                         </p>
                       </div>
-                      <ChevronRight size={14} className="text-slate-300 group-hover:text-indigo-400 opacity-0 group-hover:opacity-100 transition-all" />
+                      <ChevronRight size={14} className="text-muted-foreground group-hover:text-primary opacity-0 group-hover:opacity-100 transition-all" />
                     </button>
                   ))}
                 </div>
@@ -342,7 +341,7 @@ export function AIAssistantPanel({ chatId, initialQuery, onClose }: AIAssistantP
 
       {/* Mode Banner Subtle */}
       {view === 'chat' && agentMode && allMessages.length > 0 && (
-        <div className="mx-5 mb-4 px-3 py-2 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-100 rounded-lg flex items-start gap-2 animate-in slide-in-from-bottom-2 duration-300">
+        <div className="mx-5 mb-4 px-3 py-2 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-100 rounded-md flex items-start gap-2 animate-in slide-in-from-bottom-2 duration-300">
           <Zap size={12} className="mt-0.5 shrink-0 text-amber-500 animate-pulse" />
           <p className="text-[10px] text-amber-800 leading-tight font-medium">
             <strong>Chế độ Agent:</strong> Đang sử dụng Tool Calling để thực thi các yêu cầu phức tạp.
@@ -351,7 +350,7 @@ export function AIAssistantPanel({ chatId, initialQuery, onClose }: AIAssistantP
       )}
 
       {/* Refined Input Area */}
-      <div className="p-5 bg-white border-t border-slate-100 shadow-[0_-10px_20px_-15px_rgba(0,0,0,0.05)]">
+      <div className="p-5 bg-background border-t border-border shadow-[0_-10px_20px_-15px_rgba(0,0,0,0.05)]">
         <div className="relative group transition-all duration-300">
           <Textarea
             ref={textareaRef}
@@ -359,7 +358,7 @@ export function AIAssistantPanel({ chatId, initialQuery, onClose }: AIAssistantP
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={agentMode ? 'Yêu cầu agent thực hiện...' : 'Hỏi về tài liệu nội bộ...'}
-            className="min-h-[50px] max-h-[140px] w-full bg-slate-50/50 border-slate-200 rounded-2xl py-3.5 pl-4 pr-12 text-sm font-medium placeholder:text-slate-400 focus:bg-white focus:ring-4 focus:ring-indigo-100 focus:border-indigo-400 transition-all duration-300 resize-none custom-scrollbar"
+            className="min-h-[50px] max-h-[140px] w-full bg-muted/50 border-border rounded-md py-3.5 pl-4 pr-12 text-sm font-medium placeholder:text-muted-foreground focus:bg-background focus:ring-4 focus:ring-primary/20 focus:border-primary transition-all duration-300 resize-none custom-scrollbar"
             disabled={isStreaming}
             rows={1}
           />
@@ -367,10 +366,10 @@ export function AIAssistantPanel({ chatId, initialQuery, onClose }: AIAssistantP
             <Button
               size="icon"
               className={cn(
-                'h-9 w-9 rounded-xl shadow-lg transition-all duration-300 transform active:scale-95',
+                'h-9 w-9 rounded-md shadow-lg transition-all duration-300 transform active:scale-95',
                 agentMode
                   ? 'bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 shadow-amber-200/50'
-                  : 'bg-gradient-to-br from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 shadow-indigo-200/50'
+                  : 'bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm'
               )}
               onClick={handleSend}
               disabled={!inputValue.trim() || isStreaming}
@@ -384,7 +383,7 @@ export function AIAssistantPanel({ chatId, initialQuery, onClose }: AIAssistantP
           </div>
         </div>
         <div className="flex items-center justify-center gap-4 mt-3 opacity-60">
-            <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest text-center">
+            <p className="text-[9px] text-muted-foreground font-bold uppercase tracking-widest text-center">
                 {agentMode ? 'Tool Calling enabled' : 'Gemini AI Assistant'}
             </p>
         </div>

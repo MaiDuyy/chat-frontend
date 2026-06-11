@@ -11,7 +11,7 @@ export default async function DocumentDetailPage({ params }: Props) {
 
     return (
         <RequirePermission permission={KNOWLEDGE_PERMISSIONS.READ}>
-            <div className="m-2 py-6">
+            <div className="w-full p-4 md:p-6">
                 <DocumentPreview documentId={docId} showChunks />
             </div>
         </RequirePermission>

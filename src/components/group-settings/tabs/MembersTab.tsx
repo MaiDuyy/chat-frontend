@@ -65,22 +65,22 @@ export function MembersTab({
             </div>
 
             <div className="relative mb-2">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
                 <Input
                     placeholder="Tìm thành viên..."
                     value={memberSearch}
                     onChange={(e) => setMemberSearch(e.target.value)}
-                    className="pl-9 h-8 text-xs rounded-lg border-slate-200"
+                    className="pl-9 h-8 text-xs rounded-md border-border"
                 />
             </div>
 
-            <div className="border border-slate-100 rounded-xl overflow-hidden">
+            <div className="border border-border rounded-lg overflow-hidden">
                 <table className="w-full">
                     <thead>
-                        <tr className="border-b border-slate-100 bg-slate-50/70">
-                            <th className="text-left text-[10px] font-semibold text-slate-400 tracking-wider uppercase px-4 py-2.5">Thành viên</th>
-                            <th className="text-left text-[10px] font-semibold text-slate-400 tracking-wider uppercase px-4 py-2.5">Vai trò</th>
-                            {/* <th className="text-left text-[10px] font-semibold text-slate-400 tracking-wider uppercase px-4 py-2.5 hidden md:table-cell">Ngày tham gia</th> */}
+                        <tr className="border-b border-border bg-muted/70">
+                            <th className="text-left text-[10px] font-semibold text-muted-foreground tracking-wider uppercase px-4 py-2.5">Thành viên</th>
+                            <th className="text-left text-[10px] font-semibold text-muted-foreground tracking-wider uppercase px-4 py-2.5">Vai trò</th>
+                            {/* <th className="text-left text-[10px] font-semibold text-muted-foreground tracking-wider uppercase px-4 py-2.5 hidden md:table-cell">Ngày tham gia</th> */}
                             <th className="px-4 py-2.5 w-10"></th>
                         </tr>
                     </thead>
@@ -89,15 +89,15 @@ export function MembersTab({
                             const memberId = getMemberId(p);
                             const isMe = memberId === currentUserId;
                             return (
-                                <tr key={p.id || i} className="border-t border-slate-50 hover:bg-slate-50/50 transition-colors">
+                                <tr key={p.id || i} className="border-t border-slate-50 hover:bg-muted/50 transition-colors">
                                     <td className="px-4 py-2.5">
                                         <div className="flex items-center gap-2.5">
                                             <MemberAvatar participant={p} />
                                             <div className="min-w-0">
-                                                <p className="text-[13px] font-medium text-slate-800 truncate">
-                                                    {getMemberName(p)} {isMe && <span className="text-slate-400 font-normal">(bạn)</span>}
+                                                <p className="text-[13px] font-medium text-foreground truncate">
+                                                    {getMemberName(p)} {isMe && <span className="text-muted-foreground font-normal">(bạn)</span>}
                                                 </p>
-                                                <p className="text-[11px] text-slate-400 truncate">
+                                                <p className="text-[11px] text-muted-foreground truncate">
                                                     {p.account?.id ? `#${p.account.id.slice(0, 8)}` : ""}
                                                 </p>
                                             </div>
@@ -107,13 +107,13 @@ export function MembersTab({
                                         <RoleBadge role={p.role} />
                                     </td>
                                     {/* <td className="px-4 py-2.5 hidden md:table-cell">
-                                        <span className="text-[11px] text-slate-400">—</span>
+                                        <span className="text-[11px] text-muted-foreground">—</span>
                                     </td> */}
                                     <td className="px-4 py-2.5">
                                         {isAdmin && !isMe && p.role !== "CHANNEL_OWNER" && (
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
-                                                    <button className="h-7 w-7 rounded-md flex items-center justify-center text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors">
+                                                    <button className="h-7 w-7 rounded-md flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-muted-foreground transition-colors">
                                                         <MoreVertical className="w-3.5 h-3.5" />
                                                     </button>
                                                 </DropdownMenuTrigger>
@@ -152,20 +152,20 @@ export function MembersTab({
                     </tbody>
                 </table>
                 {filteredParticipants.length === 0 && (
-                    <div className="text-center py-10 text-sm text-slate-400">Không tìm thấy thành viên</div>
+                    <div className="text-center py-10 text-sm text-muted-foreground">Không tìm thấy thành viên</div>
                 )}
             </div>
 
             {/* Join requests */}
             {isAdmin && chat?.joinPolicy === "APPROVAL" && (
                 <div className="space-y-3 mb-6">
-                    <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest">Yêu cầu tham gia đang chờ</h3>
+                    <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Yêu cầu tham gia đang chờ</h3>
                     {chat?.joinRequests?.length === 0 ? (
-                        <p className="text-[11px] text-gray-400 italic">Không có yêu cầu nào</p>
+                        <p className="text-[11px] text-muted-foreground italic">Không có yêu cầu nào</p>
                     ) : (
                         <div className="space-y-2">
                             {chat?.joinRequests?.map((req: any) => (
-                                <div key={req.id} className="flex items-center justify-between p-2.5 border rounded-xl bg-gray-50/50">
+                                <div key={req.id} className="flex items-center justify-between p-2.5 border rounded-lg bg-muted/50">
                                     <div className="flex items-center gap-2">
                                         <Avatar className="h-8 w-8 hover:scale-105 transition-transform">
                                             <AvatarImage src={getAvatarUrl(req.account?.avatar || "", req.account?.name)} />
@@ -173,7 +173,7 @@ export function MembersTab({
                                         </Avatar>
                                         <div className="min-w-0">
                                             <p className="text-xs font-bold truncate">{req.account?.name}</p>
-                                            <p className="text-[9px] text-gray-400">
+                                            <p className="text-[9px] text-muted-foreground">
                                                 Gửi ngày {format(new Date(req.createdAt), "dd/MM")}
                                             </p>
                                         </div>

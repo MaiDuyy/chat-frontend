@@ -449,7 +449,7 @@ export default function GroupSettingsPanel({
             <SheetContent
                 side="right"
                 className={cn(
-                    "w-1/2 flex flex-col bg-white border-l border-slate-200 shadow-2xl p-0",
+                    "w-1/2 flex flex-col bg-white border-l border-border shadow-2xl p-0",
                     "sm:max-w-none sm:w-[540px] md:w-[700px] lg:w-[900px]"
                 )}
             >

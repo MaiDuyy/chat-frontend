@@ -149,14 +149,14 @@ export default function FriendsPanel({ onlineUsers, onStartChat, workspaceId }: 
     return (
         <div className="flex flex-col h-full">
             {/* Tabs */}
-            <div className="flex border-b border-gray-200 dark:border-gray-700">
+            <div className="flex border-b border-border">
                 {tabs.map((tab) => (
                     <button
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
                         className={`flex-1 py-2.5 px-2 text-xs font-medium relative transition-colors flex items-center justify-center gap-1 ${activeTab === tab.id
-                            ? "text-blue-600 dark:text-blue-400"
-                            : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+                            ? "text-primary"
+                            : "text-muted-foreground hover:text-foreground"
                             }`}
                     >
                         {tab.icon ? <tab.icon className="h-4 w-4" /> : tab.label}
@@ -169,7 +169,7 @@ export default function FriendsPanel({ onlineUsers, onStartChat, workspaceId }: 
                             </Badge>
                         )}
                         {activeTab === tab.id && (
-                            <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600" />
+                            <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />
                         )}
                     </button>
                 ))}
@@ -177,12 +177,12 @@ export default function FriendsPanel({ onlineUsers, onStartChat, workspaceId }: 
 
             {/* Search bar for friends */}
             {(activeTab === "all" || activeTab === "online") && (
-                <div className="p-3 border-b border-gray-100 dark:border-gray-700">
+                <div className="p-3 border-b border-border">
                     <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input
                             placeholder="Tìm bạn bè..."
-                            className="pl-9 bg-gray-100 dark:bg-gray-700 border-0 h-9 text-sm"
+                            className="pl-9 bg-muted border-0 h-9 text-sm"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                         />
@@ -200,18 +200,18 @@ export default function FriendsPanel({ onlineUsers, onStartChat, workspaceId }: 
                                 <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
                             </div>
                         ) : (activeTab === "online" ? onlineFriends : filteredFriends).length === 0 ? (
-                            <div className="flex flex-col items-center justify-center h-48 text-gray-500">
-                                <Users className="h-10 w-10 mb-2 text-gray-300" />
+                            <div className="flex flex-col items-center justify-center h-48 text-muted-foreground">
+                                <Users className="h-10 w-10 mb-2 text-muted-foreground" />
                                 <p className="text-sm">
                                     {activeTab === "online" ? "Không có bạn bè online" : "Chưa có bạn bè"}
                                 </p>
                             </div>
                         ) : (
-                            <div className="divide-y divide-gray-100 dark:divide-gray-700">
+                            <div className="divide-y divide-border">
                                 {(activeTab === "online" ? onlineFriends : filteredFriends).map((friend) => (
                                     <div
                                         key={friend.id}
-                                        className="flex items-center gap-3 p-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                                        className="flex items-center gap-3 p-3 hover:bg-muted transition-colors cursor-pointer"
                                         onClick={() => {
                                             setSelectedFriend(friend);
                                             setShowFriendProfile(true);
@@ -220,19 +220,19 @@ export default function FriendsPanel({ onlineUsers, onStartChat, workspaceId }: 
                                         <div className="relative">
                                             <Avatar className="h-11 w-11">
                                                 <AvatarImage src={getAvatarUrl(friend.avatar, friend.name)} />
-                                                <AvatarFallback className="bg-gradient-to-br from-blue-400 to-purple-500 text-white">
+                                                <AvatarFallback className="bg-muted text-white">
                                                     {friend.name.slice(0, 2).toUpperCase()}
                                                 </AvatarFallback>
                                             </Avatar>
                                             {onlineUsers.has(friend.id) && (
-                                                <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white dark:border-gray-800 rounded-full" />
+                                                <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white dark:border-border rounded-full" />
                                             )}
                                         </div>
                                         <div className="flex-1 min-w-0">
-                                            <p className="font-medium text-gray-900 dark:text-white truncate">
+                                            <p className="font-medium text-foreground truncate">
                                                 {friend.name}
                                             </p>
-                                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                                            <p className="text-xs text-muted-foreground dark:text-muted-foreground">
                                                 {onlineUsers.has(friend.id) ? (
                                                     <span className="text-green-500">Đang hoạt động</span>
                                                 ) : friend.lastSeen ? (
@@ -264,32 +264,32 @@ export default function FriendsPanel({ onlineUsers, onStartChat, workspaceId }: 
                 {activeTab === "requests" && (
                     <div>
                         {/* Received */}
-                        <div className="p-3 bg-gray-50 dark:bg-gray-800/50">
-                            <p className="text-xs font-semibold text-gray-500 uppercase">
+                        <div className="p-3 bg-muted/50">
+                            <p className="text-xs font-semibold text-muted-foreground uppercase">
                                 Lời mời đã nhận ({receivedRequests.length})
                             </p>
                         </div>
                         {receivedRequests.length === 0 ? (
-                            <p className="text-sm text-gray-400 text-center py-6">
+                            <p className="text-sm text-muted-foreground text-center py-6">
                                 Không có lời mời nào
                             </p>
                         ) : (
                             receivedRequests.map((request) => (
                                 <div
                                     key={request.id}
-                                    className="flex items-center gap-3 p-3 border-b border-gray-100 dark:border-gray-700"
+                                    className="flex items-center gap-3 p-3 border-b border-border"
                                 >
                                     <Avatar className="h-11 w-11">
                                         <AvatarImage src={getAvatarUrl(request.sender?.avatar, request.sender?.name)} />
-                                        <AvatarFallback className="bg-gradient-to-br from-green-400 to-teal-500 text-white">
+                                        <AvatarFallback className="bg-muted text-white">
                                             {request.sender?.name.slice(0, 2).toUpperCase()}
                                         </AvatarFallback>
                                     </Avatar>
                                     <div className="flex-1 min-w-0">
-                                        <p className="font-medium text-gray-900 dark:text-white truncate">
+                                        <p className="font-medium text-foreground truncate">
                                             {request.sender?.name}
                                         </p>
-                                        <p className="text-xs text-gray-500">
+                                        <p className="text-xs text-muted-foreground">
                                             {formatDistanceToNow(new Date(request.createdAt), { addSuffix: true, locale: vi })}
                                         </p>
                                     </div>
@@ -314,32 +314,32 @@ export default function FriendsPanel({ onlineUsers, onStartChat, workspaceId }: 
                         )}
 
                         {/* Sent */}
-                        <div className="p-3 bg-gray-50 dark:bg-gray-800/50 mt-2">
-                            <p className="text-xs font-semibold text-gray-500 uppercase">
+                        <div className="p-3 bg-muted/50 mt-2">
+                            <p className="text-xs font-semibold text-muted-foreground uppercase">
                                 Đã gửi ({sentRequests.length})
                             </p>
                         </div>
                         {sentRequests.length === 0 ? (
-                            <p className="text-sm text-gray-400 text-center py-6">
+                            <p className="text-sm text-muted-foreground text-center py-6">
                                 Chưa gửi lời mời nào
                             </p>
                         ) : (
                             sentRequests.map((request) => (
                                 <div
                                     key={request.id}
-                                    className="flex items-center gap-3 p-3 border-b border-gray-100 dark:border-gray-700"
+                                    className="flex items-center gap-3 p-3 border-b border-border"
                                 >
                                     <Avatar className="h-11 w-11">
                                         <AvatarImage src={getAvatarUrl(request.receiver?.avatar, request.receiver?.name)} />
-                                        <AvatarFallback className="bg-gradient-to-br from-orange-400 to-pink-500 text-white">
+                                        <AvatarFallback className="bg-muted text-white">
                                             {request.receiver?.name.slice(0, 2).toUpperCase()}
                                         </AvatarFallback>
                                     </Avatar>
                                     <div className="flex-1 min-w-0">
-                                        <p className="font-medium text-gray-900 dark:text-white truncate">
+                                        <p className="font-medium text-foreground truncate">
                                             {request.receiver?.name}
                                         </p>
-                                        <p className="text-xs text-gray-500 flex items-center gap-1">
+                                        <p className="text-xs text-muted-foreground flex items-center gap-1">
                                             <Clock className="h-3 w-3" />
                                             Đang chờ phản hồi
                                         </p>
@@ -363,7 +363,7 @@ export default function FriendsPanel({ onlineUsers, onStartChat, workspaceId }: 
                         <div className="flex gap-2 mb-4">
                             <Input
                                 placeholder="Nhập tên hoặc email..."
-                                className="bg-gray-100 dark:bg-gray-700 border-0"
+                                className="bg-muted border-0"
                                 value={addQuery}
                                 onChange={(e) => setAddQuery(e.target.value)}
                                 onKeyDown={(e) => e.key === "Enter" && handleSearchUsers()}
@@ -378,7 +378,7 @@ export default function FriendsPanel({ onlineUsers, onStartChat, workspaceId }: 
                                 <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
                             </div>
                         ) : searchResults.length === 0 && addQuery.length >= 2 ? (
-                            <p className="text-sm text-gray-400 text-center py-6">
+                            <p className="text-sm text-muted-foreground text-center py-6">
                                 Không tìm thấy người dùng
                             </p>
                         ) : (
@@ -390,19 +390,19 @@ export default function FriendsPanel({ onlineUsers, onStartChat, workspaceId }: 
                                             setSelectedFriend(user);
                                             setShowFriendProfile(true);
                                         }}
-                                        className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg"
+                                        className="flex items-center gap-3 p-3 bg-muted/50 rounded-md"
                                     >
                                         <Avatar className="h-11 w-11">
                                             <AvatarImage src={getAvatarUrl(user.avatar, user.name)} />
-                                            <AvatarFallback className="bg-gradient-to-br from-indigo-400 to-purple-500 text-white">
+                                            <AvatarFallback className="bg-muted text-white">
                                                 {user.name.slice(0, 2).toUpperCase()}
                                             </AvatarFallback>
                                         </Avatar>
                                         <div className="flex-1 min-w-0">
-                                            <p className="font-medium text-gray-900 dark:text-white truncate">
+                                            <p className="font-medium text-foreground truncate">
                                                 {user.name}
                                             </p>
-                                            <p className="text-xs text-gray-500">{user.status || ""}</p>
+                                            <p className="text-xs text-muted-foreground">{user.status || ""}</p>
                                         </div>
                                         {user.relation === "friend" ? (
                                             <Badge variant="secondary" className="bg-green-100 text-green-700">

@@ -72,10 +72,10 @@ export const MentionSelector: React.FC<MentionSelectorProps> = ({
   if (allOptions.length === 0) return null;
 
   return (
-    <div className="absolute bottom-full left-0 mb-2 w-64 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl z-[100] overflow-hidden">
-      <div className="p-2 border-b border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 flex items-center gap-2">
-        <AtSign size={14} className="text-slate-400" />
-        <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Nhắc tên</span>
+    <div className="absolute bottom-full left-0 mb-2 w-64 bg-white dark:bg-slate-800 border border-border dark:border-border rounded-lg shadow-xl z-[100] overflow-hidden">
+      <div className="p-2 border-b border-border dark:border-border bg-muted/50 dark:bg-slate-900/50 flex items-center gap-2">
+        <AtSign size={14} className="text-muted-foreground" />
+        <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Nhắc tên</span>
       </div>
       <div className="max-h-64 overflow-y-auto custom-scrollbar">
         {allOptions.map((option, index) => {
@@ -86,7 +86,7 @@ export const MentionSelector: React.FC<MentionSelectorProps> = ({
             <div
               key={option.accountId}
               className={`flex items-center gap-3 px-3 py-2 cursor-pointer transition-colors ${
-                isSelected ? 'bg-blue-50 dark:bg-blue-900/30' : 'hover:bg-slate-50 dark:hover:bg-slate-700/50'
+                isSelected ? 'bg-blue-50 dark:bg-blue-900/30' : 'hover:bg-muted dark:hover:bg-slate-700/50'
               }`}
               onClick={() => onSelect(option)}
               onMouseEnter={() => setSelectedIndex(index)}
@@ -105,17 +105,17 @@ export const MentionSelector: React.FC<MentionSelectorProps> = ({
               )}
               <div className="min-w-0">
                 <div className="flex items-center gap-1.5">
-                  <span className={`text-sm font-semibold truncate ${isSelected ? 'text-blue-600' : 'text-slate-700 dark:text-slate-200'}`}>
+                  <span className={`text-sm font-semibold truncate ${isSelected ? 'text-blue-600' : 'text-muted-foreground dark:text-foreground'}`}>
                     @{isSpecial ? option.name : (option.name || option.account?.name || 'User')}
                   </span>
                   {isSpecial && (
-                    <span className="text-[9px] font-bold px-1 py-0.5 rounded bg-slate-100 dark:bg-slate-700 text-slate-500 uppercase">
+                    <span className="text-[9px] font-bold px-1 py-0.5 rounded bg-muted dark:bg-slate-700 text-muted-foreground uppercase">
                       Lệnh
                     </span>
                   )}
                 </div>
                 {isSpecial && (
-                  <p className="text-[10px] text-slate-400 truncate">
+                  <p className="text-[10px] text-muted-foreground truncate">
                     {option.description}
                   </p>
                 )}

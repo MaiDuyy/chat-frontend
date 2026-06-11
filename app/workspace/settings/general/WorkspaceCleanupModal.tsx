@@ -64,9 +64,9 @@ export function WorkspaceCleanupModal({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[520px] rounded-3xl p-0 overflow-hidden border-none shadow-2xl">
-        <div className="bg-blue-600 p-6 text-white">
+        <div className="bg-primary p-6 text-white">
           <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-white/20 rounded-lg">
+            <div className="p-2 bg-white/20 rounded-md">
               <ShieldCheck size={24} />
             </div>
             <h2 className="text-xl font-bold">Xử lý quyền sở hữu</h2>
@@ -86,35 +86,35 @@ export function WorkspaceCleanupModal({
           {!showMemberPicker ? (
             <div className="space-y-6">
               <div className="text-center space-y-2">
-                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Đang xử lý ({currentIndex + 1}/{ownedItems.length})</p>
-                <h3 className="text-2xl font-bold text-slate-900">{currentItem?.name}</h3>
-                <p className="text-slate-500 text-sm">Loại: {currentItem?.type === 'CHANNEL' ? 'Kênh Workspace' : 'Nhóm Chat'}</p>
+                <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Đang xử lý ({currentIndex + 1}/{ownedItems.length})</p>
+                <h3 className="text-2xl font-bold text-foreground">{currentItem?.name}</h3>
+                <p className="text-muted-foreground text-sm">Loại: {currentItem?.type === 'CHANNEL' ? 'Kênh Workspace' : 'Nhóm Chat'}</p>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <Button 
                   variant="outline" 
-                  className="h-24 rounded-2xl flex flex-col gap-2 border-slate-200 hover:border-blue-500 hover:bg-blue-50 group transition-all"
+                  className="h-24 rounded-xl flex flex-col gap-2 border-border hover:border-blue-500 hover:bg-blue-50 group transition-all"
                   onClick={() => setShowMemberPicker(true)}
                   disabled={isProcessing}
                 >
-                  <UserPlus size={24} className="text-slate-400 group-hover:text-blue-600" />
-                  <span className="font-bold text-slate-700 group-hover:text-blue-700">Chuyển quyền</span>
+                  <UserPlus size={24} className="text-muted-foreground group-hover:text-blue-600" />
+                  <span className="font-bold text-muted-foreground group-hover:text-blue-700">Chuyển quyền</span>
                 </Button>
                 <Button 
                   variant="outline" 
-                  className="h-24 rounded-2xl flex flex-col gap-2 border-slate-200 hover:border-red-500 hover:bg-red-50 group transition-all"
+                  className="h-24 rounded-xl flex flex-col gap-2 border-border hover:border-red-500 hover:bg-red-50 group transition-all"
                   onClick={() => handleAction('DELETE')}
                   disabled={isProcessing}
                 >
-                  <Trash2 size={24} className="text-slate-400 group-hover:text-red-600" />
-                  <span className="font-bold text-slate-700 group-hover:text-red-700">Xóa nhóm</span>
+                  <Trash2 size={24} className="text-muted-foreground group-hover:text-red-600" />
+                  <span className="font-bold text-muted-foreground group-hover:text-red-700">Xóa nhóm</span>
                 </Button>
               </div>
 
-              <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 flex gap-3">
+              <div className="p-4 bg-muted rounded-xl border border-border flex gap-3">
                 <AlertTriangle size={20} className="text-amber-500 shrink-0" />
-                <p className="text-xs text-slate-600 leading-relaxed">
+                <p className="text-xs text-muted-foreground leading-relaxed">
                   Nếu bạn xóa nhóm, tất cả tin nhắn và thành viên sẽ bị loại bỏ. Nếu bạn chuyển quyền, bạn sẽ trở thành thành viên bình thường.
                 </p>
               </div>
@@ -122,7 +122,7 @@ export function WorkspaceCleanupModal({
           ) : (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="font-bold text-slate-900">Chọn người nhận quyền</h3>
+                <h3 className="font-bold text-foreground">Chọn người nhận quyền</h3>
                 <Button variant="ghost" size="sm" onClick={() => setShowMemberPicker(false)} className="text-xs font-bold">Quay lại</Button>
               </div>
               <div className="max-h-[300px] overflow-y-auto space-y-2 pr-2 custom-scrollbar">
@@ -130,7 +130,7 @@ export function WorkspaceCleanupModal({
                   <div 
                     key={member.userId}
                     onClick={() => handleAction('TRANSFER', member.userId)}
-                    className="flex items-center gap-3 p-3 rounded-2xl hover:bg-slate-50 cursor-pointer border border-transparent hover:border-slate-100 transition-all group"
+                    className="flex items-center gap-3 p-3 rounded-xl hover:bg-muted cursor-pointer border border-transparent hover:border-border transition-all group"
                   >
                     <Avatar className="h-10 w-10">
                       <AvatarImage src={member.user?.avatar} />
@@ -139,10 +139,10 @@ export function WorkspaceCleanupModal({
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1">
-                      <p className="text-sm font-bold text-slate-900">{member.user?.name}</p>
-                      <p className="text-xs text-slate-500">{member.role}</p>
+                      <p className="text-sm font-bold text-foreground">{member.user?.name}</p>
+                      <p className="text-xs text-muted-foreground">{member.role}</p>
                     </div>
-                    <ChevronRight size={16} className="text-slate-300 group-hover:text-blue-500 transition-colors" />
+                    <ChevronRight size={16} className="text-muted-foreground group-hover:text-blue-500 transition-colors" />
                   </div>
                 ))}
               </div>
@@ -150,7 +150,7 @@ export function WorkspaceCleanupModal({
           )}
         </div>
 
-        <DialogFooter className="p-6 bg-slate-50 border-t border-slate-100 flex items-center justify-center">
+        <DialogFooter className="p-6 bg-muted border-t border-border flex items-center justify-center">
           {isProcessing && (
             <div className="flex items-center gap-2 text-blue-600 font-bold text-sm">
               <Loader2 size={18} className="animate-spin" />

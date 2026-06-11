@@ -23,6 +23,8 @@ export interface Document {
   chunkCount: number;
   errorMessage?: string;
   securityClassification?: 'PUBLIC' | 'INTERNAL' | 'CONFIDENTIAL' | 'RESTRICTED';
+  departmentId?: string;
+  allowedRoles?: string;
   parserMethod?: string;
   tags?: string[];
   createdAt: string;
@@ -148,16 +150,41 @@ export const knowledgeApi = apiSlice.injectEndpoints({
       }),
     }),
 
-    uploadDocument: builder.mutation<DocumentUploadResponse, FormData | { formData: FormData; preview: boolean; parser?: string; workspaceId?: string }>({
+    uploadDocument: builder.mutation<
+      DocumentUploadResponse,
+      FormData | {
+        formData: FormData;
+        preview: boolean;
+        parser?: string;
+        workspaceId?: string;
+        departmentId?: string;
+        allowedRoles?: string;
+        securityClassification?: string;
+      }
+    >({
       query: (arg) => {
         const formData = arg instanceof FormData ? arg : arg.formData;
         const preview = arg instanceof FormData ? false : arg.preview;
         const parser = arg instanceof FormData ? 'gemini' : (arg.parser || 'gemini');
         const workspaceId = arg instanceof FormData ? undefined : arg.workspaceId;
+        const departmentId = arg instanceof FormData ? undefined : arg.departmentId;
+        const allowedRoles = arg instanceof FormData ? undefined : arg.allowedRoles;
+        const securityClassification = arg instanceof FormData ? undefined : arg.securityClassification;
+
         let url = `/documents/upload?preview=${preview}&parser=${parser}`;
         if (workspaceId) {
           url += `&workspaceId=${encodeURIComponent(workspaceId)}`;
         }
+        if (departmentId) {
+          url += `&departmentId=${encodeURIComponent(departmentId)}`;
+        }
+        if (allowedRoles) {
+          url += `&allowedRoles=${encodeURIComponent(allowedRoles)}`;
+        }
+        if (securityClassification) {
+          url += `&securityClassification=${encodeURIComponent(securityClassification)}`;
+        }
+
         return {
           url,
           method: 'POST',
@@ -196,7 +223,7 @@ export const knowledgeApi = apiSlice.injectEndpoints({
       }),
     }),
 
-    updateDocumentMetadata: builder.mutation<Document, { id: string | number; securityClassification?: string; tags?: string[] }>({
+    updateDocumentMetadata: builder.mutation<Document, { id: string | number; securityClassification?: string; tags?: string[]; departmentId?: string; allowedRoles?: string }>({
       query: ({ id, ...body }) => ({
         url: `/documents/${id}/metadata`,
         method: 'PATCH',

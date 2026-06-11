@@ -57,9 +57,9 @@ export function TasksTab({
                     <Loader2 className="w-6 h-6 animate-spin text-blue-500" />
                 </div>
             ) : tasks.length === 0 ? (
-                <div className="text-center py-16 text-sm text-slate-400">Chưa có kế hoạch nào</div>
+                <div className="text-center py-16 text-sm text-muted-foreground">Chưa có kế hoạch nào</div>
             ) : (
-                <div className="border border-slate-100 rounded-xl divide-y divide-slate-50">
+                <div className="border border-border rounded-lg divide-y divide-slate-50">
                     {tasks.map((task: any) => {
                         const isAssignee = task.assignees?.some((a: any) => a.accountId === currentUserId);
                         const canUpdate = isAdmin || isAssignee;
@@ -69,7 +69,7 @@ export function TasksTab({
                         const isCancelled = task.status === "CANCELLED";
 
                         return (
-                            <div key={task.id} className="p-4 flex items-start gap-3 hover:bg-slate-50/50 group/item transition-colors">
+                            <div key={task.id} className="p-4 flex items-start gap-3 hover:bg-muted/50 group/item transition-colors">
                                 <button
                                     onClick={() => {
                                         if (isCancelled) return toast.error("Kế hoạch đã bị hủy, không thể đánh dấu!");
@@ -86,10 +86,10 @@ export function TasksTab({
                                     className={cn(
                                         "mt-0.5 w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors",
                                         task.status === "DONE"
-                                            ? "bg-blue-600 border-blue-600"
+                                            ? "bg-primary border-blue-600"
                                             : isCancelled
-                                            ? "border-slate-200 bg-slate-50 cursor-not-allowed"
-                                            : "border-slate-300 hover:border-blue-400",
+                                            ? "border-border bg-muted cursor-not-allowed"
+                                            : "border-border hover:border-blue-400",
                                         (!canUpdate || isCancelled) && "opacity-50 cursor-not-allowed"
                                     )}
                                     disabled={isCancelled}
@@ -99,16 +99,16 @@ export function TasksTab({
                                 <div className="flex-1 min-w-0">
                                     <p
                                         className={cn(
-                                            "text-[13px] font-medium text-slate-800",
-                                            (task.status === "DONE" || isCancelled) && "line-through text-slate-400"
+                                            "text-[13px] font-medium text-foreground",
+                                            (task.status === "DONE" || isCancelled) && "line-through text-muted-foreground"
                                         )}
                                     >
                                         {task.title}
                                     </p>
                                     <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1">
                                         {task.startAt && (
-                                            <p className="text-[10px] text-slate-400 flex items-center gap-1">
-                                                <Calendar className="w-3 h-3 text-slate-300" />
+                                            <p className="text-[10px] text-muted-foreground flex items-center gap-1">
+                                                <Calendar className="w-3 h-3 text-muted-foreground" />
                                                 Bắt đầu: {format(new Date(task.startAt), "dd/MM HH:mm")}
                                             </p>
                                         )}
@@ -132,7 +132,7 @@ export function TasksTab({
                                                 ))}
                                             </div>
                                             {task.assignees.length > 4 && (
-                                                <span className="text-[10px] text-slate-400">+{task.assignees.length - 4}</span>
+                                                <span className="text-[10px] text-muted-foreground">+{task.assignees.length - 4}</span>
                                             )}
                                         </div>
                                     )}
@@ -150,7 +150,7 @@ export function TasksTab({
                                     {canUpdate && !isCancelled && task.status === "IN_PROGRESS" && (
                                         <button
                                             onClick={() => handleUpdateTaskStatus(task.id, "TODO")}
-                                            className="p-1 px-1.5 rounded bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-800 transition-all text-[10px] font-semibold flex items-center gap-1"
+                                            className="p-1 px-1.5 rounded bg-muted text-muted-foreground hover:bg-muted hover:text-foreground transition-all text-[10px] font-semibold flex items-center gap-1"
                                             title="Tạm dừng thực hiện kế hoạch"
                                         >
                                             Tạm dừng
@@ -161,7 +161,7 @@ export function TasksTab({
                                             {!isCancelled && task.status !== "DONE" && (
                                                 <button
                                                     onClick={() => handleUpdateTaskStatus(task.id, "CANCELLED")}
-                                                    className="p-1 px-1.5 rounded bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-700 transition-all text-[10px] font-medium flex items-center gap-1"
+                                                    className="p-1 px-1.5 rounded bg-muted text-muted-foreground hover:bg-muted hover:text-muted-foreground transition-all text-[10px] font-medium flex items-center gap-1"
                                                     title="Hủy kế hoạch"
                                                 >
                                                     <XCircle className="w-2.5 h-2.5" /> Hủy
@@ -173,7 +173,7 @@ export function TasksTab({
                                                         handleDeleteTask(task.id);
                                                     }
                                                 }}
-                                                className="p-1.5 rounded-lg text-slate-400 hover:bg-red-50 hover:text-red-500 transition-all"
+                                                className="p-1.5 rounded-md text-muted-foreground hover:bg-red-50 hover:text-red-500 transition-all"
                                                 title="Xóa kế hoạch"
                                             >
                                                 <Trash2 className="w-3.5 h-3.5" />

@@ -21,6 +21,7 @@ import { getPageType } from "../components/WikilinkAutocomplete";
 import { useHasRole } from "@/src/lib/rbac/usePermission";
 import { useSelector } from "react-redux";
 import { WikiAIChatPanel, WikiAIChatButton } from "../components/WikiAIChatPanel";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
   Calendar,
   Layers,
@@ -31,7 +32,8 @@ import {
   Compass,
   FileEdit,
   Tag,
-  Search
+  Search,
+  Menu
 } from "lucide-react";
 
 export default function WikiPageDetail() {
@@ -95,6 +97,7 @@ export default function WikiPageDetail() {
 
   const [searchOpen, setSearchOpen] = React.useState(false);
   const [showAIChat, setShowAIChat] = React.useState(false);
+  const [rightPanelMode, setRightPanelMode] = React.useState<"meta" | "ai">("meta");
 
   // Key bindings for Ctrl+K
   React.useEffect(() => {
@@ -180,14 +183,14 @@ export default function WikiPageDetail() {
 
   if (pageError || !page) {
     return (
-      <div className="font-sans max-w-2xl mx-auto p-4 border border-rose-500/30 bg-rose-500/5 text-center rounded-xl shadow-md my-6">
+      <div className="font-sans max-w-2xl mx-auto p-4 border border-rose-500/30 bg-rose-500/5 text-center rounded-lg shadow-md my-6">
         <h2 className="text-sm font-semibold uppercase text-rose-600 mb-1.5">Trang không tồn tại hoặc đã bị xóa</h2>
         <p className="text-[11px] text-muted-foreground leading-relaxed mb-4">
           Tài liệu với đường dẫn <code className="bg-muted px-1 py-0.5 rounded font-mono border">/wiki/{slug}</code> không được tìm thấy trong cơ sở tri thức hiện tại.
         </p>
         <Link
           href="/wiki"
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium border border-border bg-secondary hover:bg-secondary/80 text-secondary-foreground transition-colors rounded-lg shadow-sm active:scale-[0.98]"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium border border-border bg-secondary hover:bg-secondary/80 text-secondary-foreground transition-colors rounded-md shadow-sm active:scale-[0.98]"
         >
           <ArrowLeft className="w-3.5 h-3.5" /> Quay lại Dashboard
         </Link>
@@ -199,10 +202,29 @@ export default function WikiPageDetail() {
   const tagsList = page.tags ? page.tags.split(/,\s*/) : [];
 
   return (
-    <div className="font-sans flex gap-3 w-full text-foreground mx-auto p-2 md:p-3 h-full overflow-y-auto text-xs md:text-sm">
+    <div className="font-sans flex gap-3 w-full text-foreground mx-auto p-2 md:p-3 h-full overflow-y-auto text-xs md:text-sm relative">
       {/* Collapsible Left Sidebar */}
       <div className="hidden md:block">
         <WikiPageTree activeSlug={slug} />
+      </div>
+
+      {/* Mobile Floating Wiki Tree Toggle */}
+      <div className="md:hidden fixed bottom-20 left-4 z-40">
+        <Sheet>
+          <SheetTrigger asChild>
+            <button 
+              className="w-10 h-10 bg-primary hover:bg-primary/90 text-primary-foreground rounded-full flex items-center justify-center shadow-lg border border-primary/20 cursor-pointer active:scale-95 transition-transform"
+              aria-label="Mục lục Wiki"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+          </SheetTrigger>
+          <SheetContent side="left" className="p-0 w-72 bg-card border-r border-border">
+            <div className="h-full p-3 overflow-y-auto select-none">
+              <WikiPageTree activeSlug={slug} />
+            </div>
+          </SheetContent>
+        </Sheet>
       </div>
 
       {/* Main Body */}
@@ -213,7 +235,7 @@ export default function WikiPageDetail() {
           <div className="flex items-center gap-1.5">
             <Link
               href="/wiki"
-              className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium border border-border bg-secondary hover:bg-secondary/80 text-secondary-foreground transition-colors rounded-lg shadow-sm active:scale-[0.98]"
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold border border-border bg-secondary hover:bg-secondary/90 text-secondary-foreground transition-all duration-200 rounded-md shadow-sm hover:shadow-md hover:-translate-y-[0.5px] active:scale-[0.98] select-none cursor-pointer"
             >
               <ArrowLeft className="w-3 h-3" />
               Quay lại bảng
@@ -221,15 +243,25 @@ export default function WikiPageDetail() {
 
             <button
               onClick={() => setSearchOpen(true)}
-              className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium border border-border bg-secondary hover:bg-secondary/80 text-secondary-foreground transition-colors rounded-lg shadow-sm active:scale-[0.98]"
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold border border-border bg-secondary hover:bg-secondary/90 text-secondary-foreground transition-all duration-200 rounded-md shadow-sm hover:shadow-md hover:-translate-y-[0.5px] active:scale-[0.98] select-none cursor-pointer"
             >
               <Search className="w-3 h-3" />
               Tìm nhanh (Ctrl+K)
             </button>
 
+            {/* Suggest Edit Button */}
+            <Link
+              href={`/wiki/new?suggestEdit=true&slug=${slug}`}
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold border border-transparent bg-primary hover:bg-primary/95 text-primary-foreground transition-all duration-200 rounded-md shadow-sm hover:shadow-md hover:-translate-y-[0.5px] active:scale-[0.98] select-none cursor-pointer"
+            >
+              <FileEdit className="w-3 h-3" />
+              Đề xuất chỉnh sửa
+            </Link>
+
             {/* AI chat button — context-aware for current page */}
             <WikiAIChatButton
-              onClick={() => setShowAIChat((v) => !v)}
+              onClick={() => setRightPanelMode((m) => m === "ai" ? "meta" : "ai")}
+              hasMessages={rightPanelMode === "ai"}
             />
           </div>
 
@@ -260,8 +292,8 @@ export default function WikiPageDetail() {
               />
             )}
 
-            {/* Wiki Content Render Box */}
-            <div className="border border-border bg-card p-3 md:p-4.5 rounded-xl shadow-md">
+            {/* Wiki Content Render Box - Constrained to 65ch max-width for premium readability */}
+            <div className="border border-border bg-card p-3 md:p-4.5 rounded-lg shadow-md max-w-[72ch] lg:max-w-[65ch] mx-auto w-full">
               {/* Title block */}
               <div className="flex flex-col gap-1.5 border-b pb-2 mb-4">
                 <h1 className="text-lg md:text-xl font-bold text-foreground leading-snug">
@@ -290,83 +322,94 @@ export default function WikiPageDetail() {
 
           </div>
 
-          {/* Right sidebar pane */}
-          <div className="lg:col-span-4 flex flex-col gap-3">
-            
-            {/* Metadata information card */}
-            <div className="border border-border bg-card p-3 rounded-xl shadow-md flex flex-col gap-2.5">
-              <div className="border-b pb-1 flex items-center gap-1.5">
-                <Settings className="w-3.5 h-3.5 text-primary shrink-0" />
-                <span className="font-mono text-[9px] uppercase font-extrabold text-foreground">
-                  THÔNG TIN CHI TIẾT
-                </span>
+          {/* Right sidebar pane - swaps between metadata and inline AI Chat */}
+          <div className="lg:col-span-4 flex flex-col gap-3 h-full">
+            {rightPanelMode === "ai" ? (
+              <div className="h-[600px] border border-border rounded-lg overflow-hidden bg-card animate-fade-in-up">
+                <WikiAIChatPanel
+                  currentPageSlug={slug}
+                  currentPageTitle={page?.title}
+                  onClose={() => setRightPanelMode("meta")}
+                  inline={true}
+                />
               </div>
+            ) : (
+              <>
+                {/* Metadata information card */}
+                <div className="border border-border bg-card p-3 rounded-lg shadow-md flex flex-col gap-2.5">
+                  <div className="border-b pb-1 flex items-center gap-1.5">
+                    <Settings className="w-3.5 h-3.5 text-primary shrink-0" />
+                    <span className="font-mono text-[9px] uppercase font-extrabold text-foreground">
+                      THÔNG TIN CHI TIẾT
+                    </span>
+                  </div>
 
-              <div className="flex flex-col gap-1.5 font-sans text-[11px]">
-                <div className="flex items-center justify-between border-b border-dashed border-border pb-1.5">
-                  <span className="text-muted-foreground flex items-center gap-1"><Layers className="w-3 h-3" /> ID trang</span>
-                  <span className="font-mono font-bold">{page.id}</span>
+                  <div className="flex flex-col gap-1.5 font-sans text-[11px]">
+                    <div className="flex items-center justify-between border-b border-dashed border-border pb-1.5">
+                      <span className="text-muted-foreground flex items-center gap-1"><Layers className="w-3 h-3" /> ID trang</span>
+                      <span className="font-mono font-bold">{page.id}</span>
+                    </div>
+                    <div className="flex items-center justify-between border-b border-dashed border-border pb-1.5">
+                      <span className="text-muted-foreground flex items-center gap-1"><Calendar className="w-3 h-3" /> Ngày tạo</span>
+                      <span className="font-mono font-bold">{new Date(page.createdAt).toLocaleDateString("vi-VN")}</span>
+                    </div>
+                    <div className="flex items-center justify-between border-b border-dashed border-border pb-1.5">
+                      <span className="text-muted-foreground flex items-center gap-1"><Clock className="w-3 h-3" /> Cập nhật</span>
+                      <span className="font-mono font-bold">{new Date(page.updatedAt).toLocaleDateString("vi-VN")}</span>
+                    </div>
+                    {page.sourceDocumentId && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-muted-foreground flex items-center gap-1"><Shield className="w-3 h-3" /> ID Nguồn thô</span>
+                        <span className="font-mono font-bold text-primary">{page.sourceDocumentId}</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
-                <div className="flex items-center justify-between border-b border-dashed border-border pb-1.5">
-                  <span className="text-muted-foreground flex items-center gap-1"><Calendar className="w-3 h-3" /> Ngày tạo</span>
-                  <span className="font-mono font-bold">{new Date(page.createdAt).toLocaleDateString("vi-VN")}</span>
-                </div>
-                <div className="flex items-center justify-between border-b border-dashed border-border pb-1.5">
-                  <span className="text-muted-foreground flex items-center gap-1"><Clock className="w-3 h-3" /> Cập nhật</span>
-                  <span className="font-mono font-bold">{new Date(page.updatedAt).toLocaleDateString("vi-VN")}</span>
-                </div>
-                {page.sourceDocumentId && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground flex items-center gap-1"><Shield className="w-3 h-3" /> ID Nguồn thô</span>
-                    <span className="font-mono font-bold text-primary">{page.sourceDocumentId}</span>
+
+                {/* Dynamic internal backlinks cross-linking */}
+                <WikiBacklinks
+                  currentPageTitle={page.title}
+                  currentPageSlug={page.slug}
+                  allWikiPages={allPages}
+                />
+
+                {/* Mini sub-graph visual */}
+                {localGraphData.nodes.length > 1 && (
+                  <div className="border border-border bg-card p-3 rounded-lg shadow-md flex flex-col gap-2.5">
+                    <div className="border-b pb-1.5 flex items-center gap-1.5">
+                      <Compass className="w-3.5 h-3.5 text-primary shrink-0" />
+                      <span className="font-mono text-[9px] uppercase font-extrabold text-foreground">
+                        BẢN ĐỒ LIÊN KẾT
+                      </span>
+                    </div>
+                    <div className="w-full h-[180px] overflow-hidden rounded-md border border-border bg-muted/30">
+                      <WikiGraphMini slug={slug} nodes={localGraphData.nodes} edges={localGraphData.edges} />
+                    </div>
                   </div>
                 )}
-              </div>
-            </div>
 
-            {/* Dynamic internal backlinks cross-linking */}
-            <WikiBacklinks
-              currentPageTitle={page.title}
-              currentPageSlug={page.slug}
-              allWikiPages={allPages}
-            />
+                {/* Quick Wiki Navigation Sidebar Actions */}
+                <div className="border border-border bg-card p-3 rounded-lg shadow-md flex flex-col gap-2">
+                  <div className="border-b pb-1.5 flex items-center gap-1.5">
+                    <Compass className="w-3.5 h-3.5 text-primary shrink-0" />
+                    <span className="font-mono text-[9px] uppercase font-extrabold text-foreground">
+                      ĐIỀU HƯỚNG WIKI
+                    </span>
+                  </div>
 
-            {/* Mini sub-graph visual */}
-            {localGraphData.nodes.length > 1 && (
-              <div className="border border-border bg-card p-3 rounded-xl shadow-md flex flex-col gap-2.5">
-                <div className="border-b pb-1.5 flex items-center gap-1.5">
-                  <Compass className="w-3.5 h-3.5 text-primary shrink-0" />
-                  <span className="font-mono text-[9px] uppercase font-extrabold text-foreground">
-                    BẢN ĐỒ LIÊN KẾT
-                  </span>
+                  <p className="text-[10px] text-muted-foreground leading-relaxed">
+                    Bạn có thể xem các trang khác trong hệ thống để tìm kiếm thông tin liên quan hoặc trích xuất tri thức.
+                  </p>
+
+                  <Link
+                    href="/wiki"
+                    className="w-full flex items-center justify-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold bg-primary hover:bg-primary/95 text-primary-foreground transition-all duration-200 rounded-md shadow-sm hover:shadow-md hover:-translate-y-[0.5px] active:scale-[0.98] select-none cursor-pointer"
+                  >
+                    Mở Wiki Explorer Dashboard
+                  </Link>
                 </div>
-                <div className="w-full h-[180px] overflow-hidden rounded-lg border border-border bg-muted/30">
-                  <WikiGraphMini slug={slug} nodes={localGraphData.nodes} edges={localGraphData.edges} />
-                </div>
-              </div>
+              </>
             )}
-
-            {/* Quick Wiki Navigation Sidebar Actions */}
-            <div className="border border-border bg-card p-3 rounded-xl shadow-md flex flex-col gap-2">
-              <div className="border-b pb-1.5 flex items-center gap-1.5">
-                <Compass className="w-3.5 h-3.5 text-primary shrink-0" />
-                <span className="font-mono text-[9px] uppercase font-extrabold text-foreground">
-                  ĐIỀU HƯỚNG WIKI
-                </span>
-              </div>
-
-              <p className="text-[10px] text-muted-foreground leading-relaxed">
-                Bạn có thể xem các trang khác trong hệ thống để tìm kiếm thông tin liên quan hoặc trích xuất tri thức.
-              </p>
-
-              <Link
-                href="/wiki"
-                className="w-full flex items-center justify-center gap-1.5 px-2.5 py-1.5 text-xs font-medium bg-primary hover:bg-primary/90 text-primary-foreground transition-colors rounded-lg shadow-sm active:scale-[0.98]"
-              >
-                Mở Wiki Explorer Dashboard
-              </Link>
-            </div>
-
           </div>
 
         </div>

@@ -88,12 +88,12 @@ export function CreateWorkspaceModal({ isOpen, onClose }: CreateWorkspaceModalPr
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px] rounded-[2px] border border-slate-200/80 dark:border-white/[0.06] bg-white dark:bg-[#19191B] p-6 shadow-2xl [&>button]:rounded-[2px]">
-        <DialogHeader className="border-b border-slate-100 dark:border-white/[0.04] pb-4">
-          <DialogTitle className="text-sm font-semibold uppercase font-mono tracking-wider text-slate-800 dark:text-slate-200">
+      <DialogContent className="sm:max-w-[425px] rounded-sm border border-border bg-background p-6 shadow-2xl [&>button]:rounded-sm">
+        <DialogHeader className="border-b border-border dark:border-white/[0.04] pb-4">
+          <DialogTitle className="text-sm font-semibold uppercase font-mono tracking-wider text-foreground dark:text-foreground">
             Tạo Workspace mới
           </DialogTitle>
-          <DialogDescription className="text-[10px] font-mono text-slate-400 dark:text-zinc-500 mt-2">
+          <DialogDescription className="text-[10px] font-mono text-muted-foreground dark:text-muted-foreground mt-2">
             Workspace là nơi team của bạn làm việc. Bạn có thể mời thành viên sau khi tạo.
           </DialogDescription>
         </DialogHeader>
@@ -105,13 +105,13 @@ export function CreateWorkspaceModal({ isOpen, onClose }: CreateWorkspaceModalPr
               name="name"
               render={({ field }) => (
                 <FormItem className="text-left">
-                  <FormLabel className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-zinc-500 block font-mono">Tên Workspace</FormLabel>
+                  <FormLabel className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground dark:text-muted-foreground block font-mono">Tên Workspace</FormLabel>
                   <FormControl>
                     <Input 
                       placeholder="VD: Dự án Alpha, Team Marketing..." 
                       {...field} 
                       onChange={onNameChange}
-                      className="bg-slate-50 dark:bg-zinc-800/40 border border-slate-200 dark:border-white/[0.06] rounded-[2px] text-xs h-9 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-blue-500 font-mono transition-colors text-slate-850 dark:text-slate-150"
+                      className="bg-muted dark:bg-muted/40 border border-border rounded-sm text-xs h-9 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-blue-500 font-mono transition-colors text-slate-850 dark:text-slate-150"
                     />
                   </FormControl>
                   <FormMessage className="text-[10px] font-mono text-red-500" />
@@ -124,14 +124,14 @@ export function CreateWorkspaceModal({ isOpen, onClose }: CreateWorkspaceModalPr
               name="slug"
               render={({ field }) => (
                 <FormItem className="text-left">
-                  <FormLabel className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-zinc-500 block font-mono">Slug (Đường dẫn)</FormLabel>
+                  <FormLabel className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground dark:text-muted-foreground block font-mono">Slug (Đường dẫn)</FormLabel>
                   <FormControl>
                     <div className="flex items-center gap-2">
-                      <span className="text-slate-400 dark:text-zinc-500 text-xs font-mono">workspace/</span>
+                      <span className="text-muted-foreground dark:text-muted-foreground text-xs font-mono">workspace/</span>
                       <Input 
                         placeholder="my-awesome-team" 
                         {...field} 
-                        className="bg-slate-50 dark:bg-zinc-800/40 border border-slate-200 dark:border-white/[0.06] rounded-[2px] text-xs h-9 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-blue-500 font-mono transition-colors text-slate-850 dark:text-slate-150"
+                        className="bg-muted dark:bg-muted/40 border border-border rounded-sm text-xs h-9 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-blue-500 font-mono transition-colors text-slate-850 dark:text-slate-150"
                       />
                     </div>
                   </FormControl>
@@ -145,15 +145,15 @@ export function CreateWorkspaceModal({ isOpen, onClose }: CreateWorkspaceModalPr
               name="departmentId"
               render={({ field }) => (
                 <FormItem className="text-left">
-                  <FormLabel className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-zinc-500 block font-mono">Phòng ban trực thuộc</FormLabel>
+                  <FormLabel className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground dark:text-muted-foreground block font-mono">Phòng ban trực thuộc</FormLabel>
                   <FormControl>
                     <select
                       {...field}
-                      className="flex h-9 w-full rounded-[2px] border border-slate-200 dark:border-white/[0.06] bg-slate-50 dark:bg-[#1e1e21] px-3 py-1 text-xs focus-visible:outline-none focus:border-blue-500 font-mono text-slate-800 dark:text-slate-200"
+                      className="flex h-9 w-full rounded-sm border border-border bg-muted dark:bg-[#1e1e21] px-3 py-1 text-xs focus-visible:outline-none focus:border-blue-500 font-mono text-foreground dark:text-foreground"
                     >
-                      <option value="" className="bg-white dark:bg-[#19191B]">-- Không trực thuộc (Dự án độc lập) --</option>
+                      <option value="" className="bg-background">-- Không trực thuộc (Dự án độc lập) --</option>
                       {departments.map((dept) => (
-                        <option key={dept.id} value={dept.id} className="bg-white dark:bg-[#19191B]">
+                        <option key={dept.id} value={dept.id} className="bg-background">
                           {dept.name}
                         </option>
                       ))}
@@ -169,11 +169,11 @@ export function CreateWorkspaceModal({ isOpen, onClose }: CreateWorkspaceModalPr
               name="description"
               render={({ field }) => (
                 <FormItem className="text-left">
-                  <FormLabel className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-zinc-500 block font-mono">Mô tả (Không bắt buộc)</FormLabel>
+                  <FormLabel className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground dark:text-muted-foreground block font-mono">Mô tả (Không bắt buộc)</FormLabel>
                   <FormControl>
                     <Textarea 
                       placeholder="Mục đích của workspace này là gì?" 
-                      className="resize-none bg-slate-50 dark:bg-zinc-800/40 border border-slate-200 dark:border-white/[0.06] rounded-[2px] text-xs focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-blue-500 font-mono transition-colors text-slate-850 dark:text-slate-150 h-20"
+                      className="resize-none bg-muted dark:bg-muted/40 border border-border rounded-sm text-xs focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-blue-500 font-mono transition-colors text-slate-850 dark:text-slate-150 h-20"
                       {...field} 
                     />
                   </FormControl>
@@ -186,10 +186,10 @@ export function CreateWorkspaceModal({ isOpen, onClose }: CreateWorkspaceModalPr
               control={form.control}
               name="isPublic"
               render={({ field }) => (
-                <FormItem className="flex flex-row items-center justify-between rounded-[2px] border border-slate-200 dark:border-white/[0.06] bg-slate-50/50 dark:bg-zinc-950/20 p-3 shadow-sm">
+                <FormItem className="flex flex-row items-center justify-between rounded-sm border border-border bg-muted/50 dark:bg-muted/20 p-3 shadow-sm">
                   <div className="space-y-0.5 text-left">
-                    <FormLabel className="text-xs font-bold text-slate-750 dark:text-slate-300">Chế độ công khai</FormLabel>
-                    <div className="text-[10px] text-slate-400 dark:text-zinc-500 font-mono">
+                    <FormLabel className="text-xs font-bold text-muted-foreground dark:text-muted-foreground">Chế độ công khai</FormLabel>
+                    <div className="text-[10px] text-muted-foreground dark:text-muted-foreground font-mono">
                       Cho phép người khác tìm thấy workspace này
                     </div>
                   </div>
@@ -198,10 +198,10 @@ export function CreateWorkspaceModal({ isOpen, onClose }: CreateWorkspaceModalPr
                       type="button"
                       variant="outline"
                       size="sm"
-                      className={`gap-2 rounded-[2px] border border-slate-200 dark:border-white/[0.06] font-mono text-xs font-medium uppercase tracking-wider transition-colors ${
+                      className={`gap-2 rounded-sm border border-border font-mono text-xs font-medium uppercase tracking-wider transition-colors ${
                         field.value 
                           ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-900/30' 
-                          : 'bg-slate-100 text-slate-700 dark:bg-zinc-800 dark:text-zinc-300'
+                          : 'bg-muted text-muted-foreground dark:bg-muted dark:text-muted-foreground'
                       }`}
                       onClick={() => field.onChange(!field.value)}
                     >
@@ -213,19 +213,19 @@ export function CreateWorkspaceModal({ isOpen, onClose }: CreateWorkspaceModalPr
               )}
             />
 
-            <DialogFooter className="pt-4 border-t border-slate-100 dark:border-white/[0.04]">
+            <DialogFooter className="pt-4 border-t border-border dark:border-white/[0.04]">
               <Button 
                 type="button" 
                 variant="outline" 
                 onClick={onClose}
-                className="rounded-[2px] border border-slate-200 dark:border-white/[0.06] hover:bg-slate-100 dark:hover:bg-white/[0.02] font-mono text-xs font-medium h-9 uppercase tracking-wider transition-colors"
+                className="rounded-sm border border-border hover:bg-muted dark:hover:bg-muted/10 font-mono text-xs font-medium h-9 uppercase tracking-wider transition-colors"
               >
                 Hủy
               </Button>
               <Button 
                 type="submit" 
                 disabled={isLoading} 
-                className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 text-white rounded-[2px] font-mono text-xs font-medium h-9 uppercase tracking-wider transition-colors"
+                className="bg-primary hover:bg-primary/90 dark:bg-primary/90 dark:hover:bg-primary text-white rounded-sm font-mono text-xs font-medium h-9 uppercase tracking-wider transition-colors"
               >
                 {isLoading && <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />}
                 Tạo Workspace

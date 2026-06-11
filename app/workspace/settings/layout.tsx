@@ -34,13 +34,13 @@ const SidebarItem: React.FC<SidebarItemProps> = ({ icon, label, href, active, da
     href={href}
     className={`flex items-center gap-2.5 px-3 py-1.5 transition-all duration-150 text-xs font-mono font-medium ${
       active 
-        ? 'bg-slate-100 dark:bg-zinc-800 text-slate-900 dark:text-slate-100 font-bold border-l-2 border-slate-900 dark:border-slate-100 pl-2 rounded-none' 
+        ? 'bg-muted dark:bg-muted text-foreground font-bold border-l-2 border-slate-900 dark:border-border pl-2 rounded-none' 
         : danger 
-          ? 'text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 hover:text-red-700 dark:hover:text-red-400 rounded-[2px]'
-          : 'text-slate-600 dark:text-slate-400 hover:bg-slate-200/40 dark:hover:bg-zinc-800 hover:text-slate-900 dark:hover:text-slate-200 rounded-[2px]'
+          ? 'text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 hover:text-red-700 dark:hover:text-red-400 rounded-sm'
+          : 'text-muted-foreground dark:text-muted-foreground hover:bg-muted/40 dark:hover:bg-muted hover:text-foreground dark:hover:text-foreground rounded-sm'
     }`}
   >
-    <span className={active ? 'text-slate-850 dark:text-zinc-200' : 'text-slate-400 dark:text-zinc-500 group-hover:text-slate-500 dark:group-hover:text-zinc-400'}>
+    <span className={active ? 'text-slate-850 dark:text-foreground' : 'text-muted-foreground dark:text-muted-foreground group-hover:text-muted-foreground dark:group-hover:text-muted-foreground'}>
       {icon}
     </span>
     {label}
@@ -48,7 +48,7 @@ const SidebarItem: React.FC<SidebarItemProps> = ({ icon, label, href, active, da
 );
 
 const SectionHeader: React.FC<{ label: string }> = ({ label }) => (
-  <div className="px-3 py-1.5 mt-3 text-[9px] font-bold font-mono uppercase tracking-wider text-slate-400 dark:text-zinc-550">
+  <div className="px-3 py-1.5 mt-3 text-[9px] font-bold font-mono uppercase tracking-wider text-muted-foreground">
     {label}
   </div>
 );
@@ -58,29 +58,30 @@ export default function WorkspaceSettingsLayout({ children }: { children: React.
   const currentWorkspaceId = useSelector((state: RootState) => state.workspace.currentWorkspaceId);
   const { data: workspaces } = useGetUserWorkspacesQuery();
   const currentWorkspace = workspaces?.find(w => w.id === currentWorkspaceId);
+  const isRootSettings = pathname === '/workspace/settings';
 
   return (
     <div className="flex w-full h-screen overflow-hidden bg-white dark:bg-[#111113]">
       {/* Settings Sidebar */}
-      <div className="w-[240px] flex flex-col bg-slate-50 dark:bg-[#19191B] border-r border-slate-200/80 dark:border-white/[0.06] h-screen shrink-0">
-        <div className="p-3.5 border-b border-slate-200/80 dark:border-white/[0.06] bg-slate-50 dark:bg-[#19191B]">
+      <div className={`${isRootSettings ? 'flex w-full' : 'hidden'} md:flex md:w-[240px] flex-col bg-muted dark:bg-background border-r border-border h-screen shrink-0`}>
+        <div className="p-3.5 border-b border-border bg-muted dark:bg-background">
           <Link 
             href="/chat"
-            className="flex items-center gap-1.5 text-slate-500 hover:text-slate-900 dark:hover:text-slate-200 transition-colors mb-3 group"
+            className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground dark:hover:text-foreground transition-colors mb-3 group"
           >
             <ChevronLeft size={14} className="group-hover:-translate-x-0.5 transition-transform" />
             <span className="text-[9px] font-bold font-mono uppercase tracking-wider">Quay lại Chat</span>
           </Link>
           <div className="flex items-center gap-2.5">
-            <Avatar className="h-8 w-8 rounded-[2px] shrink-0">
-              <AvatarImage src={currentWorkspace?.icon ? getAvatarUrl(currentWorkspace.icon) : undefined} alt={currentWorkspace?.name} className="object-cover rounded-[2px]" />
-              <AvatarFallback className="bg-blue-600 dark:bg-zinc-800 text-white dark:text-zinc-300 font-bold text-sm rounded-[2px]">
+            <Avatar className="h-8 w-8 rounded-sm shrink-0">
+              <AvatarImage src={currentWorkspace?.icon ? getAvatarUrl(currentWorkspace.icon) : undefined} alt={currentWorkspace?.name} className="object-cover rounded-sm" />
+              <AvatarFallback className="bg-primary dark:bg-muted text-white dark:text-muted-foreground font-bold text-sm rounded-sm">
                 {currentWorkspace?.name?.substring(0, 1).toUpperCase() || 'W'}
               </AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
-              <h2 className="font-bold font-mono text-slate-900 dark:text-slate-100 text-xs truncate">{currentWorkspace?.name || 'Workspace'}</h2>
-              <p className="text-[10px] font-mono text-slate-400 dark:text-slate-500 font-medium">Quản trị hệ thống</p>
+              <h2 className="font-bold font-mono text-foreground text-xs truncate">{currentWorkspace?.name || 'Workspace'}</h2>
+              <p className="text-[10px] font-mono text-muted-foreground dark:text-muted-foreground font-medium">Quản trị hệ thống</p>
             </div>
           </div>
         </div>
@@ -131,7 +132,7 @@ export default function WorkspaceSettingsLayout({ children }: { children: React.
             active={pathname === '/workspace/settings/general'} 
           />
 
-          <div className="mt-4 pt-3 border-t border-slate-200/60 dark:border-white/[0.06]">
+          <div className="mt-4 pt-3 border-t border-border/60 dark:border-white/[0.06]">
             <SidebarItem 
               icon={<Trash2 size={16} />} 
               label="Giải tán Workspace" 
@@ -144,8 +145,18 @@ export default function WorkspaceSettingsLayout({ children }: { children: React.
       </div>
 
       {/* Main Content Area */}
-      <main className="flex-1 overflow-y-auto bg-slate-50/20 dark:bg-[#111113]/50">
-        {children}
+      <main className={`flex-1 overflow-y-auto bg-muted/20 dark:bg-[#111113]/50 ${isRootSettings ? 'hidden md:block' : 'block'}`}>
+        {!isRootSettings && (
+          <div className="md:hidden flex items-center h-12 px-4 border-b border-border bg-background dark:bg-background sticky top-0 z-20 select-none">
+            <Link href="/workspace/settings" className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground text-xs font-mono font-bold uppercase">
+              <ChevronLeft size={16} />
+              <span>Cấu hình</span>
+            </Link>
+          </div>
+        )}
+        <div className="max-w-[1200px] mx-auto w-full">
+          {children}
+        </div>
       </main>
     </div>
   );
