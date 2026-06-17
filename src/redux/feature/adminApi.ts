@@ -3,9 +3,6 @@
 
 import { apiSlice } from '../api/baseApi';
 
-// AI Knowledge service base URL (port 8080)
-const AI_KNOWLEDGE_URL = process.env.NEXT_PUBLIC_AI_KNOWLEDGE_URL || 'http://127.0.0.1:8080';
-
 // Types
 export interface User {
   id: string;
@@ -395,69 +392,33 @@ export const adminApi = apiSlice.injectEndpoints({
 
     // Get all AI config (sensitive values are masked by backend)
     getAiSettings: builder.query<AiConfig, void>({
-      queryFn: async () => {
-        try {
-          const res = await fetch(`${AI_KNOWLEDGE_URL}/api/settings`);
-          if (!res.ok) throw new Error(`HTTP ${res.status}`);
-          const data = await res.json();
-          return { data };
-        } catch (e: any) {
-          return { error: { status: 'FETCH_ERROR', error: e.message } };
-        }
-      },
+      query: () => '/settings',
       providesTags: ['AISettings'],
     }),
 
     // Batch update AI config
     updateAiSettings: builder.mutation<AiConfig & { _saveResults: Record<string, boolean> }, { settings: Record<string, string> }>({
-      queryFn: async ({ settings }) => {
-        try {
-          const res = await fetch(`${AI_KNOWLEDGE_URL}/api/settings`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ settings }),
-          });
-          if (!res.ok) throw new Error(`HTTP ${res.status}`);
-          const data = await res.json();
-          return { data };
-        } catch (e: any) {
-          return { error: { status: 'FETCH_ERROR', error: e.message } };
-        }
-      },
+      query: (body) => ({
+        url: '/settings',
+        method: 'PATCH',
+        body,
+      }),
       invalidatesTags: ['AISettings'],
     }),
 
     // Get LLM model catalog
     getLlmCatalog: builder.query<LlmModel[], void>({
-      queryFn: async () => {
-        try {
-          const res = await fetch(`${AI_KNOWLEDGE_URL}/api/settings/llm/catalog`);
-          if (!res.ok) throw new Error(`HTTP ${res.status}`);
-          const data = await res.json();
-          return { data };
-        } catch (e: any) {
-          return { error: { status: 'FETCH_ERROR', error: e.message } };
-        }
-      },
+      query: () => '/settings/llm/catalog',
       providesTags: ['AISettings'],
     }),
 
     // Switch active LLM model
     switchLlmModel: builder.mutation<{ message: string; activeModel: string; provider: string }, { modelId: string; provider: string }>({
-      queryFn: async ({ modelId, provider }) => {
-        try {
-          const res = await fetch(`${AI_KNOWLEDGE_URL}/api/settings/llm/switch`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ modelId, provider }),
-          });
-          if (!res.ok) throw new Error(`HTTP ${res.status}`);
-          const data = await res.json();
-          return { data };
-        } catch (e: any) {
-          return { error: { status: 'FETCH_ERROR', error: e.message } };
-        }
-      },
+      query: (body) => ({
+        url: '/settings/llm/switch',
+        method: 'POST',
+        body,
+      }),
       invalidatesTags: ['AISettings'],
     }),
   }),

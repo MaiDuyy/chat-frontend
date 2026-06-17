@@ -192,6 +192,12 @@ export const mrpApi = apiSlice.injectEndpoints({
       providesTags: ['Documents'],
     }),
 
+    // Lấy đồ thị liên kết tri thức (Wiki Graph) của Workspace
+    getWikiGraph: builder.query<{ nodes: Array<{ slug: string; title: string; pageType: string }>; edges: Array<{ from: string; to: string }> }, { workspaceId?: string }>({
+      query: ({ workspaceId = 'default-workspace' } = {}) => `/mrp/wiki/graph?workspaceId=${workspaceId}`,
+      providesTags: ['Documents'],
+    }),
+
     // Lấy trang Wiki theo slug
     getWikiPageBySlug: builder.query<WikiPage, { slug: string; workspaceId?: string }>({
       query: ({ slug, workspaceId = 'default-workspace' }) => `/mrp/wiki/slug/${slug}?workspaceId=${workspaceId}`,
@@ -236,6 +242,62 @@ export const mrpApi = apiSlice.injectEndpoints({
         body,
       }),
     }),
+fetchWikiImageRaw: builder.query<string, string>({
+  queryFn: async (imageId, api, _extraOptions, baseQuery) => {
+    try {
+      const result = await baseQuery({
+        url: `/wiki/images/raw/${imageId}`,
+        method: 'GET',
+        responseHandler: async (response: Response) => {
+          if (!response.ok) {
+            try {
+              return await response.json();
+            } catch {
+              return await response.text();
+            }
+          }
+          return response.blob();
+        },
+      });
+
+      if (result.error) return { error: result.error };
+
+      const blob = result.data as unknown as Blob;
+      const blobUrl = URL.createObjectURL(blob);
+      return { data: blobUrl };
+    } catch (err) {
+      return {
+        error: {
+          status: 'CUSTOM_ERROR' as const,
+          error: 'Failed to fetch wiki image',
+          data: err,
+        },
+      };
+    }
+  },
+  // BÍ KÍP Ở ĐÂY: Quản lý vòng đời của Blob URL theo vòng đời của Cache
+  onCacheEntryAdded: async (
+    _arg,
+    { cacheDataLoaded, cacheEntryRemoved }
+  ) => {
+    let url = '';
+    try {
+      // Đợi cache có data (fetch thành công)
+      const { data } = await cacheDataLoaded;
+      url = data;
+    } catch {
+      // Bỏ qua nếu fetch lỗi
+    }
+
+    // Đợi cho đến khi RTK Query quyết định xóa cache này (ví dụ: component unmount được 60s)
+    await cacheEntryRemoved;
+
+    // Lúc này mới dọn dẹp bộ nhớ
+    if (url) {
+      URL.revokeObjectURL(url);
+    }
+  },
+}),
   }),
 });
 
@@ -253,9 +315,12 @@ export const {
   useBulkApproveDraftsMutation,
   useGetWikiPagesQuery,
   useGetWikiPagesMetadataQuery,
+  useGetWikiGraphQuery,
   useGetWikiPageBySlugQuery,
   useGetWikiPageByIdQuery,
   useGetCompilationPlansQuery,
   useGetPlanByIdQuery,
   useResolveWikiImagesMutation,
+  useFetchWikiImageRawQuery,
+  useLazyFetchWikiImageRawQuery,
 } = mrpApi;

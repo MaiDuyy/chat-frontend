@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useSelector } from "react-redux";
 import {
   useGetWikiPagesMetadataQuery,
+  useGetWikiGraphQuery,
   WikiPage,
 } from "@/src/redux/feature/mrpApi";
 import { WikiGraph } from "../components/WikiGraph";
@@ -41,9 +42,16 @@ export default function WikiGraphPage() {
   const currentWorkspaceId = useSelector((state: any) => state.workspace.currentWorkspaceId);
   const workspaceId = searchParams.get("workspaceId") || currentWorkspaceId || "default-workspace";
 
-  const { data: allPages = [], isLoading } = useGetWikiPagesMetadataQuery({
+  const { data: allPages = [], isLoading: isMetadataLoading } = useGetWikiPagesMetadataQuery({
     workspaceId,
   });
+
+  const { data: graphDataFromBackend, isLoading: isGraphLoading } = useGetWikiGraphQuery({
+    workspaceId,
+  });
+
+  const isLoading = isMetadataLoading || isGraphLoading;
+
 
   const [activeTypes, setActiveTypes] = React.useState<Set<PageType>>(
     new Set(PAGE_TYPES)
@@ -56,68 +64,16 @@ export default function WikiGraphPage() {
 
   // Build graph data
   const graphData: GraphData = React.useMemo(() => {
-    if (!allPages.length) return { nodes: [], edges: [] };
-
-    const nodes: GraphNode[] = allPages.map((p) => ({
-      slug: p.slug,
-      title: p.title,
-      page_type: getPageType(p),
-    }));
-
-    const edges: GraphEdge[] = [];
-    const seenEdges = new Set<string>();
-    const WIKILINK_RE = /\[\[([^\]|]+)(?:\|[^\]]+)?\]\]/g;
-
-    const titleToSlug = new Map<string, string>();
-    const slugToSlug = new Map<string, string>();
-    for (const p of allPages) {
-      titleToSlug.set(p.title.toLowerCase(), p.slug);
-      slugToSlug.set(p.slug.toLowerCase(), p.slug);
-    }
-
-    const resolve = (target: string) => {
-      const norm = target.trim().toLowerCase();
-      if (slugToSlug.has(norm)) return slugToSlug.get(norm);
-      if (titleToSlug.has(norm)) return titleToSlug.get(norm);
-      if (slugToSlug.has(`source/${norm}`)) return slugToSlug.get(`source/${norm}`);
-      const slugified = norm
-        .replace(/[^a-z0-9\s-]/g, "")
-        .replace(/\s+/g, "-")
-        .replace(/-+/g, "-")
-        .trim();
-      if (slugToSlug.has(slugified)) return slugToSlug.get(slugified);
-      if (slugToSlug.has(`source/${slugified}`)) return slugToSlug.get(`source/${slugified}`);
-      return null;
+    if (!graphDataFromBackend) return { nodes: [], edges: [] };
+    return {
+      nodes: graphDataFromBackend.nodes.map((n) => ({
+        slug: n.slug,
+        title: n.title,
+        page_type: n.pageType || "concept",
+      })),
+      edges: graphDataFromBackend.edges,
     };
-
-    for (const page of allPages) {
-      const links = page.links || [];
-      const targets =
-        links.length > 0
-          ? links
-          : (() => {
-              const found: string[] = [];
-              let m;
-              WIKILINK_RE.lastIndex = 0;
-              while ((m = WIKILINK_RE.exec(page.content || "")) !== null)
-                found.push(m[1]);
-              return found;
-            })();
-
-      for (const t of targets) {
-        const r = resolve(t);
-        if (r && r !== page.slug) {
-          const key = [page.slug, r].sort().join("->");
-          if (!seenEdges.has(key)) {
-            seenEdges.add(key);
-            edges.push({ from: page.slug, to: r });
-          }
-        }
-      }
-    }
-
-    return { nodes, edges };
-  }, [allPages]);
+  }, [graphDataFromBackend]);
 
   const filteredData = React.useMemo(() => {
     if (!graphData.nodes.length) return null;
