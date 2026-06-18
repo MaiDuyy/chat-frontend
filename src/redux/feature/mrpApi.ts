@@ -30,6 +30,9 @@ export interface WikiPage {
   createdAt: string;
   updatedAt: string;
   links?: string[];
+  departmentId?: string;
+  allowedRoles?: string;
+  securityClassification?: string;
 }
 
 export interface WikiPageDraft {
@@ -48,6 +51,9 @@ export interface WikiPageDraft {
   reviewerNote?: string;
   baseVersion?: number;
   revisionRound: number;
+  departmentId?: string;
+  allowedRoles?: string;
+  securityClassification?: string;
   createdAt: string;
   updatedAt: string;
 }

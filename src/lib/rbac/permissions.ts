@@ -116,6 +116,16 @@ export const ROLE_PERMISSIONS = {
   ASSIGN_SYSTEM: 'role.assign',    // role:assign:system - Assign any role
 } as const;
 
+// =============================================================================
+// WIKI PERMISSIONS (reuses knowledge permissions)
+// =============================================================================
+
+export const WIKI_PERMISSIONS = {
+  READ: KNOWLEDGE_PERMISSIONS.READ,
+  WRITE: KNOWLEDGE_PERMISSIONS.WRITE,
+  ADMIN: KNOWLEDGE_PERMISSIONS.ADMIN,
+} as const;
+
 // Legacy aliases for backward compatibility
 export const SECURITY_PERMISSIONS = {
   AUDIT_VIEW: AUDIT_PERMISSIONS.VIEW,

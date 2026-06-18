@@ -35,6 +35,7 @@ import {
   Search,
   Menu
 } from "lucide-react";
+import { WikiSecurityBadge } from "../components/WikiSecurityBadge";
 
 export default function WikiPageDetail() {
   const params = useParams();
@@ -296,9 +297,18 @@ export default function WikiPageDetail() {
             <div className="border border-border bg-card p-3 md:p-4.5 rounded-lg shadow-md max-w-[72ch] lg:max-w-[65ch] mx-auto w-full">
               {/* Title block */}
               <div className="flex flex-col gap-1.5 border-b pb-2 mb-4">
-                <h1 className="text-lg md:text-xl font-bold text-foreground leading-snug">
-                  {page.title}
-                </h1>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h1 className="text-lg md:text-xl font-bold text-foreground leading-snug">
+                    {page.title}
+                  </h1>
+                  {page.securityClassification && (
+                    <WikiSecurityBadge
+                      classification={page.securityClassification}
+                      departmentId={page.departmentId}
+                      allowedRoles={page.allowedRoles}
+                    />
+                  )}
+                </div>
                 
                 {/* Tags & quick info */}
                 {tagsList.length > 0 && (

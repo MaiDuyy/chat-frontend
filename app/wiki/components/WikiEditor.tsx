@@ -12,14 +12,19 @@ interface WikiEditorProps {
   initialContent?: string;
   initialTags?: string;
   initialPageType?: string;
+  initialDepartmentId?: string;
+  initialClassification?: string;
   slug?: string;
   wikiPages?: WikiPage[];
+  userDepartments?: { departmentId: string; name?: string; role?: string }[];
   onSubmit: (data: {
     title: string;
     content: string;
     pageType: string;
     tags: string;
     note: string;
+    departmentId?: string;
+    securityClassification?: string;
   }) => void;
   isLoading?: boolean;
   onCancel?: () => void;
@@ -30,8 +35,11 @@ export function WikiEditor({
   initialContent = "",
   initialTags = "",
   initialPageType = "concept",
+  initialDepartmentId = "",
+  initialClassification = "INTERNAL",
   slug = "new-page",
   wikiPages,
+  userDepartments = [],
   onSubmit,
   isLoading = false,
   onCancel,
@@ -40,6 +48,8 @@ export function WikiEditor({
   const [content, setContent] = React.useState(initialContent);
   const [tags, setTags] = React.useState(initialTags);
   const [pageType, setPageType] = React.useState(initialPageType);
+  const [departmentId, setDepartmentId] = React.useState(initialDepartmentId);
+  const [classification, setClassification] = React.useState(initialClassification);
   const [note, setNote] = React.useState("");
 
 
@@ -63,6 +73,8 @@ export function WikiEditor({
       pageType,
       tags,
       note: note.trim() || "Đề xuất chỉnh sửa Wiki bởi người dùng.",
+      departmentId: departmentId || undefined,
+      securityClassification: classification || "INTERNAL",
     });
   };
 
@@ -135,6 +147,47 @@ export function WikiEditor({
               placeholder="ngôn-ngữ, java, spring..."
               className="border border-border bg-background rounded-md px-3 py-1.5 text-sm font-sans focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all duration-150"
             />
+          </div>
+        </div>
+
+        {/* Permission fields */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 border border-border bg-card p-3 rounded-lg shadow-md">
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="wiki-department" className="text-xs font-mono font-extrabold uppercase text-foreground">Phòng ban</label>
+            <select
+              id="wiki-department"
+              value={departmentId}
+              onChange={(e) => setDepartmentId(e.target.value)}
+              className="border border-border bg-background rounded-md px-3 py-1.5 text-sm font-sans focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all duration-150"
+            >
+              <option value="">Toàn workspace (không giới hạn)</option>
+              {userDepartments.map((d) => (
+                <option key={d.departmentId} value={d.departmentId}>
+                  {d.name || d.departmentId} {d.role ? `(${d.role})` : ""}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="wiki-classification" className="text-xs font-mono font-extrabold uppercase text-foreground">Phân loại bảo mật</label>
+            <select
+              id="wiki-classification"
+              value={classification}
+              onChange={(e) => setClassification(e.target.value)}
+              className="border border-border bg-background rounded-md px-3 py-1.5 text-sm font-sans focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all duration-150"
+            >
+              <option value="PUBLIC">Công khai (PUBLIC)</option>
+              <option value="INTERNAL">Nội bộ (INTERNAL)</option>
+              <option value="CONFIDENTIAL">Mật (CONFIDENTIAL)</option>
+              <option value="RESTRICTED">Tối mật (RESTRICTED)</option>
+            </select>
+          </div>
+
+          <div className="flex items-end pb-1">
+            <p className="text-[10px] text-muted-foreground leading-snug">
+              Bản thảo sẽ được HEAD/MANAGER phòng ban duyệt trước khi xuất bản.
+            </p>
           </div>
         </div>
 

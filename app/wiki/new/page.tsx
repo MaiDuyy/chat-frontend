@@ -8,6 +8,8 @@ import { useGetWikiPagesQuery, useCompileDocumentMutation, useGetWikiPageBySlugQ
 import { useHasRole } from "@/src/lib/rbac/usePermission";
 import { WikiEditor } from "../components/WikiEditor";
 import { useSelector } from "react-redux";
+import { useGetUserDepartmentsQuery } from "@/src/redux/feature/departmentApi";
+import type { RootState } from "@/src/redux/store";
 
 export default function NewWikiPage() {
   const router = useRouter();
@@ -17,6 +19,8 @@ export default function NewWikiPage() {
 
   const currentWorkspaceId = useSelector((state: any) => state.workspace.currentWorkspaceId);
   const workspaceId = currentWorkspaceId || "default-workspace";
+  const user = useSelector((state: RootState) => state.auth.user);
+  const { data: userDepts } = useGetUserDepartmentsQuery(user?.id ?? "", { skip: !user?.id });
 
   const isSuperAdmin = useHasRole("SUPER_ADMIN");
   const isAdmin = useHasRole("ADMIN");
@@ -44,11 +48,11 @@ export default function NewWikiPage() {
     pageType: string;
     tags: string;
     note: string;
+    departmentId?: string;
+    securityClassification?: string;
   }) => {
-    // Propose new draft manual edit
     console.log("Submitting proposed manual wiki page draft:", data);
-    
-    // Derived slug
+
     const slug = suggestEdit && editSlug
       ? editSlug
       : data.title
@@ -106,8 +110,11 @@ export default function NewWikiPage() {
       initialContent={editPage?.content || ""}
       initialTags={editPage?.tags || ""}
       initialPageType={editPage?.pageType || "concept"}
+      initialDepartmentId={editPage?.departmentId || ""}
+      initialClassification={editPage?.securityClassification || "INTERNAL"}
       slug={editSlug}
       wikiPages={wikiPages}
+      userDepartments={userDepts?.map((d) => ({ departmentId: d.id, name: d.name, role: d.userRole })) || []}
       onSubmit={handleSubmit}
       isLoading={isLoading}
       onCancel={() => router.push(suggestEdit && editSlug ? `/wiki/${editSlug}` : "/wiki")}

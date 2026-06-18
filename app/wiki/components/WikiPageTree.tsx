@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { useGetWikiPagesMetadataQuery, WikiPage } from "@/src/redux/feature/mrpApi";
 import { wikiTypeIcon, wikiTypeColor, wikiTypeGroupLabel } from "./WikiTypeBadge";
+import { WikiSecurityBadge } from "./WikiSecurityBadge";
 import { getPageType } from "./WikilinkAutocomplete";
 
 const GROUP_ORDER = ["concept", "entity", "topic", "source"];
@@ -220,18 +221,24 @@ export function WikiPageTree({
                           {onPageSelect ? (
                             <button
                               onClick={() => onPageSelect(page.slug)}
-                              className={`flex-1 px-2 py-0.5 text-xs truncate text-left transition-all`}
+                              className={`flex-1 px-2 py-0.5 text-xs truncate text-left transition-all flex items-center gap-1`}
                               title={page.title}
                             >
-                              {page.title}
+                              <span className="truncate">{page.title}</span>
+                              {page.securityClassification && page.securityClassification !== "INTERNAL" && (
+                                <WikiSecurityBadge classification={page.securityClassification} compact />
+                              )}
                             </button>
                           ) : (
                             <Link
                               href={`/wiki/${page.slug}`}
-                              className={`flex-1 px-2 py-0.5 text-xs truncate transition-all`}
+                              className={`flex-1 px-2 py-0.5 text-xs truncate transition-all flex items-center gap-1`}
                               title={page.title}
                             >
-                              {page.title}
+                              <span className="truncate">{page.title}</span>
+                              {page.securityClassification && page.securityClassification !== "INTERNAL" && (
+                                <WikiSecurityBadge classification={page.securityClassification} compact />
+                              )}
                             </Link>
                           )}
                         </div>
