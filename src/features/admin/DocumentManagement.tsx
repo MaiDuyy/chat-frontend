@@ -59,7 +59,12 @@ import {
     Globe,
     X,
     Lock,
+    Folder,
+    FolderOpen,
+    ChevronRight,
+    ChevronDown,
 } from 'lucide-react';
+import { parseDocumentsToTree, TreeNode } from './FolderTreeParser';
 import { format, formatDistanceToNow } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import { cn, formatFileSize } from '@/lib/utils';
@@ -84,6 +89,8 @@ export function DocumentManagement() {
     const [filterWorkspaceId, setFilterWorkspaceId] = useState<string>('all');
     const [filterPendingOnly, setFilterPendingOnly] = useState(false);
     const currentWorkspaceId = useSelector((state: RootState) => state.workspace.currentWorkspaceId);
+
+    const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
 
     const { data: workspaces = [] } = useGetUserWorkspacesQuery();
     const { data: departments = [] } = useListDepartmentsQuery();
@@ -110,6 +117,17 @@ export function DocumentManagement() {
         return { departments: depts, projects: projs };
     }, [workspaces]);
 
+    // Expand workspaces and departments by default when loaded
+    useEffect(() => {
+        setExpandedNodes(prev => {
+            const next = new Set(prev);
+            next.add("workspace:workspace-default"); // always expand global shared folder
+            workspaces.forEach((ws: any) => next.add(`workspace:${ws.id}`));
+            departments.forEach((dept: any) => next.add(`dept:${dept.id}`));
+            return next;
+        });
+    }, [workspaces, departments]);
+
     // Debounce search term to protect performance and reset page to 0 immediately
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -124,10 +142,8 @@ export function DocumentManagement() {
         return filterWorkspaceId;
     }, [filterWorkspaceId]);
 
-    const queryArg = debouncedSearchTerm.trim()
-        ? (workspaceIdForQuery ? { workspaceId: workspaceIdForQuery } : undefined)
-        : { workspaceId: workspaceIdForQuery, page, size };
-    const { data, isLoading, refetch } = useGetDocumentsQuery(queryArg);
+    // Query all matching documents without page limit to correctly build the tree structure
+    const { data, isLoading, refetch } = useGetDocumentsQuery({ workspaceId: workspaceIdForQuery });
 
     const [deleteDocument, { isLoading: isDeleting }] = useDeleteDocumentMutation();
     const [approveDocument, { isLoading: isApproving }] = useApproveDocumentMutation();
@@ -146,7 +162,9 @@ export function DocumentManagement() {
 
     const handleStartMRP = async (doc: Document) => {
         try {
-            const targetWorkspaceId = doc.workspaceId || (workspaceIdForQuery && workspaceIdForQuery !== 'all' ? workspaceIdForQuery : null) || currentWorkspaceId || 'default-workspace';
+            const targetWorkspaceId = doc.departmentId && !doc.workspaceId
+                ? null
+                : (doc.workspaceId || (workspaceIdForQuery && workspaceIdForQuery !== 'all' ? workspaceIdForQuery : null) || currentWorkspaceId || 'default-workspace');
             await compileDocument({ documentId: doc.id, workspaceId: targetWorkspaceId, autoApprove: false }).unwrap();
             toast.success('Kích hoạt quy trình biên soạn MRP thành công! Kế hoạch mới đang chờ duyệt.');
         } catch (error: any) {
@@ -162,7 +180,8 @@ export function DocumentManagement() {
         return isPaged ? (data as any).content : (Array.isArray(data) ? data : []);
     }, [data, isPaged]);
 
-    const filteredDocuments = useMemo(() => {
+    // Build the hierarchical tree structure
+    const treeData = useMemo(() => {
         let docs = allDocs;
         if (filterPendingOnly) {
             docs = docs.filter((doc: Document) => doc.status === 'PENDING');
@@ -174,14 +193,25 @@ export function DocumentManagement() {
                 doc.userId.toLowerCase().includes(q)
             );
         }
-        // Workspace filter: match by workspaceId, legacy tag, or department-wide documents belonging to the workspace's department
+        
+        // Workspace filter matches by workspaceId, legacy tag, or department-wide documents belonging to the workspace's department
         if (filterWorkspaceId !== 'all') {
+            const isFilterDefault = filterWorkspaceId === 'default-workspace' || filterWorkspaceId === 'workspace-default';
             docs = docs.filter((doc: Document) => {
                 if (doc.workspaceId === filterWorkspaceId) return true;
+                
+                const isDocWorkspaceEmpty = !doc.workspaceId || 
+                                           doc.workspaceId === '' || 
+                                           doc.workspaceId === 'default-workspace' || 
+                                           doc.workspaceId === 'workspace-default';
+
+                if (isFilterDefault && isDocWorkspaceEmpty) {
+                    return true;
+                }
+
                 if (doc.tags?.some(t => t === `ws:${filterWorkspaceId}` || t.includes(filterWorkspaceId))) return true;
 
-                // Department-wide document match: doc has no workspace, but departmentId matches workspace's departmentId
-                if (!doc.workspaceId || doc.workspaceId === '') {
+                if (isDocWorkspaceEmpty) {
                     const ws = workspaces.find((w: any) => w.id === filterWorkspaceId);
                     if (ws && ws.departmentId && doc.departmentId === ws.departmentId) {
                         return true;
@@ -190,19 +220,41 @@ export function DocumentManagement() {
                 return false;
             });
         }
-        return docs;
-    }, [allDocs, debouncedSearchTerm, filterWorkspaceId, filterPendingOnly]);
+
+        return parseDocumentsToTree(docs, workspaces, departments);
+    }, [allDocs, workspaces, departments, debouncedSearchTerm, filterWorkspaceId, filterPendingOnly]);
+
+    interface FlatNode {
+        node: TreeNode;
+        depth: number;
+        parentIds: string[];
+    }
+
+    // Flatten tree nodes for table rendering based on expanded state
+    const flatTreeNodes = useMemo(() => {
+        const list: FlatNode[] = [];
+        const isSearchActive = !!debouncedSearchTerm.trim();
+
+        const traverse = (nodes: TreeNode[], depth: number = 0, parentIds: string[] = []) => {
+            nodes.forEach(node => {
+                list.push({ node, depth, parentIds });
+                const isExpanded = isSearchActive || expandedNodes.has(node.id);
+                if (isExpanded && node.children && node.children.length > 0) {
+                    traverse(node.children, depth + 1, [...parentIds, node.id]);
+                }
+            });
+        };
+        traverse(treeData);
+        return list;
+    }, [treeData, expandedNodes, debouncedSearchTerm]);
 
     // Compute paginated subset and counts
-    const totalElements = debouncedSearchTerm.trim() ? filteredDocuments.length : (isPaged ? (data as any).totalElements : allDocs.length);
-    const totalPages = debouncedSearchTerm.trim() ? Math.ceil(filteredDocuments.length / size) : (isPaged ? (data as any).totalPages : 1);
+    const totalElements = flatTreeNodes.length;
+    const totalPages = Math.ceil(totalElements / size);
     
-    // Slice only if we fetched all documents (i.e. queryArg is undefined)
-    const paginatedDocs = useMemo(() => {
-        return debouncedSearchTerm.trim() 
-            ? filteredDocuments.slice(page * size, (page + 1) * size)
-            : filteredDocuments;
-    }, [filteredDocuments, debouncedSearchTerm, page, size]);
+    const paginatedTreeNodes = useMemo(() => {
+        return flatTreeNodes.slice(page * size, (page + 1) * size);
+    }, [flatTreeNodes, page, size]);
 
     // Edge Case 1: Auto-decrement page if the current page becomes empty
     useEffect(() => {
@@ -211,6 +263,18 @@ export function DocumentManagement() {
             setPage(maxPage);
         }
     }, [totalPages, page, isLoading]);
+
+    const toggleNode = (nodeId: string) => {
+        setExpandedNodes(prev => {
+            const next = new Set(prev);
+            if (next.has(nodeId)) {
+                next.delete(nodeId);
+            } else {
+                next.add(nodeId);
+            }
+            return next;
+        });
+    };
 
     const handleSearchChange = (value: string) => {
         setSearchTerm(value);
@@ -253,17 +317,20 @@ export function DocumentManagement() {
         securityClassification: 'PUBLIC' | 'INTERNAL' | 'CONFIDENTIAL' | 'RESTRICTED';
         departmentId: string;
         allowedRoles: string;
-        uploadScope: 'DEPARTMENT' | 'WORKSPACE';
+        uploadScope: 'DEPARTMENT' | 'WORKSPACE' | 'GLOBAL';
         workspaceId?: string;
+        folderPath?: string;
     }) => {
         if (!uploadPendingFile) return;
 
         const formData = new FormData();
         formData.append('file', uploadPendingFile);
 
-        const targetUploadWorkspaceId = meta.uploadScope === 'DEPARTMENT'
-            ? (meta.workspaceId || '')
-            : (meta.workspaceId || ((workspaceIdForQuery && workspaceIdForQuery !== 'all') ? workspaceIdForQuery : (currentWorkspaceId || 'default-workspace')));
+        const targetUploadWorkspaceId = meta.uploadScope === 'GLOBAL'
+            ? 'default-workspace'
+            : (meta.uploadScope === 'DEPARTMENT'
+                ? ''
+                : (meta.workspaceId && meta.workspaceId !== 'none' ? meta.workspaceId : 'default-workspace'));
         try {
             const result = await uploadDocument({
                 formData,
@@ -272,7 +339,8 @@ export function DocumentManagement() {
                 workspaceId: targetUploadWorkspaceId,
                 departmentId: meta.departmentId,
                 allowedRoles: meta.allowedRoles,
-                securityClassification: meta.securityClassification
+                securityClassification: meta.securityClassification,
+                folderPath: meta.folderPath
             }).unwrap();
             toast.success(`Tải lên thành công: ${result.fileName}`);
             
@@ -483,7 +551,7 @@ export function DocumentManagement() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {filteredDocuments.length === 0 ? (
+                            {flatTreeNodes.length === 0 ? (
                                 <TableRow>
                                     <TableCell colSpan={7} className="text-center py-16 text-muted-foreground">
                                         <FileText className="w-10 h-10 mx-auto mb-3 opacity-15" />
@@ -491,211 +559,279 @@ export function DocumentManagement() {
                                     </TableCell>
                                 </TableRow>
                             ) : (
-                                paginatedDocs.map((doc: Document) => {
-                                    const status = statusConfig[doc.status as keyof typeof statusConfig] || statusConfig.PREVIEW;
-                                    const StatusIcon = status.icon;
+                                paginatedTreeNodes.map(({ node, depth }) => {
+                                    if (node.type === 'file') {
+                                        const doc = node.document!;
+                                        const status = statusConfig[doc.status as keyof typeof statusConfig] || statusConfig.PREVIEW;
+                                        const StatusIcon = status.icon;
 
-                                    return (
-                                        <TableRow key={doc.id} className="hover:bg-muted/30 dark:hover:bg-slate-800/10 transition-colors border-border group">
-                                            <TableCell className="pl-4 py-1.5">
-                                                <div className="flex items-center gap-2.5">
-                                                    <div className="p-1.5 rounded-md bg-muted dark:bg-slate-800 text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary transition-colors">
-                                                        <FileText className="w-4 h-4" />
-                                                    </div>
-                                                    <div>
-                                                        <p className="text-xs font-bold text-foreground leading-snug">{doc.fileName}</p>
-                                                        <div className="flex items-center gap-1.5 mt-0.5">
-                                                            <span className="text-[9px] text-muted-foreground font-mono uppercase tracking-wider">{doc.documentType}</span>
-                                                            <span className="text-muted-foreground dark:text-muted-foreground text-[9px]">•</span>
-                                                            <span className={cn(
-                                                                "text-[8px] font-bold px-1 py-0.2 rounded uppercase tracking-wider border flex items-center gap-0.5",
-                                                                doc.parserMethod === 'tika'
-                                                                    ? "bg-sky-50 dark:bg-sky-950/20 text-sky-650 dark:text-sky-400 border-sky-100 dark:border-sky-900/30"
-                                                                    : "bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 border-emerald-100 dark:border-emerald-900/30"
-                                                            )}>
-                                                                {doc.parserMethod === 'tika' ? (
-                                                                    <>
-                                                                        <Cpu className="w-2 h-2 text-sky-500" />
-                                                                        Tika Local
-                                                                    </>
-                                                                ) : (
-                                                                    <>
-                                                                        <Sparkles className="w-2 h-2 text-emerald-500" />
-                                                                        Gemini AI
-                                                                    </>
-                                                                )}
-                                                            </span>
+                                        return (
+                                            <TableRow key={node.id} className="hover:bg-muted/30 dark:hover:bg-slate-800/10 transition-colors border-border group">
+                                                <TableCell className="pl-4 py-1.5">
+                                                    <div 
+                                                        className="flex items-center gap-2.5"
+                                                        style={{ paddingLeft: `${depth * 16}px` }}
+                                                    >
+                                                        <div className="p-1.5 rounded-md bg-muted dark:bg-slate-800 text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary transition-colors shrink-0">
+                                                            <FileText className="w-4 h-4" />
+                                                        </div>
+                                                        <div className="min-w-0">
+                                                            <p className="text-xs font-bold text-foreground leading-snug truncate" title={doc.fileName}>{doc.fileName}</p>
+                                                            <div className="flex items-center gap-1.5 mt-0.5">
+                                                                <span className="text-[9px] text-muted-foreground font-mono uppercase tracking-wider">{doc.documentType}</span>
+                                                                <span className="text-muted-foreground dark:text-muted-foreground text-[9px]">•</span>
+                                                                <span className={cn(
+                                                                    "text-[8px] font-bold px-1 py-0.2 rounded uppercase tracking-wider border flex items-center gap-0.5",
+                                                                    doc.parserMethod === 'tika'
+                                                                        ? "bg-sky-50 dark:bg-sky-950/20 text-sky-650 dark:text-sky-400 border-sky-100 dark:border-sky-900/30"
+                                                                        : "bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 border-emerald-100 dark:border-emerald-900/30"
+                                                                )}>
+                                                                    {doc.parserMethod === 'tika' ? (
+                                                                        <>
+                                                                            <Cpu className="w-2 h-2 text-sky-500" />
+                                                                            Tika Local
+                                                                        </>
+                                                                    ) : (
+                                                                        <>
+                                                                            <Sparkles className="w-2 h-2 text-emerald-500" />
+                                                                            Gemini AI
+                                                                        </>
+                                                                    )}
+                                                                </span>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            </TableCell>
-                                            <TableCell className="text-xs font-medium text-muted-foreground py-1.5">
-                                                {formatFileSize(doc.fileSize)}
-                                            </TableCell>
-                                            <TableCell className="py-1.5">
-                                                <div className="flex flex-col gap-0.5">
-                                                    <Badge variant="outline" className="rounded-md text-[9px] font-bold uppercase tracking-tight bg-muted dark:bg-slate-800/40 border-border px-1.5 py-0.5 w-fit">
-                                                        {doc.securityClassification || 'INTERNAL'}
-                                                    </Badge>
-                                                    {doc.departmentId && (
-                                                        <span className="text-[8px] font-bold text-blue-550 dark:text-blue-400 flex items-center gap-0.5 mt-0.5">
-                                                            <Building2 className="w-2.5 h-2.5" />
-                                                            {departments.find((d: any) => d.id === doc.departmentId)?.name || 'Phòng ban'} ({doc.allowedRoles || 'ALL'})
+                                                </TableCell>
+                                                <TableCell className="text-xs font-medium text-muted-foreground py-1.5">
+                                                    {formatFileSize(doc.fileSize)}
+                                                </TableCell>
+                                                <TableCell className="py-1.5">
+                                                    <div className="flex flex-col gap-0.5">
+                                                        <Badge variant="outline" className="rounded-md text-[9px] font-bold uppercase tracking-tight bg-muted dark:bg-slate-800/40 border-border px-1.5 py-0.5 w-fit">
+                                                            {doc.securityClassification || 'INTERNAL'}
+                                                        </Badge>
+                                                        {doc.departmentId && (
+                                                            <span className="text-[8px] font-bold text-blue-550 dark:text-blue-400 flex items-center gap-0.5 mt-0.5">
+                                                                <Building2 className="w-2.5 h-2.5" />
+                                                                {departments.find((d: any) => d.id === doc.departmentId)?.name || 'Phòng ban'} ({doc.allowedRoles || 'ALL'})
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell className="py-1.5 text-xs font-semibold text-muted-foreground">
+                                                    {doc.workspaceId ? (
+                                                        <span className="flex items-center gap-1.5">
+                                                            <Database className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                                                            {workspaces.find((ws: any) => ws.id === doc.workspaceId)?.name || doc.workspaceId}
+                                                        </span>
+                                                    ) : (
+                                                        <span className="flex items-center gap-1.5 text-slate-550 dark:text-slate-400">
+                                                            <Globe className="w-3.5 h-3.5 text-slate-450 shrink-0" />
+                                                            Dùng chung
                                                         </span>
                                                     )}
-                                                </div>
-                                            </TableCell>
-                                            <TableCell className="py-1.5 text-xs font-semibold text-muted-foreground">
-                                                {doc.workspaceId ? (
-                                                    <span className="flex items-center gap-1.5">
-                                                        <Database className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                                                        {workspaces.find((ws: any) => ws.id === doc.workspaceId)?.name || doc.workspaceId}
-                                                    </span>
-                                                ) : (
-                                                    <span className="flex items-center gap-1.5 text-slate-550 dark:text-slate-400">
-                                                        <Globe className="w-3.5 h-3.5 text-slate-450 shrink-0" />
-                                                        Dùng chung
-                                                    </span>
-                                                )}
-                                            </TableCell>
-                                            <TableCell className="py-1.5">
-                                                <Badge className={cn('rounded-md text-[9px] font-bold px-2 py-0.5 shadow-sm', status.color)}>
-                                                    <StatusIcon className={cn("w-2.5 h-2.5 mr-1", doc.status === 'PROCESSING' && "animate-spin")} />
-                                                    {status.label}
-                                                </Badge>
-                                            </TableCell>
-                                            <TableCell className="text-[10px] text-muted-foreground font-medium py-1.5">
-                                                {format(new Date(doc.createdAt), 'dd/MM/yyyy HH:mm')}
-                                            </TableCell>
-                                            <TableCell className="pr-4 py-1.5">
-                                                <div className="flex items-center gap-1.5 justify-end">
-                                                    {doc.status === 'PENDING' && isLeader && (
-                                                        <Button
-                                                            variant="outline"
-                                                            size="sm"
-                                                            onClick={() => handleApprove(doc.id)}
-                                                            disabled={isApproving}
-                                                            className="rounded-md h-7 text-[10px] font-semibold text-emerald-650 hover:text-emerald-700 border-emerald-200 dark:border-emerald-900 bg-emerald-50/30 dark:bg-emerald-950/20 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 transition-all shadow-sm cursor-pointer flex items-center gap-1"
-                                                        >
-                                                            {isApproving ? (
-                                                                <Loader2 className="w-3 h-3 animate-spin text-emerald-500" />
-                                                            ) : (
-                                                                <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />
-                                                            )}
-                                                            Duyệt
-                                                        </Button>
-                                                    )}
-                                                    {doc.status === 'PREVIEW' && (
-                                                        <Button
-                                                            variant="outline"
-                                                            size="sm"
-                                                            onClick={() => {
-                                                                setEditingDoc(doc);
-                                                                setEditorOpen(true);
-                                                            }}
-                                                            className="rounded-md h-7 text-[10px] font-semibold text-primary hover:text-primary border-emerald-200 dark:border-emerald-900 bg-emerald-50/30 dark:bg-emerald-950/20 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 transition-all shadow-sm"
-                                                        >
-                                                            <Eye className="w-3.5 h-3.5 mr-1" /> Duyệt & Lưu
-                                                        </Button>
-                                                    )}
-                                                    {doc.status === 'COMPLETED' && (
-                                                        <div className="flex gap-1">
+                                                </TableCell>
+                                                <TableCell className="py-1.5">
+                                                    <Badge className={cn('rounded-md text-[9px] font-bold px-2 py-0.5 shadow-sm', status.color)}>
+                                                        <StatusIcon className={cn("w-2.5 h-2.5 mr-1", doc.status === 'PROCESSING' && "animate-spin")} />
+                                                        {status.label}
+                                                    </Badge>
+                                                </TableCell>
+                                                <TableCell className="text-[10px] text-muted-foreground font-medium py-1.5">
+                                                    {format(new Date(doc.createdAt), 'dd/MM/yyyy HH:mm')}
+                                                </TableCell>
+                                                <TableCell className="pr-4 py-1.5">
+                                                    <div className="flex items-center gap-1.5 justify-end">
+                                                        {doc.status === 'PENDING' && isLeader && (
+                                                            <Button
+                                                                variant="outline"
+                                                                size="sm"
+                                                                onClick={() => handleApprove(doc.id)}
+                                                                disabled={isApproving}
+                                                                className="rounded-md h-7 text-[10px] font-semibold text-emerald-650 hover:text-emerald-700 border-emerald-200 dark:border-emerald-900 bg-emerald-50/30 dark:bg-emerald-950/20 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 transition-all shadow-sm cursor-pointer flex items-center gap-1"
+                                                            >
+                                                                {isApproving ? (
+                                                                    <Loader2 className="w-3 h-3 animate-spin text-emerald-500" />
+                                                                ) : (
+                                                                    <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />
+                                                                )}
+                                                                Duyệt
+                                                            </Button>
+                                                        )}
+                                                        {doc.status === 'PREVIEW' && (
                                                             <Button
                                                                 variant="outline"
                                                                 size="sm"
                                                                 onClick={() => {
-                                                                    setInspectingDoc(doc);
-                                                                    setChunkInspectorOpen(true);
+                                                                    setEditingDoc(doc);
+                                                                    setEditorOpen(true);
                                                                 }}
-                                                                className="rounded-md h-7 text-[10px] font-semibold text-muted-foreground hover:text-foreground border-border bg-background hover:bg-muted dark:hover:bg-slate-800/60 transition-all shadow-sm flex items-center gap-1 cursor-pointer"
+                                                                className="rounded-md h-7 text-[10px] font-semibold text-primary hover:text-primary border-emerald-200 dark:border-emerald-900 bg-emerald-50/30 dark:bg-emerald-950/20 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 transition-all shadow-sm"
                                                             >
-                                                                <Database className="w-3 h-3 text-muted-foreground" /> Phân mảnh
+                                                                <Eye className="w-3.5 h-3.5 mr-1" /> Duyệt & Lưu
                                                             </Button>
-                                                            <Button
-                                                                variant="outline"
-                                                                size="sm"
-                                                                onClick={() => handleStartMRP(doc)}
-                                                                disabled={isCompiling}
-                                                                className="rounded-md h-7 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 border-emerald-200/60 dark:border-emerald-900/40 bg-emerald-50/30 dark:bg-emerald-950/20 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 transition-all shadow-sm flex items-center gap-1 cursor-pointer"
-                                                            >
-                                                                <Cpu className={cn("w-3 h-3", isCompiling && "animate-spin")} /> Biên soạn MRP
-                                                            </Button>
-                                                        </div>
-                                                    )}
-                                                    <DropdownMenu>
-                                                        <DropdownMenuTrigger asChild>
-                                                            <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md opacity-0 group-hover:opacity-100 transition-opacity">
-                                                                <MoreHorizontal className="h-3.5 w-3.5" />
-                                                            </Button>
-                                                        </DropdownMenuTrigger>
-                                                        <DropdownMenuContent align="end" className="rounded-md p-1 shadow-lg border-border bg-popover text-popover-foreground">
-                                                            {doc.status === 'PREVIEW' && (
-                                                                <DropdownMenuItem 
+                                                        )}
+                                                        {doc.status === 'COMPLETED' && (
+                                                            <div className="flex gap-1">
+                                                                <Button
+                                                                    variant="outline"
+                                                                    size="sm"
                                                                     onClick={() => {
-                                                                        setEditingDoc(doc);
-                                                                        setEditorOpen(true);
-                                                                    }} 
-                                                                    className="rounded-md text-xs gap-1.5 cursor-pointer text-emerald-600 dark:text-emerald-450 focus:text-emerald-600"
+                                                                        setInspectingDoc(doc);
+                                                                        setChunkInspectorOpen(true);
+                                                                    }}
+                                                                    className="rounded-md h-7 text-[10px] font-semibold text-muted-foreground hover:text-foreground border-border bg-background hover:bg-muted dark:hover:bg-slate-800/60 transition-all shadow-sm flex items-center gap-1 cursor-pointer"
                                                                 >
-                                                                    <Eye className="w-3.5 h-3.5" />
-                                                                    Biên tập & Duyệt
-                                                                </DropdownMenuItem>
-                                                            )}
-                                                            {doc.status === 'COMPLETED' && (
-                                                                <>
+                                                                    <Database className="w-3 h-3 text-muted-foreground" /> Phân mảnh
+                                                                </Button>
+                                                                <Button
+                                                                    variant="outline"
+                                                                    size="sm"
+                                                                    onClick={() => handleStartMRP(doc)}
+                                                                    disabled={isCompiling}
+                                                                    className="rounded-md h-7 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 border-emerald-200/60 dark:border-emerald-900/40 bg-emerald-50/30 dark:bg-emerald-950/20 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 transition-all shadow-sm flex items-center gap-1 cursor-pointer"
+                                                                >
+                                                                    <Cpu className={cn("w-3 h-3", isCompiling && "animate-spin")} /> Biên soạn MRP
+                                                                </Button>
+                                                            </div>
+                                                        )}
+                                                        <DropdownMenu>
+                                                            <DropdownMenuTrigger asChild>
+                                                                <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md opacity-0 group-hover:opacity-100 transition-opacity">
+                                                                    <MoreHorizontal className="h-3.5 w-3.5" />
+                                                                </Button>
+                                                            </DropdownMenuTrigger>
+                                                            <DropdownMenuContent align="end" className="rounded-md p-1 shadow-lg border-border bg-popover text-popover-foreground">
+                                                                {doc.status === 'PREVIEW' && (
                                                                     <DropdownMenuItem 
                                                                         onClick={() => {
-                                                                            setInspectingDoc(doc);
-                                                                            setChunkInspectorOpen(true);
-                                                                        }}
-                                                                        className="rounded-md text-xs gap-1.5 cursor-pointer text-foreground font-semibold"
+                                                                            setEditingDoc(doc);
+                                                                            setEditorOpen(true);
+                                                                        }} 
+                                                                        className="rounded-md text-xs gap-1.5 cursor-pointer text-emerald-600 dark:text-emerald-450 focus:text-emerald-600"
                                                                     >
-                                                                        <Database className="w-3.5 h-3.5 text-muted-foreground" />
-                                                                        Xem phân mảnh (Chunks)
+                                                                        <Eye className="w-3.5 h-3.5" />
+                                                                        Biên tập & Duyệt
                                                                     </DropdownMenuItem>
-                                                                    <DropdownMenuItem 
-                                                                        onClick={() => handleStartMRP(doc)}
-                                                                        disabled={isCompiling}
-                                                                        className="rounded-md text-xs gap-1.5 cursor-pointer text-emerald-600 dark:text-emerald-400 focus:text-emerald-600 dark:focus:text-emerald-450 font-semibold"
-                                                                    >
-                                                                        <Cpu className="w-3.5 h-3.5" />
-                                                                        Khởi chạy biên soạn MRP
+                                                                )}
+                                                                {doc.status === 'COMPLETED' && (
+                                                                    <>
+                                                                        <DropdownMenuItem 
+                                                                            onClick={() => {
+                                                                                setInspectingDoc(doc);
+                                                                                setChunkInspectorOpen(true);
+                                                                            }}
+                                                                            className="rounded-md text-xs gap-1.5 cursor-pointer text-foreground font-semibold"
+                                                                        >
+                                                                            <Database className="w-3.5 h-3.5 text-muted-foreground" />
+                                                                            Xem phân mảnh (Chunks)
+                                                                        </DropdownMenuItem>
+                                                                        <DropdownMenuItem 
+                                                                            onClick={() => handleStartMRP(doc)}
+                                                                            disabled={isCompiling}
+                                                                            className="rounded-md text-xs gap-1.5 cursor-pointer text-emerald-600 dark:text-emerald-400 focus:text-emerald-600 dark:focus:text-emerald-450 font-semibold"
+                                                                        >
+                                                                            <Cpu className="w-3.5 h-3.5" />
+                                                                            Khởi chạy biên soạn MRP
+                                                                        </DropdownMenuItem>
+                                                                    </>
+                                                                )}
+                                                                {doc.status === 'PENDING' && (
+                                                                    <DropdownMenuItem onClick={() => handleApprove(doc.id)} className="rounded-md text-xs gap-1.5 cursor-pointer">
+                                                                        <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
+                                                                        Duyệt tài liệu
                                                                     </DropdownMenuItem>
-                                                                </>
-                                                            )}
-                                                            {doc.status === 'PENDING' && (
-                                                                <DropdownMenuItem onClick={() => handleApprove(doc.id)} className="rounded-md text-xs gap-1.5 cursor-pointer">
-                                                                    <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
-                                                                    Duyệt tài liệu
+                                                                )}
+                                                                <DropdownMenuItem 
+                                                                    onClick={() => {
+                                                                        setMetadataDoc(doc);
+                                                                        setMetadataOpen(true);
+                                                                    }}
+                                                                    className="rounded-md text-xs gap-1.5 cursor-pointer text-blue-650 dark:text-blue-400 focus:text-blue-600 dark:focus:text-blue-450 font-semibold"
+                                                                >
+                                                                    <Lock className="w-3.5 h-3.5" />
+                                                                    Phân quyền tài liệu
                                                                 </DropdownMenuItem>
-                                                            )}
-                                                            <DropdownMenuItem 
-                                                                onClick={() => {
-                                                                    setMetadataDoc(doc);
-                                                                    setMetadataOpen(true);
-                                                                }}
-                                                                className="rounded-md text-xs gap-1.5 cursor-pointer text-blue-650 dark:text-blue-400 focus:text-blue-600 dark:focus:text-blue-450 font-semibold"
-                                                            >
-                                                                <Lock className="w-3.5 h-3.5" />
-                                                                Phân quyền tài liệu
-                                                            </DropdownMenuItem>
-                                                            <DropdownMenuItem className="rounded-md text-xs gap-1.5 cursor-pointer">
-                                                                <Download className="w-3.5 h-3.5" />
-                                                                Tải về
-                                                            </DropdownMenuItem>
-                                                            <DropdownMenuItem
-                                                                onClick={() => handleDelete(doc.id)}
-                                                                className="text-rose-600 dark:text-rose-455 rounded-md text-xs gap-1.5 cursor-pointer focus:bg-rose-50 dark:focus:bg-rose-950/20 focus:text-rose-600"
-                                                            >
-                                                                <Trash2 className="w-3.5 h-3.5" />
-                                                                Xóa
-                                                            </DropdownMenuItem>
-                                                        </DropdownMenuContent>
-                                                    </DropdownMenu>
-                                                </div>
-                                            </TableCell>
-                                        </TableRow>
-                                    );
+                                                                <DropdownMenuItem className="rounded-md text-xs gap-1.5 cursor-pointer">
+                                                                    <Download className="w-3.5 h-3.5" />
+                                                                    Tải về
+                                                                </DropdownMenuItem>
+                                                                <DropdownMenuItem
+                                                                    onClick={() => handleDelete(doc.id)}
+                                                                    className="text-rose-600 dark:text-rose-455 rounded-md text-xs gap-1.5 cursor-pointer focus:bg-rose-50 dark:focus:bg-rose-950/20 focus:text-rose-600"
+                                                                >
+                                                                    <Trash2 className="w-3.5 h-3.5" />
+                                                                    Xóa
+                                                                </DropdownMenuItem>
+                                                            </DropdownMenuContent>
+                                                        </DropdownMenu>
+                                                    </div>
+                                                </TableCell>
+                                            </TableRow>
+                                        );
+                                    } else {
+                                        // Folder / Workspace / Department row
+                                        const isExpanded = expandedNodes.has(node.id);
+                                        const hasChildren = node.children && node.children.length > 0;
+                                        
+                                        const renderFolderIcon = () => {
+                                            switch (node.type) {
+                                                case 'workspace':
+                                                    return <Database className="w-3.5 h-3.5 text-emerald-500 shrink-0" />;
+                                                case 'department':
+                                                    return <Building2 className="w-3.5 h-3.5 text-blue-500 shrink-0" />;
+                                                case 'folder':
+                                                    return isExpanded 
+                                                        ? <FolderOpen className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                                                        : <Folder className="w-3.5 h-3.5 text-amber-500 shrink-0" />;
+                                                default:
+                                                    return null;
+                                            }
+                                        };
+
+                                        return (
+                                            <TableRow 
+                                                key={node.id} 
+                                                className="hover:bg-muted/20 dark:hover:bg-slate-800/5 transition-colors border-border font-medium bg-muted/30 dark:bg-slate-900/5 select-none"
+                                            >
+                                                <TableCell className="pl-4 py-2" colSpan={7}>
+                                                    <div 
+                                                        className="flex items-center gap-2 cursor-pointer w-full"
+                                                        style={{ paddingLeft: `${depth * 16}px` }}
+                                                        onClick={() => toggleNode(node.id)}
+                                                    >
+                                                        {hasChildren ? (
+                                                            <span className="p-0.5 text-muted-foreground shrink-0">
+                                                                {isExpanded ? (
+                                                                    <ChevronDown className="w-3.5 h-3.5" />
+                                                                ) : (
+                                                                    <ChevronRight className="w-3.5 h-3.5" />
+                                                                )}
+                                                            </span>
+                                                        ) : (
+                                                            <span className="w-4.5 shrink-0" />
+                                                        )}
+                                                        {renderFolderIcon()}
+                                                        <span className={cn(
+                                                            "text-xs truncate max-w-[400px]",
+                                                            node.type === 'workspace' 
+                                                                ? 'font-mono font-extrabold uppercase text-foreground/80 tracking-wide' 
+                                                                : node.type === 'department'
+                                                                ? 'font-mono font-bold text-foreground/75'
+                                                                : 'text-foreground/85 font-semibold'
+                                                        )} title={node.name}>
+                                                            {node.name}
+                                                        </span>
+                                                        {node.children && (
+                                                            <span className="text-[10px] text-muted-foreground font-normal ml-1.5 shrink-0">
+                                                                ({node.children.length})
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </TableCell>
+                                            </TableRow>
+                                        );
+                                    }
                                 })
                             )}
                         </TableBody>

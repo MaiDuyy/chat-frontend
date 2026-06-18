@@ -68,9 +68,9 @@ export const mrpApi = apiSlice.injectEndpoints({
   overrideExisting: true,
   endpoints: (builder) => ({
     // Khởi tạo quy trình compile MRP
-    compileDocument: builder.mutation<SourceCompilationPlan, { documentId: number; workspaceId: string; autoApprove?: boolean }>({
+    compileDocument: builder.mutation<SourceCompilationPlan, { documentId: number; workspaceId?: string | null; autoApprove?: boolean }>({
       query: ({ documentId, workspaceId, autoApprove = false }) => ({
-        url: `/mrp/compile?documentId=${documentId}&workspaceId=${workspaceId}&autoApprove=${autoApprove}`,
+        url: `/mrp/compile?documentId=${documentId}${workspaceId ? `&workspaceId=${workspaceId}` : ''}&autoApprove=${autoApprove}`,
         method: 'POST',
       }),
       invalidatesTags: ['Documents', 'Tasks'],

@@ -1,4 +1,5 @@
 'use client';
+/* eslint-disable react-hooks/set-state-in-effect */
 
 import React, { useState, useEffect, useMemo } from 'react';
 import {
@@ -10,7 +11,6 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
 import {
     Select,
     SelectContent,
@@ -30,10 +30,17 @@ import {
     Save,
     X,
     ShieldCheck,
-    Database
+    Database,
+    FolderOpen
 } from 'lucide-react';
 import { useGetUserWorkspacesQuery } from '@/src/redux/feature/workspaceApi';
 import { toast } from 'sonner';
+
+interface WorkspaceType {
+    id: string;
+    name: string;
+    departmentId?: string;
+}
 
 interface DocumentMetadataModalProps {
     isOpen: boolean;
@@ -43,7 +50,9 @@ interface DocumentMetadataModalProps {
         securityClassification: 'PUBLIC' | 'INTERNAL' | 'CONFIDENTIAL' | 'RESTRICTED';
         departmentId: string;
         allowedRoles: string;
-        uploadScope: 'DEPARTMENT' | 'WORKSPACE';
+        uploadScope: 'DEPARTMENT' | 'WORKSPACE' | 'GLOBAL';
+        workspaceId?: string;
+        folderPath?: string;
     }) => void; // Used for upload context config
 }
 
@@ -62,43 +71,45 @@ export function DocumentMetadataModal({
     const globalRoles = useSelector((state: RootState) => state.auth.roles) || [];
     const userId = user?.id || '';
     const { data: userDepts = [] } = useGetUserDepartmentsQuery(userId, { skip: !userId });
-
     const isGlobalAdmin = globalRoles.some(r => r.includes('ADMIN') || r.includes('SUPER_ADMIN'));
     const isLeader = isGlobalAdmin || userDepts.some(d => d.userRole === 'HEAD' || d.userRole === 'MANAGER');
 
     const [securityClassification, setSecurityClassification] = useState<'PUBLIC' | 'INTERNAL' | 'CONFIDENTIAL' | 'RESTRICTED'>('INTERNAL');
     const [departmentId, setDepartmentId] = useState<string>('none');
     const [allowedRoles, setAllowedRoles] = useState<string>('ALL');
-    const [uploadScope, setUploadScope] = useState<'WORKSPACE' | 'DEPARTMENT'>('WORKSPACE');
+    const [uploadScope, setUploadScope] = useState<'WORKSPACE' | 'DEPARTMENT' | 'GLOBAL'>('WORKSPACE');
     const [workspaceId, setWorkspaceId] = useState<string>('none');
+    const [folderPath, setFolderPath] = useState<string>('');
 
     const filteredWorkspaces = useMemo(() => {
         if (departmentId === 'none') {
-            return workspaces;
+            return workspaces as WorkspaceType[];
         }
-        return workspaces.filter((ws: any) => ws.departmentId === departmentId);
+        return (workspaces as WorkspaceType[]).filter((ws: WorkspaceType) => ws.departmentId === departmentId);
     }, [workspaces, departmentId]);
 
-    // Initialize state from document if in edit mode
     useEffect(() => {
         if (editingDoc) {
             setSecurityClassification(editingDoc.securityClassification || 'INTERNAL');
             setDepartmentId(editingDoc.departmentId || 'none');
             setAllowedRoles(editingDoc.allowedRoles || 'ALL');
+            setFolderPath(editingDoc.folderPath || '');
+            setWorkspaceId(editingDoc.workspaceId || 'none');
         } else {
             // Defaults for new uploads
             setSecurityClassification('INTERNAL');
-            setDepartmentId('none');
             setAllowedRoles('ALL');
-            setUploadScope('WORKSPACE');
+            setUploadScope(isGlobalAdmin ? 'GLOBAL' : 'WORKSPACE');
+            setFolderPath('');
             setWorkspaceId('none');
+            setDepartmentId('none');
         }
-    }, [editingDoc, isOpen]);
+    }, [editingDoc, isOpen, isGlobalAdmin]);
 
     // Auto-reset workspace if it doesn't belong to the selected department
     useEffect(() => {
         if (departmentId !== 'none' && workspaceId !== 'none') {
-            const isValid = filteredWorkspaces.some((ws: any) => ws.id === workspaceId);
+            const isValid = filteredWorkspaces.some((ws: WorkspaceType) => ws.id === workspaceId);
             if (!isValid) {
                 setWorkspaceId('none');
             }
@@ -113,27 +124,36 @@ export function DocumentMetadataModal({
             return;
         }
 
+        if (!isEditMode && uploadScope === 'WORKSPACE' && (workspaceId === 'none' || workspaceId === '')) {
+            toast.error('Vui lòng chọn một workspace đính kèm cụ thể.');
+            return;
+        }
+
         if (isEditMode && editingDoc) {
             try {
                 await updateMetadata({
                     id: editingDoc.id,
                     securityClassification,
                     departmentId: payloadDeptId,
-                    allowedRoles
+                    allowedRoles,
+                    folderPath: folderPath.trim(),
+                    workspaceId: workspaceId === 'none' ? '' : workspaceId
                 }).unwrap();
                 toast.success('Cập nhật phân quyền tài liệu thành công!');
                 onClose();
-            } catch (err: any) {
+            } catch (err: unknown) {
                 console.error('Failed to update metadata:', err);
-                toast.error(err.data?.message || 'Có lỗi xảy ra khi cập nhật phân quyền');
+                const error = err as { data?: { message?: string } };
+                toast.error(error.data?.message || 'Có lỗi xảy ra khi cập nhật phân quyền');
             }
         } else if (onConfirm) {
             onConfirm({
                 securityClassification,
-                departmentId: payloadDeptId,
+                departmentId: uploadScope === 'GLOBAL' ? '' : payloadDeptId,
                 allowedRoles,
                 uploadScope,
-                workspaceId: workspaceId === 'none' ? '' : workspaceId
+                workspaceId: uploadScope === 'GLOBAL' ? 'default-workspace' : (uploadScope === 'DEPARTMENT' ? '' : (workspaceId === 'none' ? '' : workspaceId)),
+                folderPath: folderPath.trim()
             });
             onClose();
         }
@@ -176,7 +196,7 @@ export function DocumentMetadataModal({
                         </Label>
                         <Select
                             value={securityClassification}
-                            onValueChange={(val: any) => setSecurityClassification(val)}
+                            onValueChange={setSecurityClassification}
                         >
                             <SelectTrigger className="w-full h-9 bg-slate-900 border-border text-xs text-white">
                                 <SelectValue placeholder="Chọn mức bảo mật" />
@@ -209,10 +229,20 @@ export function DocumentMetadataModal({
                             </Label>
                             <Select
                                 value={uploadScope}
-                                onValueChange={(val: 'WORKSPACE' | 'DEPARTMENT') => {
+                                onValueChange={(val: 'WORKSPACE' | 'DEPARTMENT' | 'GLOBAL') => {
                                     setUploadScope(val);
-                                    if (val === 'DEPARTMENT' && departmentId === 'none' && departments.length > 0) {
-                                        setDepartmentId(departments[0].id);
+                                    if (val === 'GLOBAL') {
+                                        setDepartmentId('none');
+                                        setWorkspaceId('none');
+                                    } else if (val === 'DEPARTMENT') {
+                                        if (departmentId === 'none' && departments.length > 0) {
+                                            setDepartmentId(departments[0].id);
+                                        }
+                                        setWorkspaceId('none');
+                                    } else if (val === 'WORKSPACE') {
+                                        if (departmentId === 'none' && departments.length > 0) {
+                                            setDepartmentId(departments[0].id);
+                                        }
                                     }
                                 }}
                             >
@@ -220,6 +250,11 @@ export function DocumentMetadataModal({
                                     <SelectValue placeholder="Chọn phạm vi tải lên" />
                                 </SelectTrigger>
                                 <SelectContent className="bg-slate-900 border-border text-white text-xs">
+                                    {isGlobalAdmin && (
+                                        <SelectItem value="GLOBAL" className="cursor-pointer text-xs focus:bg-slate-800">
+                                            Toàn hệ thống (Global - default-workspace)
+                                        </SelectItem>
+                                    )}
                                     <SelectItem value="WORKSPACE" className="cursor-pointer text-xs focus:bg-slate-800">
                                         Workspace cụ thể (Lưu trong workspace hiện tại)
                                     </SelectItem>
@@ -252,13 +287,13 @@ export function DocumentMetadataModal({
                             <Select
                                 value={departmentId}
                                 onValueChange={(val) => setDepartmentId(val)}
-                                disabled={!isLeader}
+                                disabled={!isLeader || uploadScope === 'GLOBAL'}
                             >
                                 <SelectTrigger className="w-full h-9 bg-slate-900 border-border text-xs text-white">
                                     <SelectValue placeholder="Chọn phòng ban sở hữu" />
                                 </SelectTrigger>
                                 <SelectContent className="bg-slate-900 border-border text-white text-xs max-h-[200px]">
-                                    {uploadScope === 'WORKSPACE' && (
+                                    {(uploadScope === 'WORKSPACE' || uploadScope === 'GLOBAL') && (
                                         <SelectItem value="none" className="cursor-pointer text-xs focus:bg-slate-800 font-medium text-emerald-400">
                                             Công ty (Không phân phòng ban - Dùng chung)
                                         </SelectItem>
@@ -276,8 +311,8 @@ export function DocumentMetadataModal({
                         </p>
                     </div>
 
-                    {/* Workspace Selector — Only for upload mode & when department owner or department scope is active */}
-                    {!isEditMode && (uploadScope === 'DEPARTMENT' || departmentId !== 'none') && (
+                    {/* Workspace Selector — Expose in edit mode, or in upload mode if workspace scope is active */}
+                    {(isEditMode || uploadScope === 'WORKSPACE') && (
                         <div className="space-y-2">
                             <Label className="text-xs font-bold text-white flex items-center gap-1.5">
                                 <Database className="w-3.5 h-3.5 text-muted-foreground" /> Không gian lưu trữ đính kèm (Workspace Target)
@@ -290,14 +325,22 @@ export function DocumentMetadataModal({
                             ) : (
                                 <Select
                                     value={workspaceId}
-                                    onValueChange={(val) => setWorkspaceId(val)}
+                                    onValueChange={(val) => {
+                                        setWorkspaceId(val);
+                                        if (val !== 'none') {
+                                            const selectedWs = (workspaces as WorkspaceType[]).find((w: WorkspaceType) => w.id === val);
+                                            if (selectedWs && selectedWs.departmentId) {
+                                                setDepartmentId(selectedWs.departmentId);
+                                            }
+                                        }
+                                    }}
                                 >
                                     <SelectTrigger className="w-full h-9 bg-slate-900 border-border text-xs text-white">
                                         <SelectValue placeholder="Chọn workspace đính kèm" />
                                     </SelectTrigger>
                                     <SelectContent className="bg-slate-900 border-border text-white text-xs max-h-[200px]">
                                         <SelectItem value="none" className="cursor-pointer text-xs focus:bg-slate-800 font-medium text-emerald-400">
-                                            Không đính kèm (Lưu chung cho phòng ban)
+                                            Chọn workspace đính kèm...
                                         </SelectItem>
                                         {filteredWorkspaces.map((ws) => (
                                             <SelectItem key={ws.id} value={ws.id} className="cursor-pointer text-xs focus:bg-slate-800">
@@ -343,6 +386,23 @@ export function DocumentMetadataModal({
                                 * Quyền chức vụ chỉ áp dụng khi tài liệu thuộc về một phòng ban cụ thể.
                             </p>
                         )}
+                    </div>
+
+                    {/* 4. Folder Path */}
+                    <div className="space-y-2">
+                        <Label className="text-xs font-bold text-white flex items-center gap-1.5 font-sans">
+                            <FolderOpen className="w-3.5 h-3.5 text-muted-foreground" /> Đường dẫn thư mục (Folder Path)
+                        </Label>
+                        <input
+                            type="text"
+                            value={folderPath}
+                            onChange={(e) => setFolderPath(e.target.value)}
+                            placeholder="e.g. /specs/api"
+                            className="w-full h-9 px-3 bg-slate-900 border border-border text-xs rounded-md text-white placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary font-sans"
+                        />
+                        <p className="text-[10px] text-muted-foreground font-sans">
+                            Đường dẫn thư mục ảo (ví dụ: /specs/api). Hãy bắt đầu bằng dấu gạch chéo.
+                        </p>
                     </div>
                 </div>
 

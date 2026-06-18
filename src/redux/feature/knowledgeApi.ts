@@ -27,6 +27,7 @@ export interface Document {
   allowedRoles?: string;
   parserMethod?: string;
   tags?: string[];
+  folderPath?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -146,7 +147,7 @@ export const knowledgeApi = apiSlice.injectEndpoints({
     getRawDocument: builder.query<Blob, string>({
       query: (id) => ({
         url: `/documents/${id}/raw`,
-        responseHandler: (response) => response.blob(),
+        responseHandler: (response: Response) => response.blob(),
       }),
     }),
 
@@ -160,6 +161,7 @@ export const knowledgeApi = apiSlice.injectEndpoints({
         departmentId?: string;
         allowedRoles?: string;
         securityClassification?: string;
+        folderPath?: string;
       }
     >({
       query: (arg) => {
@@ -170,6 +172,7 @@ export const knowledgeApi = apiSlice.injectEndpoints({
         const departmentId = arg instanceof FormData ? undefined : arg.departmentId;
         const allowedRoles = arg instanceof FormData ? undefined : arg.allowedRoles;
         const securityClassification = arg instanceof FormData ? undefined : arg.securityClassification;
+        const folderPath = arg instanceof FormData ? undefined : arg.folderPath;
 
         let url = `/documents/upload?preview=${preview}&parser=${parser}`;
         if (workspaceId) {
@@ -183,6 +186,9 @@ export const knowledgeApi = apiSlice.injectEndpoints({
         }
         if (securityClassification) {
           url += `&securityClassification=${encodeURIComponent(securityClassification)}`;
+        }
+        if (folderPath) {
+          url += `&folderPath=${encodeURIComponent(folderPath)}`;
         }
 
         return {
@@ -223,7 +229,7 @@ export const knowledgeApi = apiSlice.injectEndpoints({
       }),
     }),
 
-    updateDocumentMetadata: builder.mutation<Document, { id: string | number; securityClassification?: string; tags?: string[]; departmentId?: string; allowedRoles?: string }>({
+    updateDocumentMetadata: builder.mutation<Document, { id: string | number; securityClassification?: string; tags?: string[]; departmentId?: string; allowedRoles?: string; folderPath?: string; workspaceId?: string }>({
       query: ({ id, ...body }) => ({
         url: `/documents/${id}/metadata`,
         method: 'PATCH',

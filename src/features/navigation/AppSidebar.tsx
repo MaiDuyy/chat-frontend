@@ -9,6 +9,7 @@ import {
     MessageSquare,
     Sparkles,
     BookOpen,
+    FolderOpen,
     Shield,
     Settings,
     ChevronLeft,
@@ -45,6 +46,12 @@ const navItems: NavItem[] = [
         group: PERMISSION_GROUPS.AI,
     },
     {
+        label: 'Tài liệu',
+        href: '/documents',
+        icon: FolderOpen,
+        group: PERMISSION_GROUPS.KNOWLEDGE,
+    },
+    {
         label: 'Knowledge',
         href: '/knowledge',
         icon: BookOpen,
@@ -54,13 +61,13 @@ const navItems: NavItem[] = [
         label: 'Security',
         href: '/security',
         icon: Shield,
-        group: PERMISSION_GROUPS.SECURITY,
+        group: PERMISSION_GROUPS.AUDIT,
     },
     {
         label: 'Admin',
         href: '/admin',
         icon: Settings,
-        group: PERMISSION_GROUPS.ADMIN,
+        group: PERMISSION_GROUPS.ROLE,
     },
 ];
 
