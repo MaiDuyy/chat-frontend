@@ -4,10 +4,10 @@ import React from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useSelector } from "react-redux";
+import { RootState } from "@/src/redux/store";
 import {
   useGetWikiPagesMetadataQuery,
   useGetWikiGraphQuery,
-  WikiPage,
 } from "@/src/redux/feature/mrpApi";
 import {
   useGetAdminWikiMetadataQuery,
@@ -18,19 +18,13 @@ import { WikiGraph } from "../components/WikiGraph";
 import {
   wikiTypeColor,
   wikiTypeGroupLabel,
-  WikiTypeBadge,
 } from "../components/WikiTypeBadge";
-import { WikiContent } from "../components/WikiContent";
-import { getPageType } from "../components/WikilinkAutocomplete";
 import {
   ArrowLeft,
   X,
-  ExternalLink,
   Search,
   Network,
   SlidersHorizontal,
-  Eye,
-  EyeOff,
   Maximize2,
   RotateCcw,
 } from "lucide-react";
@@ -43,8 +37,9 @@ type GraphEdge = { from: string; to: string };
 type GraphData = { nodes: GraphNode[]; edges: GraphEdge[] };
 
 export default function WikiGraphPage() {
+  const router = useRouter();
   const searchParams = useSearchParams();
-  const currentWorkspaceId = useSelector((state: any) => state.workspace.currentWorkspaceId);
+  const currentWorkspaceId = useSelector((state: RootState) => state.workspace.currentWorkspaceId);
   const workspaceId = searchParams.get("workspaceId") || currentWorkspaceId || "default-workspace";
 
   const isSuperAdmin = useHasRole("SUPER_ADMIN");
@@ -53,7 +48,6 @@ export default function WikiGraphPage() {
 
   const showAdminWiki = isSystemAdmin && workspaceId === "all";
 
-  // RTK Query calls
   const { data: userWikiMetadata, isLoading: isMetadataLoadingUser } = useGetWikiPagesMetadataQuery(
     { workspaceId },
     { skip: showAdminWiki }
@@ -72,23 +66,19 @@ export default function WikiGraphPage() {
     { skip: !showAdminWiki }
   );
 
-  const allPages = (showAdminWiki ? adminWikiMetadata : userWikiMetadata) || [];
   const graphDataFromBackend = showAdminWiki ? adminGraphData : userGraphData;
   const isLoading = showAdminWiki
     ? (isMetadataLoadingAdmin || isGraphLoadingAdmin)
     : (isMetadataLoadingUser || isGraphLoadingUser);
-
 
   const [activeTypes, setActiveTypes] = React.useState<Set<PageType>>(
     new Set(PAGE_TYPES)
   );
   const [searchQuery, setSearchQuery] = React.useState("");
   const [highlightSlug, setHighlightSlug] = React.useState<string | null>(null);
-  const [previewSlug, setPreviewSlug] = React.useState<string | null>(null);
   const [showFilters, setShowFilters] = React.useState(false);
   const [isFullscreen, setIsFullscreen] = React.useState(false);
 
-  // Build graph data
   const graphData: GraphData = React.useMemo(() => {
     if (!graphDataFromBackend) return { nodes: [], edges: [] };
     return {
@@ -121,15 +111,14 @@ export default function WikiGraphPage() {
     );
   }, [searchQuery, graphData]);
 
-  const previewPage = React.useMemo(
-    () => (previewSlug ? allPages.find((p) => p.slug === previewSlug) ?? null : null),
-    [previewSlug, allPages]
-  );
-
   const toggleType = (type: PageType) =>
     setActiveTypes((prev) => {
       const next = new Set(prev);
-      next.has(type) ? next.delete(type) : next.add(type);
+      if (next.has(type)) {
+        next.delete(type);
+      } else {
+        next.add(type);
+      }
       return next;
     });
 
@@ -145,12 +134,9 @@ export default function WikiGraphPage() {
 
   return (
     <div
-      className={`relative flex flex-col bg-background ${
-        isFullscreen
-          ? "fixed inset-0 z-50"
-          : "-mx-6 -my-4 md:-mx-8 lg:-mx-10"
+      className={`flex flex-col bg-background w-full h-full overflow-hidden ${
+        isFullscreen ? "fixed inset-0 z-50" : ""
       }`}
-      style={isFullscreen ? undefined : { height: "100vh" }}
     >
       {/* ── Toolbar ──────────────────────────────────────────── */}
       <div className="flex items-center justify-between px-4 py-2.5 border-b border-border bg-card/90 backdrop-blur-sm shrink-0 gap-3">
@@ -211,7 +197,6 @@ export default function WikiGraphPage() {
 
         {/* Right: controls */}
         <div className="flex items-center gap-1.5 shrink-0">
-          {/* Filter toggle */}
           <button
             onClick={() => setShowFilters(!showFilters)}
             className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium border transition-colors cursor-pointer ${
@@ -227,7 +212,6 @@ export default function WikiGraphPage() {
             )}
           </button>
 
-          {/* Reset */}
           {activeTypes.size < PAGE_TYPES.length && (
             <button
               onClick={resetFilters}
@@ -238,7 +222,6 @@ export default function WikiGraphPage() {
             </button>
           )}
 
-          {/* Fullscreen */}
           <button
             onClick={() => setIsFullscreen(!isFullscreen)}
             className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors border border-border cursor-pointer"
@@ -328,201 +311,81 @@ export default function WikiGraphPage() {
       )}
 
       {/* ── Main Area ────────────────────────────────────────── */}
-      <div className="flex-1 min-h-0 flex relative">
-        {/* Graph canvas */}
-        <div className="flex-1 min-h-0 relative">
-          {isLoading ? (
-            <div className="w-full h-full flex flex-col items-center justify-center gap-4 bg-background">
-              <div className="relative">
-                <div className="w-12 h-12 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-                <Network className="absolute inset-0 m-auto w-5 h-5 text-primary" />
-              </div>
-              <p className="text-sm text-muted-foreground font-medium">
-                Đang xây dựng đồ thị tri thức...
+      <div className="flex-1 min-h-0 relative">
+        {isLoading ? (
+          <div className="w-full h-full flex flex-col items-center justify-center gap-4 bg-background">
+            <div className="relative">
+              <div className="w-12 h-12 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+              <Network className="absolute inset-0 m-auto w-5 h-5 text-primary" />
+            </div>
+            <p className="text-sm text-muted-foreground font-medium">
+              Đang xây dựng đồ thị tri thức...
+            </p>
+          </div>
+        ) : !filteredData || filteredData.nodes.length === 0 ? (
+          <div className="w-full h-full flex flex-col items-center justify-center gap-4 bg-background">
+            <div className="w-16 h-16 rounded-xl bg-muted/50 flex items-center justify-center">
+              <Network className="w-8 h-8 text-muted-foreground/40" />
+            </div>
+            <div className="text-center">
+              <p className="text-sm font-semibold text-foreground mb-1">
+                Chưa có dữ liệu
+              </p>
+              <p className="text-xs text-muted-foreground max-w-xs">
+                Upload và biên soạn tài liệu để bắt đầu xây dựng đồ thị tri
+                thức liên kết.
               </p>
             </div>
-          ) : !filteredData || filteredData.nodes.length === 0 ? (
-            <div className="w-full h-full flex flex-col items-center justify-center gap-4 bg-background">
-              <div className="w-16 h-16 rounded-xl bg-muted/50 flex items-center justify-center">
-                <Network className="w-8 h-8 text-muted-foreground/40" />
-              </div>
-              <div className="text-center">
-                <p className="text-sm font-semibold text-foreground mb-1">
-                  Chưa có dữ liệu
-                </p>
-                <p className="text-xs text-muted-foreground max-w-xs">
-                  Upload và biên soạn tài liệu để bắt đầu xây dựng đồ thị tri
-                  thức liên kết.
-                </p>
-              </div>
-              {activeTypes.size < PAGE_TYPES.length && (
-                <button
-                  onClick={resetFilters}
-                  className="text-xs font-medium text-primary hover:underline cursor-pointer"
-                >
-                  Hiển thị tất cả loại trang
-                </button>
-              )}
-            </div>
-          ) : (
-            <WikiGraph
-              nodes={filteredData.nodes}
-              edges={filteredData.edges}
-              centerSlug={highlightSlug ?? undefined}
-              height={undefined}
-              onNodeClick={(slug) => {
-                setPreviewSlug(previewSlug === slug ? null : slug);
-              }}
-            />
-          )}
-
-          {/* Legend overlay */}
-          {filteredData && filteredData.nodes.length > 0 && (
-            <div className="absolute bottom-4 left-4 bg-card/90 backdrop-blur-sm border border-border rounded-lg px-3 py-2 shadow-lg">
-              <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground mb-2">
-                Chú thích
-              </p>
-              <div className="flex flex-col gap-1.5">
-                {PAGE_TYPES.filter((t) => activeTypes.has(t)).map((type) => (
-                  <div key={type} className="flex items-center gap-1.5">
-                    <span
-                      className="w-2.5 h-2.5 rounded-full shrink-0"
-                      style={{ background: wikiTypeColor(type) }}
-                    />
-                    <span className="text-[10px] text-muted-foreground">
-                      {wikiTypeGroupLabel(type)}
-                    </span>
-                    <span className="text-[9px] text-muted-foreground/60 tabular-nums ml-auto">
-                      {typeStats[type] ?? 0}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Hint when no selection */}
-          {filteredData && filteredData.nodes.length > 0 && !previewSlug && (
-            <div className="absolute bottom-4 right-4 bg-card/90 backdrop-blur-sm border border-border rounded-md px-3 py-2 shadow text-[10px] text-muted-foreground">
-              Click vào node để xem chi tiết
-            </div>
-          )}
-        </div>
-
-        {/* Preview panel */}
-        {previewSlug && (
-          <div className="w-[360px] shrink-0 border-l border-border flex flex-col bg-card">
-            {/* Panel header */}
-            <div className="px-4 py-3 border-b border-border bg-card flex items-start gap-3">
-              <div className="flex-1 min-w-0">
-                <h3 className="text-sm font-bold text-foreground leading-tight line-clamp-2">
-                  {previewPage?.title ?? previewSlug}
-                </h3>
-                {previewPage && (
-                  <div className="flex items-center gap-2 mt-1.5">
-                    <WikiTypeBadge type={getPageType(previewPage)} />
-                    <span className="text-[9px] font-mono text-muted-foreground truncate">
-                      /{previewPage.slug}
-                    </span>
-                  </div>
-                )}
-              </div>
-              <div className="flex items-center gap-1 shrink-0">
-                {previewSlug && (
-                  <Link
-                    href={`/wiki/${previewSlug}`}
-                    className="inline-flex items-center gap-1 px-2 py-1 text-[10px] font-medium border border-border rounded-md hover:bg-accent transition-colors"
-                  >
-                    <ExternalLink className="w-3 h-3" />
-                    Mở
-                  </Link>
-                )}
-                <button
-                  onClick={() => setPreviewSlug(null)}
-                  className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-accent rounded-md transition-colors cursor-pointer"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-
-            {/* Metadata strip */}
-            {previewPage && (
-              <div className="px-4 py-2 border-b border-border bg-muted/20 flex items-center gap-4 text-[10px] text-muted-foreground">
-                {previewPage.version !== undefined && (
-                  <span>v{previewPage.version}</span>
-                )}
-                {previewPage.updatedAt && (
-                  <span>
-                    Cập nhật{" "}
-                    {new Date(previewPage.updatedAt).toLocaleDateString("vi-VN")}
-                  </span>
-                )}
-                {previewPage.tags && (
-                  <span className="truncate max-w-[120px]">
-                    #{previewPage.tags}
-                  </span>
-                )}
-              </div>
+            {activeTypes.size < PAGE_TYPES.length && (
+              <button
+                onClick={resetFilters}
+                className="text-xs font-medium text-primary hover:underline cursor-pointer"
+              >
+                Hiển thị tất cả loại trang
+              </button>
             )}
+          </div>
+        ) : (
+          <WikiGraph
+            nodes={filteredData.nodes}
+            edges={filteredData.edges}
+            centerSlug={highlightSlug ?? undefined}
+            height={undefined}
+            onNodeClick={(slug) => {
+              router.push(`/wiki/${slug}`);
+            }}
+          />
+        )}
 
-            {/* Content */}
-            <div className="flex-1 overflow-y-auto p-4 bg-background">
-              {previewPage ? (
-                <>
-                  {previewPage.summary && (
-                    <p className="text-xs text-muted-foreground mb-4 leading-relaxed italic border-l-2 border-primary/40 pl-3">
-                      {previewPage.summary}
-                    </p>
-                  )}
-                  <WikiContent
-                    markdown={previewPage.content}
-                    allPages={allPages}
+        {/* Legend overlay */}
+        {filteredData && filteredData.nodes.length > 0 && (
+          <div className="absolute bottom-4 left-4 bg-card/90 backdrop-blur-sm border border-border rounded-lg px-3 py-2 shadow-lg">
+            <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground mb-2">
+              Chú thích
+            </p>
+            <div className="flex flex-col gap-1.5">
+              {PAGE_TYPES.filter((t) => activeTypes.has(t)).map((type) => (
+                <div key={type} className="flex items-center gap-1.5">
+                  <span
+                    className="w-2.5 h-2.5 rounded-full shrink-0"
+                    style={{ background: wikiTypeColor(type) }}
                   />
-                </>
-              ) : (
-                <p className="text-sm text-muted-foreground text-center py-12">
-                  Không tìm thấy nội dung.
-                </p>
-              )}
-            </div>
-
-            {/* Related nodes */}
-            {filteredData && (() => {
-              const related = filteredData.edges
-                .filter((e) => e.from === previewSlug || e.to === previewSlug)
-                .map((e) => (e.from === previewSlug ? e.to : e.from))
-                .slice(0, 5);
-              if (!related.length) return null;
-              return (
-                <div className="border-t border-border px-4 py-3 bg-muted/20 shrink-0">
-                  <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground mb-2">
-                    Liên kết ({related.length})
-                  </p>
-                  <div className="flex flex-col gap-1">
-                    {related.map((slug) => {
-                      const node = filteredData.nodes.find((n) => n.slug === slug);
-                      if (!node) return null;
-                      return (
-                        <button
-                          key={slug}
-                          onClick={() => setPreviewSlug(slug)}
-                          className="flex items-center gap-2 text-left px-2 py-1.5 rounded-md hover:bg-accent transition-colors cursor-pointer group"
-                        >
-                          <span
-                            className="w-2 h-2 rounded-full shrink-0"
-                            style={{ background: wikiTypeColor(node.page_type) }}
-                          />
-                          <span className="text-[11px] font-medium text-foreground truncate group-hover:text-primary transition-colors">
-                            {node.title}
-                          </span>
-                        </button>
-                      );
-                    })}
-                  </div>
+                  <span className="text-[10px] text-muted-foreground">
+                    {wikiTypeGroupLabel(type)}
+                  </span>
+                  <span className="text-[9px] text-muted-foreground/60 tabular-nums ml-auto">
+                    {typeStats[type] ?? 0}
+                  </span>
                 </div>
-              );
-            })()}
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Hint */}
+        {filteredData && filteredData.nodes.length > 0 && (
+          <div className="absolute bottom-4 right-4 bg-card/90 backdrop-blur-sm border border-border rounded-md px-3 py-2 shadow text-[10px] text-muted-foreground">
+            Click vào node để mở trang wiki
           </div>
         )}
       </div>

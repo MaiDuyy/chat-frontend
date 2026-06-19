@@ -89,7 +89,10 @@ export default function WikiPageDetail() {
 
   // Metadata for backlinks & mini-graph:
   // Admins use global metadata so backlinks from ALL workspaces are resolved correctly.
-  const metadataWorkspaceId = page?.workspaceId || workspaceId;
+  // Non-admins use the page's own workspace scope. Fallback to active workspaceId for global pages.
+  const metadataWorkspaceId = (page?.workspaceId && page.workspaceId !== 'default-workspace' && page.workspaceId !== 'GLOBAL')
+    ? page.workspaceId
+    : workspaceId;
   const { data: adminAllPages } = useGetAdminWikiMetadataQuery(undefined, { skip: !isAdminGlobalView });
   const { data: scopedAllPages } = useGetWikiPagesMetadataQuery(
     { workspaceId: metadataWorkspaceId },
