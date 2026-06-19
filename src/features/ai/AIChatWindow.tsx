@@ -3,16 +3,16 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/src/redux/store';
-import { useGetConversationMessagesQuery, useChatWithRagMutation } from '@/src/redux/feature/aiApi';
+import { useGetConversationMessagesQuery } from '@/src/redux/feature/aiApi';
 import type { ChatMessage, Citation } from '@/src/redux/feature/aiApi';
 import { useGetUserWorkspacesQuery } from '@/src/redux/feature/workspaceApi';
 import { useListDepartmentsQuery, useGetUserDepartmentsQuery } from '@/src/redux/feature/departmentApi';
+import { useAIAssistant } from '@/src/hooks/useAIAssistant';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { AIMessageBubble } from './AIMessageBubble';
-import { EmptyState } from '@/components/enterprise/EmptyState';
-import { Send, Loader2, Sparkles, StopCircle, AlertCircle } from 'lucide-react';
+import { Send, Loader2, Sparkles, StopCircle, AlertCircle, Bot, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
     Select,
@@ -30,6 +30,7 @@ export interface AIMessageLocal {
     content: string;
     timestamp: string;
     citations?: any[];
+    isStreaming?: boolean;
 }
 
 interface AIChatWindowProps {
@@ -38,14 +39,15 @@ interface AIChatWindowProps {
 }
 
 export function AIChatWindow({ conversationId, className }: AIChatWindowProps) {
-    const [messages, setMessages] = useState<AIMessageLocal[]>([]);
     const [input, setInput] = useState('');
-    const [isStreaming, setIsStreaming] = useState(false);
-    const scrollEndRef = useRef<HTMLDivElement>(null);
     const [selectedScope, setSelectedScope] = useState<string>('default');
+    const [aiMode, setAiMode] = useState<'rag' | 'agent'>('rag');
+    const scrollEndRef = useRef<HTMLDivElement>(null);
+    const [historyMessages, setHistoryMessages] = useState<AIMessageLocal[]>([]);
 
     const user = useSelector((state: RootState) => state.auth.user);
     const globalRoles = useSelector((state: RootState) => state.auth.roles) || [];
+    const currentWorkspaceId = useSelector((state: any) => state.workspace.currentWorkspaceId);
     const userId = user?.id || '';
     const { data: userDepts = [] } = useGetUserDepartmentsQuery(userId, { skip: !userId });
     const { data: workspaces = [] } = useGetUserWorkspacesQuery();
@@ -53,19 +55,14 @@ export function AIChatWindow({ conversationId, className }: AIChatWindowProps) {
 
     const isGlobalAdmin = globalRoles.some(r => r.includes('ADMIN') || r.includes('SUPER_ADMIN'));
 
-    const { data: history, isFetching } = useGetConversationMessagesQuery(conversationId);
-    const [chatWithRag] = useChatWithRagMutation();
+    const chatId = `standalone-ai-${userId}`;
+    const { aiMessages, isStreaming, sendAIQuery, sendAgentQuery, clearAI } = useAIAssistant(chatId, conversationId);
 
-    const hasPartialResults = messages.some(
-        (m) =>
-            m.role === 'assistant' &&
-            (m.content.includes('Hệ thống quản lý phòng ban hiện đang bảo trì') ||
-                m.content.includes('partial_results'))
-    );
+    const { data: history, isFetching } = useGetConversationMessagesQuery(conversationId);
 
     useEffect(() => {
         if (history) {
-            setMessages(history.map((m: ChatMessage) => ({
+            setHistoryMessages(history.map((m: ChatMessage) => ({
                 id: m.id?.toString() || `hist-${Math.random()}`,
                 role: m.role as 'user' | 'assistant',
                 content: m.content,
@@ -75,72 +72,41 @@ export function AIChatWindow({ conversationId, className }: AIChatWindowProps) {
     }, [history, conversationId]);
 
     useEffect(() => {
+        clearAI();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [conversationId]);
+
+    const allMessages: AIMessageLocal[] = [
+        ...historyMessages,
+        ...aiMessages.map(m => ({
+            id: m.id,
+            role: m.role,
+            content: m.content,
+            timestamp: m.timestamp,
+            isStreaming: m.isStreaming,
+        })),
+    ];
+
+    const hasPartialResults = allMessages.some(
+        (m) =>
+            m.role === 'assistant' &&
+            (m.content.includes('Hệ thống quản lý phòng ban hiện đang bảo trì') ||
+                m.content.includes('partial_results'))
+    );
+
+    useEffect(() => {
         scrollEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, [messages, isStreaming]);
+    }, [allMessages.length, isStreaming]);
 
-    const handleSubmit = async () => {
+    const handleSubmit = () => {
         if (!input.trim() || isStreaming) return;
-
-        const userMsgContent = input.trim();
+        const msg = input.trim();
         setInput('');
 
-        setMessages(prev => [...prev, {
-            id: `usr-${Date.now()}`,
-            role: 'user',
-            content: userMsgContent,
-            timestamp: new Date().toISOString()
-        }]);
-
-        const streamingAssistantId = `ast-${Date.now()}`;
-        setMessages(prev => [...prev, {
-            id: streamingAssistantId,
-            role: 'assistant',
-            content: '',
-            timestamp: new Date().toISOString()
-        }]);
-        setIsStreaming(true);
-
-        const headers: Record<string, string> = {};
-        if (isGlobalAdmin && selectedScope && selectedScope !== 'default') {
-            const [type, id] = selectedScope.split(':');
-            if (type === 'dept') {
-                headers['x-rag-scope'] = JSON.stringify({ type: 'department', id });
-            } else if (type === 'ws') {
-                headers['x-rag-scope'] = JSON.stringify({ type: 'workspace', id });
-            }
-        }
-
-        try {
-            const response = await chatWithRag({ 
-                message: userMsgContent, 
-                conversationId,
-                headers
-            }).unwrap();
-
-            let resolvedContent = '';
-            if (typeof response === 'string') {
-                resolvedContent = (response as string)
-                    .replace(/^data:\s*/gm, '')
-                    .replace(/\[DONE\]/g, '')
-                    .trim();
-            } else if (response && (response as any).content !== undefined) {
-                resolvedContent = (response as any).content;
-            } else {
-                resolvedContent = 'No response from AI';
-            }
-
-            setMessages(prev => prev.map(m =>
-                m.id === streamingAssistantId ? { ...m, content: resolvedContent } : m
-            ));
-        } catch (error) {
-            console.error('Chat Error:', error);
-            setMessages(prev => prev.map(m =>
-                m.id === streamingAssistantId
-                    ? { ...m, content: 'Đã xảy ra lỗi khi kết nối với máy chủ AI. Vui lòng thử lại.' }
-                    : m
-            ));
-        } finally {
-            setIsStreaming(false);
+        if (aiMode === 'agent') {
+            sendAgentQuery(msg, currentWorkspaceId || 'default-workspace');
+        } else {
+            sendAIQuery(msg);
         }
     };
 
@@ -151,14 +117,10 @@ export function AIChatWindow({ conversationId, className }: AIChatWindowProps) {
         }
     };
 
-    // Citation click: CitationList <Link> handles primary navigation.
-    // This callback is for optional side-effects (e.g., analytics).
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const handleCitationClick = useCallback((_citation: Citation) => {
-        // no-op: navigation delegated to CitationList <Link>
-    }, []);
+    const handleCitationClick = useCallback((_citation: Citation) => {}, []);
 
-    if (isFetching && messages.length === 0) {
+    if (isFetching && allMessages.length === 0) {
         return (
             <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground gap-3">
                 <Loader2 className="w-7 h-7 animate-spin text-primary/60" />
@@ -183,8 +145,7 @@ export function AIChatWindow({ conversationId, className }: AIChatWindowProps) {
             {/* Chat History */}
             <ScrollArea className="flex-1 min-h-0 px-4 sm:px-6">
                 <div className="max-w-3xl mx-auto py-12 space-y-1">
-                    {messages.length === 0 ? (
-                        // ── Empty / Welcome State ──────────────────────────────
+                    {allMessages.length === 0 ? (
                         <div className="flex flex-col items-center justify-center min-h-[60vh] text-center animate-in fade-in zoom-in duration-500">
                             <div className="w-16 h-16 bg-primary rounded-xl flex items-center justify-center shadow-lg mb-6">
                                 <Sparkles className="w-8 h-8 text-primary-foreground" />
@@ -219,13 +180,13 @@ export function AIChatWindow({ conversationId, className }: AIChatWindowProps) {
                         </div>
                     ) : (
                         <div className="space-y-1 pb-32">
-                            {messages.map((message) => (
+                            {allMessages.map((message) => (
                                 <AIMessageBubble
                                     key={message.id}
                                     role={message.role}
                                     content={message.content}
                                     citations={message.citations}
-                                    isStreaming={isStreaming && message.id.startsWith('ast-') && message === messages[messages.length - 1]}
+                                    isStreaming={!!message.isStreaming}
                                     timestamp={new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                     onCitationClick={handleCitationClick}
                                 />
@@ -236,48 +197,75 @@ export function AIChatWindow({ conversationId, className }: AIChatWindowProps) {
                 </div>
             </ScrollArea>
 
-            {/* ── Input Bar ─────────────────────────────────────────────────── */}
+            {/* Input Bar */}
             <div className="absolute bottom-0 left-0 right-0 px-4 pb-5 pt-2 z-20 pointer-events-none bg-gradient-to-t from-background via-background/95 to-transparent">
                 <div className="max-w-3xl mx-auto pointer-events-auto">
-                    {/* Admin Search Scope Dropdown */}
-                    {isGlobalAdmin && (
-                        <div className="flex items-center gap-2 mb-2 bg-slate-900 border border-border px-3 py-1.5 rounded-lg w-fit shadow-md">
-                            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Phạm vi RAG:</span>
-                            <Select
-                                value={selectedScope}
-                                onValueChange={setSelectedScope}
+                    {/* Controls row */}
+                    <div className="flex items-center gap-2 mb-2">
+                        {/* Mode toggle */}
+                        <div className="flex rounded-lg border border-border overflow-hidden">
+                            <button
+                                onClick={() => setAiMode('rag')}
+                                className={cn(
+                                    "px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 transition-colors",
+                                    aiMode === 'rag'
+                                        ? "bg-primary text-primary-foreground"
+                                        : "bg-card text-muted-foreground hover:text-foreground"
+                                )}
                             >
-                                <SelectTrigger className="h-6 w-[200px] text-xs bg-slate-950 border-border text-white rounded-md">
-                                    <SelectValue placeholder="Chọn phạm vi" />
-                                </SelectTrigger>
-                                <SelectContent className="bg-slate-950 border-border text-white text-xs max-h-[250px] overflow-y-auto">
-                                    <SelectItem value="default" className="text-xs cursor-pointer focus:bg-slate-800">
-                                        Mặc định (Không gian hiện tại)
-                                    </SelectItem>
-                                    {departments.length > 0 && (
-                                        <SelectGroup>
-                                            <SelectLabel className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest px-2 py-1">Phòng ban</SelectLabel>
-                                            {departments.map((dept: any) => (
-                                                <SelectItem key={dept.id} value={`dept:${dept.id}`} className="text-xs cursor-pointer focus:bg-slate-800 pl-4">
-                                                    Phòng {dept.name}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectGroup>
-                                    )}
-                                    {workspaces.length > 0 && (
-                                        <SelectGroup>
-                                            <SelectLabel className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest px-2 py-1">Workspace</SelectLabel>
-                                            {workspaces.map((ws: any) => (
-                                                <SelectItem key={ws.id} value={`ws:${ws.id}`} className="text-xs cursor-pointer focus:bg-slate-800 pl-4">
-                                                    {ws.name}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectGroup>
-                                    )}
-                                </SelectContent>
-                            </Select>
+                                <Search className="w-3 h-3" />RAG
+                            </button>
+                            <button
+                                onClick={() => setAiMode('agent')}
+                                className={cn(
+                                    "px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 transition-colors",
+                                    aiMode === 'agent'
+                                        ? "bg-primary text-primary-foreground"
+                                        : "bg-card text-muted-foreground hover:text-foreground"
+                                )}
+                            >
+                                <Bot className="w-3 h-3" />Agent
+                            </button>
                         </div>
-                    )}
+
+                        {/* Admin scope selector */}
+                        {isGlobalAdmin && (
+                            <div className="flex items-center gap-2 bg-slate-900 border border-border px-3 py-1.5 rounded-lg shadow-md">
+                                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Phạm vi:</span>
+                                <Select value={selectedScope} onValueChange={setSelectedScope}>
+                                    <SelectTrigger className="h-6 w-[200px] text-xs bg-slate-950 border-border text-white rounded-md">
+                                        <SelectValue placeholder="Chọn phạm vi" />
+                                    </SelectTrigger>
+                                    <SelectContent className="bg-slate-950 border-border text-white text-xs max-h-[250px] overflow-y-auto">
+                                        <SelectItem value="default" className="text-xs cursor-pointer focus:bg-slate-800">
+                                            Mặc định (Không gian hiện tại)
+                                        </SelectItem>
+                                        {departments.length > 0 && (
+                                            <SelectGroup>
+                                                <SelectLabel className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest px-2 py-1">Phòng ban</SelectLabel>
+                                                {departments.map((dept: any) => (
+                                                    <SelectItem key={dept.id} value={`dept:${dept.id}`} className="text-xs cursor-pointer focus:bg-slate-800 pl-4">
+                                                        Phòng {dept.name}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectGroup>
+                                        )}
+                                        {workspaces.length > 0 && (
+                                            <SelectGroup>
+                                                <SelectLabel className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest px-2 py-1">Workspace</SelectLabel>
+                                                {workspaces.map((ws: any) => (
+                                                    <SelectItem key={ws.id} value={`ws:${ws.id}`} className="text-xs cursor-pointer focus:bg-slate-800 pl-4">
+                                                        {ws.name}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectGroup>
+                                        )}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        )}
+                    </div>
+
                     <div
                         className={cn(
                             'relative flex items-end gap-2',
@@ -290,7 +278,7 @@ export function AIChatWindow({ conversationId, className }: AIChatWindowProps) {
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
                             onKeyDown={handleKeyDown}
-                            placeholder="Hỏi Trợ lý NEXUS về tri thức nội bộ..."
+                            placeholder={aiMode === 'agent' ? "Hỏi Agent (có thể gọi tools)..." : "Hỏi Trợ lý NEXUS về tri thức nội bộ..."}
                             className={cn(
                                 'min-h-[52px] max-h-44 flex-1 bg-transparent border-0',
                                 'focus-visible:ring-0 focus-visible:ring-offset-0',
@@ -302,7 +290,7 @@ export function AIChatWindow({ conversationId, className }: AIChatWindowProps) {
 
                         <div className="flex items-center pb-2 pr-2">
                             <Button
-                                onClick={isStreaming ? () => setIsStreaming(false) : handleSubmit}
+                                onClick={isStreaming ? () => {} : handleSubmit}
                                 disabled={!input.trim() && !isStreaming}
                                 size="icon"
                                 className={cn(
@@ -323,7 +311,7 @@ export function AIChatWindow({ conversationId, className }: AIChatWindowProps) {
                     </div>
 
                     <p className="text-[10px] text-muted-foreground text-center mt-2 font-medium tracking-wide">
-                        Trợ lý Tri thức Nội bộ · AI có thể mắc sai sót
+                        {aiMode === 'agent' ? 'Agent Mode · Gemini + Tool Calling' : 'Trợ lý Tri thức Nội bộ · AI có thể mắc sai sót'}
                     </p>
                 </div>
             </div>

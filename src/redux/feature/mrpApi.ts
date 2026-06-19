@@ -70,6 +70,70 @@ export interface PaginatedResponse<T> {
   empty: boolean;
 }
 
+// --- Wiki Graph Community Types ---
+export interface WikiGraphCommunity {
+  id: number;
+  pageSlugs: string[];
+  cohesion: number;
+  topHub: string;
+  lowCohesion: boolean;
+}
+
+export interface WikiGraphCommunityDto {
+  communities: WikiGraphCommunity[];
+  bridgeNodes: WikiPageRef[];
+}
+
+export interface WikiPageRef {
+  slug: string;
+  title: string;
+  pageType?: string;
+  updatedAt?: string;
+}
+
+export interface WikiBrokenLink {
+  fromSlug: string;
+  toSlug: string;
+}
+
+export interface WikiHealthSummary {
+  totalPages: number;
+  orphanCount: number;
+  brokenLinkCount: number;
+  staleCount: number;
+  healthScore: number;
+}
+
+export interface WikiHealthDto {
+  orphanPages: WikiPageRef[];
+  brokenLinks: WikiBrokenLink[];
+  stalePages: WikiPageRef[];
+  summary: WikiHealthSummary;
+}
+
+export interface ReindexResult {
+  reindexed: number;
+  errors: number;
+  durationMs: number;
+  total: number;
+}
+
+const normalizeWikiPage = (page: WikiPage): WikiPage => {
+  if (!page) return page;
+  return {
+    ...page,
+    workspaceId: page.workspaceId === 'GLOBAL' ? 'default-workspace' : page.workspaceId,
+  };
+};
+
+const normalizeWikiDraft = (draft: WikiPageDraft): WikiPageDraft => {
+  if (!draft) return draft;
+  return {
+    ...draft,
+    workspaceId: draft.workspaceId === 'GLOBAL' ? 'default-workspace' : draft.workspaceId,
+  };
+};
+
 export const mrpApi = apiSlice.injectEndpoints({
   overrideExisting: true,
   endpoints: (builder) => ({
@@ -100,6 +164,19 @@ export const mrpApi = apiSlice.injectEndpoints({
         }
         return url;
       },
+      transformResponse: (response: PaginatedResponse<WikiPageDraft> | WikiPageDraft[]) => {
+        if (!response) return response;
+        if (Array.isArray(response)) {
+          return response.map(normalizeWikiDraft);
+        }
+        if ('content' in response && Array.isArray(response.content)) {
+          return {
+            ...response,
+            content: response.content.map(normalizeWikiDraft)
+          };
+        }
+        return response;
+      },
       providesTags: ['Tasks'],
     }),
 
@@ -112,18 +189,27 @@ export const mrpApi = apiSlice.injectEndpoints({
         if (mine) params.set('mine', 'true');
         return `/mrp/drafts?${params.toString()}`;
       },
+      transformResponse: (response: WikiPageDraft[]) => {
+        if (!response) return response;
+        return response.map(normalizeWikiDraft);
+      },
       providesTags: ['Tasks'],
     }),
 
     // Lấy chi tiết một bản thảo theo ID
     getDraftById: builder.query<WikiPageDraft, number>({
       query: (draftId) => `/mrp/drafts/${draftId}`,
+      transformResponse: (response: WikiPageDraft) => normalizeWikiDraft(response),
       providesTags: (_r, _e, id) => [{ type: 'Tasks', id }],
     }),
 
     // Lấy bản thảo theo workspace
     getDraftsByWorkspace: builder.query<WikiPageDraft[], string>({
       query: (workspaceId) => `/mrp/drafts/workspace/${workspaceId}`,
+      transformResponse: (response: WikiPageDraft[]) => {
+        if (!response) return response;
+        return response.map(normalizeWikiDraft);
+      },
       providesTags: ['Tasks'],
     }),
 
@@ -133,6 +219,7 @@ export const mrpApi = apiSlice.injectEndpoints({
         url: `/mrp/drafts/${draftId}/approve`,
         method: 'POST',
       }),
+      transformResponse: (response: WikiPageDraft) => normalizeWikiDraft(response),
       invalidatesTags: ['Tasks', 'Documents'],
     }),
 
@@ -143,6 +230,7 @@ export const mrpApi = apiSlice.injectEndpoints({
         method: 'POST',
         body: { note },
       }),
+      transformResponse: (response: WikiPageDraft) => normalizeWikiDraft(response),
       invalidatesTags: ['Tasks'],
     }),
 
@@ -153,6 +241,7 @@ export const mrpApi = apiSlice.injectEndpoints({
         method: 'POST',
         body: { note },
       }),
+      transformResponse: (response: WikiPageDraft) => normalizeWikiDraft(response),
       invalidatesTags: ['Tasks'],
     }),
 
@@ -162,6 +251,7 @@ export const mrpApi = apiSlice.injectEndpoints({
         url: `/mrp/drafts/${draftId}/withdraw`,
         method: 'POST',
       }),
+      transformResponse: (response: WikiPageDraft) => normalizeWikiDraft(response),
       invalidatesTags: ['Tasks'],
     }),
 
@@ -189,12 +279,29 @@ export const mrpApi = apiSlice.injectEndpoints({
         }
         return url;
       },
+      transformResponse: (response: PaginatedResponse<WikiPage> | WikiPage[]) => {
+        if (!response) return response;
+        if (Array.isArray(response)) {
+          return response.map(normalizeWikiPage);
+        }
+        if ('content' in response && Array.isArray(response.content)) {
+          return {
+            ...response,
+            content: response.content.map(normalizeWikiPage)
+          };
+        }
+        return response;
+      },
       providesTags: ['Documents'],
     }),
 
     // Lấy danh sách metadata siêu nhẹ của toàn bộ Wiki (Dành cho Tree, Graph, Stats)
     getWikiPagesMetadata: builder.query<WikiPage[], { workspaceId?: string }>({
       query: ({ workspaceId = 'default-workspace' } = {}) => `/mrp/wiki/metadata?workspaceId=${workspaceId}`,
+      transformResponse: (response: WikiPage[]) => {
+        if (!response) return response;
+        return response.map(normalizeWikiPage);
+      },
       providesTags: ['Documents'],
     }),
 
@@ -207,12 +314,14 @@ export const mrpApi = apiSlice.injectEndpoints({
     // Lấy trang Wiki theo slug
     getWikiPageBySlug: builder.query<WikiPage, { slug: string; workspaceId?: string }>({
       query: ({ slug, workspaceId = 'default-workspace' }) => `/mrp/wiki/slug/${slug}?workspaceId=${workspaceId}`,
+      transformResponse: (response: WikiPage) => normalizeWikiPage(response),
       providesTags: (_r, _e, { slug }) => [{ type: 'Documents', id: slug }],
     }),
 
     // Lấy trang Wiki theo ID
     getWikiPageById: builder.query<WikiPage, number>({
       query: (id) => `/mrp/wiki/id/${id}`,
+      transformResponse: (response: WikiPage) => normalizeWikiPage(response),
       providesTags: (_r, _e, id) => [{ type: 'Documents', id }],
     }),
 
@@ -304,6 +413,24 @@ fetchWikiImageRaw: builder.query<string, string>({
     }
   },
 }),
+
+    // --- Wiki Graph Communities ---
+    getWikiGraphCommunities: builder.query<WikiGraphCommunityDto, { workspaceId: string }>({
+      query: ({ workspaceId }) => `/mrp/wiki/graph/communities?workspaceId=${workspaceId}`,
+    }),
+
+    // --- Wiki Health ---
+    getWikiHealth: builder.query<WikiHealthDto, { workspaceId: string }>({
+      query: ({ workspaceId }) => `/mrp/wiki/health?workspaceId=${workspaceId}`,
+    }),
+
+    // --- Wiki Reindex ---
+    reindexWikiPages: builder.mutation<ReindexResult, { workspaceId: string }>({
+      query: ({ workspaceId }) => ({
+        url: `/mrp/wiki/reindex?workspaceId=${workspaceId}`,
+        method: 'POST',
+      }),
+    }),
   }),
 });
 
@@ -329,4 +456,7 @@ export const {
   useResolveWikiImagesMutation,
   useFetchWikiImageRawQuery,
   useLazyFetchWikiImageRawQuery,
+  useGetWikiGraphCommunitiesQuery,
+  useGetWikiHealthQuery,
+  useReindexWikiPagesMutation,
 } = mrpApi;

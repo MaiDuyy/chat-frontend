@@ -2,7 +2,7 @@
  
 import React from "react";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import {
   useGetWikiPageBySlugQuery,
   useGetDraftsByWorkspaceQuery,
@@ -11,6 +11,7 @@ import {
   useRejectDraftMutation,
   useRequestChangesOnDraftMutation
 } from "@/src/redux/feature/mrpApi";
+import { useGetAdminWikiPageBySlugQuery, useGetAdminWikiMetadataQuery } from "@/src/redux/feature/adminApi";
 import { WikiContent } from "../components/WikiContent";
 import { WikiDraftBanner } from "../components/WikiDraftBanner";
 import { WikiBacklinks } from "../components/WikiBacklinks";
@@ -33,29 +34,77 @@ import {
   FileEdit,
   Tag,
   Search,
-  Menu
+  Menu,
+  Globe
 } from "lucide-react";
  
 export default function WikiPageDetail() {
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   
   // Extract and join all dynamic slug segments for catch-all router
   const slugParts = Array.isArray(params.slug) ? params.slug : [params.slug ?? ""];
   const slug = slugParts.join("/");
   const currentWorkspaceId = useSelector((state: any) => state.workspace.currentWorkspaceId);
-  const workspaceId = currentWorkspaceId || "default-workspace";
  
   // RBAC checks
   const isSuperAdmin = useHasRole("SUPER_ADMIN");
   const isAdmin = useHasRole("ADMIN");
   const isWorkspaceManager = useHasRole("WORKSPACE_MANAGER");
   const canManageWiki = isSuperAdmin || isAdmin || isWorkspaceManager;
- 
-  // RTK Queries
-  const { data: page, isLoading: isPageLoading, error: pageError } = useGetWikiPageBySlugQuery({ slug, workspaceId });
-  const { data: allPages } = useGetWikiPagesMetadataQuery({ workspaceId });
-  const { data: drafts, isLoading: isDraftsLoading, refetch: refetchDrafts } = useGetDraftsByWorkspaceQuery(workspaceId, { skip: !canManageWiki });
+  const isSystemAdmin = isSuperAdmin || isAdmin;
+
+  // Admin users always use the global slug query so workspace scoping never blocks them.
+  // urlWorkspaceId (if present) is used as a preference hint to resolve slug conflicts
+  // (e.g. same slug in multiple workspaces — prefer the one matching the hint).
+  const urlWorkspaceId = searchParams.get("workspaceId");
+  const isAdminGlobalView = isSystemAdmin; // Admins can always view any page globally
+
+  // For scoped query: use URL param > Redux workspace > fallback
+  const workspaceId = (urlWorkspaceId && urlWorkspaceId !== 'all' && urlWorkspaceId !== 'GLOBAL')
+    ? urlWorkspaceId
+    : (currentWorkspaceId || "default-workspace");
+
+  // Preferred workspace for conflict resolution (null means "pick most recent globally")
+  const preferredWorkspaceId = (urlWorkspaceId && urlWorkspaceId !== 'all' && urlWorkspaceId !== 'GLOBAL')
+    ? urlWorkspaceId
+    : (currentWorkspaceId ?? undefined);
+
+  // Admin global slug query — always active for ADMIN/SUPER_ADMIN
+  const { data: adminPage, isLoading: isAdminPageLoading, error: adminPageError } =
+    useGetAdminWikiPageBySlugQuery(
+      { slug, workspaceId: preferredWorkspaceId },
+      { skip: !isAdminGlobalView }
+    );
+
+  // Standard scoped slug query — only for non-admin users
+  const { data: scopedPage, isLoading: isScopedPageLoading, error: scopedPageError } =
+    useGetWikiPageBySlugQuery(
+      { slug, workspaceId },
+      { skip: isAdminGlobalView }
+    );
+
+  const page = isAdminGlobalView ? adminPage : scopedPage;
+  const isPageLoading = isAdminGlobalView ? isAdminPageLoading : isScopedPageLoading;
+  const pageError = isAdminGlobalView ? adminPageError : scopedPageError;
+
+  // Metadata for backlinks & mini-graph:
+  // Admins use global metadata so backlinks from ALL workspaces are resolved correctly.
+  // Non-admins use the page's own workspace scope.
+  const metadataWorkspaceId = page?.workspaceId || workspaceId;
+  const { data: adminAllPages } = useGetAdminWikiMetadataQuery(undefined, { skip: !isAdminGlobalView });
+  const { data: scopedAllPages } = useGetWikiPagesMetadataQuery(
+    { workspaceId: metadataWorkspaceId },
+    { skip: isAdminGlobalView }
+  );
+  const allPages = isAdminGlobalView ? adminAllPages : scopedAllPages;
+
+  // Drafts: scope to page's actual workspace
+  const { data: drafts, refetch: refetchDrafts } = useGetDraftsByWorkspaceQuery(
+    metadataWorkspaceId,
+    { skip: !canManageWiki }
+  );
  
   // Review mutations
   const [approveDraft, { isLoading: isApproving }] = useApproveDraftMutation();
@@ -268,6 +317,11 @@ export default function WikiPageDetail() {
           </div>
  
           <div className="flex items-center gap-1.5">
+            {isAdminGlobalView && (
+              <span className="flex items-center gap-1 text-[9px] font-mono font-bold bg-amber-500/15 border border-amber-500/30 text-amber-600 dark:text-amber-400 px-1.5 py-0.5 rounded-md">
+                <Globe className="w-3 h-3" /> ADMIN · GLOBAL
+              </span>
+            )}
             <span className="text-[9px] font-mono font-bold bg-muted px-1.5 py-0.5 rounded-md border border-border text-muted-foreground">
               Workspace: {page.workspaceId}
             </span>

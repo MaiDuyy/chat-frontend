@@ -14,6 +14,8 @@ import {
   FolderOpen
 } from "lucide-react";
 import { useGetWikiPagesMetadataQuery, WikiPage } from "@/src/redux/feature/mrpApi";
+import { useGetAdminWikiMetadataQuery } from "@/src/redux/feature/adminApi";
+import { useHasRole } from "@/src/lib/rbac/usePermission";
 import { wikiTypeIcon, wikiTypeColor, wikiTypeGroupLabel } from "./WikiTypeBadge";
 import { WikiSecurityBadge } from "./WikiSecurityBadge";
 import { getPageType } from "./WikilinkAutocomplete";
@@ -32,16 +34,36 @@ function useDebounce<T>(value: T, delay: number): T {
 export function WikiPageTree({
   activeSlug,
   onPageSelect,
+  workspaceId: propWorkspaceId,
 }: {
   activeSlug?: string;
   onPageSelect?: (slug: string) => void;
+  workspaceId?: string;
 }) {
   const pathname = usePathname();
   const currentWorkspaceId = useSelector((state: any) => state.workspace.currentWorkspaceId);
-  const workspaceId = currentWorkspaceId || "default-workspace";
-  
+  const workspaceId = propWorkspaceId || currentWorkspaceId || "default-workspace";
+
+  const isSuperAdmin = useHasRole("SUPER_ADMIN");
+  const isAdmin = useHasRole("ADMIN");
+  const isSystemAdmin = isSuperAdmin || isAdmin;
+
+  // Admins always see the global catalog so the tree reflects all pages system-wide
+  const showAdminWiki = isSystemAdmin;
+
   // RTK query to load pages
-  const { data: wikiPages, isLoading } = useGetWikiPagesMetadataQuery({ workspaceId });
+  const { data: userWikiPages, isLoading: isUserLoading } = useGetWikiPagesMetadataQuery(
+    { workspaceId },
+    { skip: showAdminWiki }
+  );
+  const { data: adminWikiPages, isLoading: isAdminLoading } = useGetAdminWikiMetadataQuery(
+    undefined,
+    { skip: !showAdminWiki }
+  );
+
+  const wikiPages = showAdminWiki ? adminWikiPages : userWikiPages;
+  const isLoading = showAdminWiki ? isAdminLoading : isUserLoading;
+
   const pages: WikiPage[] = React.useMemo(() => wikiPages || [], [wikiPages]);
   
   const [search, setSearch] = React.useState("");
@@ -121,6 +143,11 @@ export function WikiPageTree({
           <FolderOpen className="w-4 h-4 text-primary" /> DANH MỤC WIKI
         </span>
         <div className="flex items-center gap-2">
+          {showAdminWiki && (
+            <span className="text-[8px] font-mono font-bold bg-amber-500/15 border border-amber-500/30 text-amber-600 dark:text-amber-400 px-1 py-0.5 rounded">
+              GLOBAL
+            </span>
+          )}
           <span className="text-[9px] font-mono font-bold bg-primary text-primary-foreground px-1.5 py-0.5 rounded-md shadow-xs">
             {totalCount}
           </span>
@@ -225,6 +252,11 @@ export function WikiPageTree({
                               title={page.title}
                             >
                               <span className="truncate">{page.title}</span>
+                              {showAdminWiki && page.workspaceId && page.workspaceId !== 'GLOBAL' && (
+                                <span className="text-[8px] font-mono text-muted-foreground/60 shrink-0 truncate max-w-[50px]" title={page.workspaceId}>
+                                  {page.workspaceId.length > 6 ? page.workspaceId.slice(0, 6) + '…' : page.workspaceId}
+                                </span>
+                              )}
                               {page.securityClassification && page.securityClassification !== "INTERNAL" && (
                                 <WikiSecurityBadge classification={page.securityClassification} compact />
                               )}
@@ -236,6 +268,11 @@ export function WikiPageTree({
                               title={page.title}
                             >
                               <span className="truncate">{page.title}</span>
+                              {showAdminWiki && page.workspaceId && page.workspaceId !== 'GLOBAL' && (
+                                <span className="text-[8px] font-mono text-muted-foreground/60 shrink-0 truncate max-w-[50px]" title={page.workspaceId}>
+                                  {page.workspaceId.length > 6 ? page.workspaceId.slice(0, 6) + '…' : page.workspaceId}
+                                </span>
+                              )}
                               {page.securityClassification && page.securityClassification !== "INTERNAL" && (
                                 <WikiSecurityBadge classification={page.securityClassification} compact />
                               )}

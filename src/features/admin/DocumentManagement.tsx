@@ -10,6 +10,11 @@ import {
     useUploadDocumentMutation,
     Document,
 } from '@/src/redux/feature/knowledgeApi';
+import {
+    useGetAdminDocumentsQuery,
+    useDeleteAdminDocumentMutation,
+    useUploadAdminDocumentMutation,
+} from '@/src/redux/feature/adminApi';
 import { useCompileDocumentMutation } from '@/src/redux/feature/mrpApi';
 import { useGetUserWorkspacesQuery } from '@/src/redux/feature/workspaceApi';
 import { MarkdownEditorModal } from '@/src/features/knowledge/MarkdownEditorModal';
@@ -86,7 +91,7 @@ export function DocumentManagement() {
     const [size, setSize] = useState(10);
     const [searchTerm, setSearchTerm] = useState('');
     const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
-    const [filterWorkspaceId, setFilterWorkspaceId] = useState<string>('all');
+    const [filterWorkspaceId, setFilterWorkspaceId] = useState<string>('default-workspace');
     const [filterPendingOnly, setFilterPendingOnly] = useState(false);
     const currentWorkspaceId = useSelector((state: RootState) => state.workspace.currentWorkspaceId);
 
@@ -128,6 +133,15 @@ export function DocumentManagement() {
         });
     }, [workspaces, departments]);
 
+    // Handle filter default depending on role clearance
+    useEffect(() => {
+        if (isLeader) {
+            setFilterWorkspaceId('all');
+        } else {
+            setFilterWorkspaceId('default-workspace');
+        }
+    }, [isLeader]);
+
     // Debounce search term to protect performance and reset page to 0 immediately
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -137,17 +151,36 @@ export function DocumentManagement() {
         return () => clearTimeout(timer);
     }, [searchTerm]);
 
-    // workspaceIdForQuery directly matches filterWorkspaceId to allow system-wide query
+    // workspaceIdForQuery is used for scoped (non-admin) queries only
     const workspaceIdForQuery = useMemo(() => {
         return filterWorkspaceId;
     }, [filterWorkspaceId]);
 
-    // Query all matching documents without page limit to correctly build the tree structure
-    const { data, isLoading, refetch } = useGetDocumentsQuery({ workspaceId: workspaceIdForQuery });
+    // Global admins always use the admin query so they see ALL documents system-wide.
+    // This mirrors the wiki fix — no longer tied to filterWorkspaceId === 'all'.
+    const isAdminQuery = isGlobalAdmin;
 
-    const [deleteDocument, { isLoading: isDeleting }] = useDeleteDocumentMutation();
+    const { data: userData, isLoading: isUserLoading, refetch: refetchUser } = useGetDocumentsQuery(
+        { workspaceId: workspaceIdForQuery },
+        { skip: isAdminQuery }
+    );
+
+    const { data: adminData, isLoading: isAdminLoading, refetch: refetchAdmin } = useGetAdminDocumentsQuery(
+        undefined,
+        { skip: !isAdminQuery }
+    );
+
+    const data = isAdminQuery ? adminData : userData;
+    const isLoading = isAdminQuery ? isAdminLoading : isUserLoading;
+    const refetch = isAdminQuery ? refetchAdmin : refetchUser;
+
+    const [deleteUserDocument, { isLoading: isDeletingUser }] = useDeleteDocumentMutation();
+    const [deleteAdminDocument, { isLoading: isDeletingAdmin }] = useDeleteAdminDocumentMutation();
+    const isDeleting = isDeletingUser || isDeletingAdmin;
     const [approveDocument, { isLoading: isApproving }] = useApproveDocumentMutation();
-    const [uploadDocument, { isLoading: isUploading }] = useUploadDocumentMutation();
+    const [uploadDocument, { isLoading: isUploadingUser }] = useUploadDocumentMutation();
+    const [uploadAdminDocument, { isLoading: isUploadingAdmin }] = useUploadAdminDocumentMutation();
+    const isUploading = isGlobalAdmin ? isUploadingAdmin : isUploadingUser;
     const [compileDocument, { isLoading: isCompiling }] = useCompileDocumentMutation();
     const [previewMode, setPreviewMode] = useState(true);
     const [parserMethod, setParserMethod] = useState<'gemini' | 'tika'>('gemini');
@@ -173,12 +206,21 @@ export function DocumentManagement() {
         }
     };
 
-    // Parse response
-    const isPaged = data && !Array.isArray(data) && 'content' in data;
+    // Parse response — admin endpoint always returns Document[] (already normalized)
+    // User endpoint may return Document[] or PagedResponse<Document>
     const allDocs = useMemo(() => {
         if (!data) return [];
-        return isPaged ? (data as any).content : (Array.isArray(data) ? data : []);
-    }, [data, isPaged]);
+        if (isAdminQuery) {
+            // After transformResponse, admin endpoint always returns Document[]
+            return Array.isArray(data) ? data : [];
+        }
+        // User endpoint: check for paged response
+        if (Array.isArray(data)) return data as Document[];
+        if (typeof data === 'object' && data !== null && 'content' in data) {
+            return (data as any).content as Document[];
+        }
+        return [];
+    }, [data, isAdminQuery]);
 
     // Build the hierarchical tree structure
     const treeData = useMemo(() => {
@@ -282,12 +324,17 @@ export function DocumentManagement() {
     };
 
     const handleDelete = async (id: number) => {
-        if (!window.confirm('Are you sure you want to delete this document?')) return;
+        if (!window.confirm('Bạn có chắc muốn xóa tài liệu này không?')) return;
         try {
-            await deleteDocument(id.toString()).unwrap();
-            toast.success('Document deleted successfully');
-        } catch (error) {
-            toast.error('Failed to delete document');
+            // Global admins always use the admin delete endpoint
+            if (isGlobalAdmin) {
+                await deleteAdminDocument(id).unwrap();
+            } else {
+                await deleteUserDocument(id.toString()).unwrap();
+            }
+            toast.success('Đã xóa tài liệu thành công');
+        } catch (error: any) {
+            toast.error(error.data?.message || 'Lỗi khi xóa tài liệu');
         }
     };
 
@@ -332,7 +379,9 @@ export function DocumentManagement() {
                 ? ''
                 : (meta.workspaceId && meta.workspaceId !== 'none' ? meta.workspaceId : 'default-workspace'));
         try {
-            const result = await uploadDocument({
+            // Global admins use the dedicated admin upload endpoint to bypass workspace validation
+            const uploadFn = isGlobalAdmin ? uploadAdminDocument : uploadDocument;
+            const result = await uploadFn({
                 formData,
                 preview: previewMode,
                 parser: parserMethod,
@@ -381,32 +430,41 @@ export function DocumentManagement() {
                 accept=".pdf,.docx,.txt"
             />
             <div className="flex flex-wrap gap-2 items-center justify-between bg-muted/50 dark:bg-slate-900/10 p-2.5 rounded-lg border border-border">
-                <div className="flex-1 min-w-[260px] relative">
-                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
-                    <Input
-                        placeholder="Tìm kiếm tài liệu..."
-                        value={searchTerm}
-                        onChange={(e) => handleSearchChange(e.target.value)}
-                        className="pl-8 h-8 text-xs rounded-md border-border shadow-sm focus-visible:ring-1 bg-background"
-                    />
+                <div className="flex-1 min-w-[260px] flex items-center gap-2">
+                    {isAdminQuery && (
+                        <span className="inline-flex items-center gap-1 text-[9px] font-mono font-bold bg-amber-500/15 border border-amber-500/30 text-amber-600 dark:text-amber-400 px-1.5 py-0.5 rounded-md whitespace-nowrap shrink-0">
+                            <Globe className="w-2.5 h-2.5" /> ADMIN · GLOBAL ({allDocs.length})
+                        </span>
+                    )}
+                    <div className="relative flex-1">
+                        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+                        <Input
+                            placeholder={isAdminQuery ? "Tìm kiếm trong toàn hệ thống..." : "Tìm kiếm tài liệu..."}
+                            value={searchTerm}
+                            onChange={(e) => handleSearchChange(e.target.value)}
+                            className="pl-8 h-8 text-xs rounded-md border-border shadow-sm focus-visible:ring-1 bg-background"
+                        />
+                    </div>
                 </div>
 
-                {/* Unified Workspace filter row (Flat Model) */}
-                <div className="flex items-center gap-2 flex-wrap w-full">
+                {/* Workspace filter row — client-side filter applied on top of loaded docs */}
+                {/* <div className="flex items-center gap-2 flex-wrap w-full">
                     <Filter className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
                     
                     <div className="flex items-center gap-1.5 flex-wrap overflow-x-auto no-scrollbar max-w-[85%]">
-                        <button
-                            type="button"
-                            onClick={() => setFilterWorkspaceId('all')}
-                            className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-bold border transition-all whitespace-nowrap cursor-pointer ${
-                                filterWorkspaceId === 'all'
-                                    ? 'border-primary bg-primary/10 text-primary'
-                                    : 'border-border bg-background text-muted-foreground hover:bg-accent'
-                            }`}
-                        >
-                            <Globe className="w-3 h-3" /> Tất cả không gian
-                        </button>
+                        {isLeader && (
+                            <button
+                                type="button"
+                                onClick={() => setFilterWorkspaceId('all')}
+                                className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-bold border transition-all whitespace-nowrap cursor-pointer ${
+                                    filterWorkspaceId === 'all'
+                                        ? 'border-primary bg-primary/10 text-primary'
+                                        : 'border-border bg-background text-muted-foreground hover:bg-accent'
+                                }`}
+                            >
+                                <Globe className="w-3 h-3" /> Tất cả không gian
+                            </button>
+                        )}
 
                         <button
                             type="button"
@@ -432,7 +490,7 @@ export function DocumentManagement() {
                             <Clock className="w-3.5 h-3.5 text-amber-500" /> Chờ duyệt ({allDocs.filter((d: any) => d.status === 'PENDING').length})
                         </button>
 
-                        {/* Department Workspaces */}
+                    
                         {groupedWorkspaces.departments.map((ws: any) => (
                             <button
                                 key={ws.id}
@@ -448,7 +506,6 @@ export function DocumentManagement() {
                             </button>
                         ))}
 
-                        {/* Project Workspaces */}
                         {groupedWorkspaces.projects.map((ws: any) => (
                             <button
                                 key={ws.id}
@@ -465,7 +522,7 @@ export function DocumentManagement() {
                         ))}
                     </div>
 
-                    {/* Active filter indicator */}
+         
                     {filterWorkspaceId !== 'all' && (
                         <button
                             type="button"
@@ -475,7 +532,7 @@ export function DocumentManagement() {
                             <X className="w-3 h-3" /> Xóa bộ lọc
                         </button>
                     )}
-                </div>
+                </div> */}
                 <div className="flex flex-wrap gap-2 items-center">
                     {/* Segmented Control for Parser Selection */}
                     <div className="flex bg-muted/60 dark:bg-slate-800/40 p-0.5 rounded-md border border-border">

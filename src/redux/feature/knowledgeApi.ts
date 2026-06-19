@@ -115,6 +115,14 @@ export interface PagedResponse<T> {
 
 // Chat types removed and delegated to aiApi.ts
 
+const normalizeDoc = (doc: Document): Document => {
+  if (!doc) return doc;
+  return {
+    ...doc,
+    workspaceId: doc.workspaceId === 'GLOBAL' ? 'default-workspace' : doc.workspaceId,
+  };
+};
+
 // ============= API Endpoints =============
 
 export const knowledgeApi = apiSlice.injectEndpoints({
@@ -136,11 +144,25 @@ export const knowledgeApi = apiSlice.injectEndpoints({
         }
         return queryParts.length ? `/documents?${queryParts.join('&')}` : '/documents';
       },
+      transformResponse: (response: Document[] | PagedResponse<Document>) => {
+        if (!response) return response;
+        if (Array.isArray(response)) {
+          return response.map(normalizeDoc);
+        }
+        if ('content' in response && Array.isArray(response.content)) {
+          return {
+            ...response,
+            content: response.content.map(normalizeDoc)
+          };
+        }
+        return response;
+      },
       providesTags: ['Documents'],
     }),
 
     getDocumentById: builder.query<Document, string>({
       query: (id) => `/documents/${id}`,
+      transformResponse: (response: Document) => normalizeDoc(response),
       providesTags: (_r, _e, id) => [{ type: 'Documents', id }],
     }),
 
@@ -235,6 +257,7 @@ export const knowledgeApi = apiSlice.injectEndpoints({
         method: 'PATCH',
         body,
       }),
+      transformResponse: (response: Document) => normalizeDoc(response),
       invalidatesTags: (_result, _error, { id }) => [{ type: 'Documents', id }, 'Documents'],
     }),
 
@@ -243,6 +266,7 @@ export const knowledgeApi = apiSlice.injectEndpoints({
         url: `/documents/${id}/approve`,
         method: 'POST',
       }),
+      transformResponse: (response: Document) => normalizeDoc(response),
       invalidatesTags: (_result, _error, id) => [{ type: 'Documents', id }, 'Documents'],
     }),
 

@@ -12,6 +12,7 @@ import {
   useRequestChangesOnDraftMutation,
   useGetPendingDraftsQuery
 } from "@/src/redux/feature/mrpApi";
+import { useGetAdminWikiMetadataQuery } from "@/src/redux/feature/adminApi";
 import { WikiDraftDiff } from "../components/WikiDraftDiff";
 import { WikiAiCheckPanel } from "../components/WikiAiCheckPanel";
 import {
@@ -95,7 +96,19 @@ export default function WikiReviewConsole({ isEmbedded = false }: { isEmbedded?:
 
   // Query metadata for AI checks scoped dynamic by activeDraft's workspaceId
   const activeWorkspaceId = activeDraft ? activeDraft.workspaceId : workspaceId;
-  const { data: wikiPages } = useGetWikiPagesMetadataQuery({ workspaceId: activeWorkspaceId }, { skip: !canManageWiki });
+  const showAdminWiki = isSuperAdmin || isAdmin;
+
+  const { data: userWikiMetadata } = useGetWikiPagesMetadataQuery(
+    { workspaceId: activeWorkspaceId },
+    { skip: !canManageWiki || showAdminWiki }
+  );
+
+  const { data: adminWikiMetadata } = useGetAdminWikiMetadataQuery(
+    undefined,
+    { skip: !canManageWiki || !showAdminWiki }
+  );
+
+  const wikiPages = showAdminWiki ? adminWikiMetadata : userWikiMetadata;
 
   // Reset page if totalElements changes and page is out of bounds
   React.useEffect(() => {

@@ -15,6 +15,7 @@ import {
   Compass,
   Layers,
   Menu,
+  Globe,
 } from "lucide-react";
 import {
   useGetWikiPagesQuery,
@@ -39,6 +40,11 @@ import {
   WikiAIChatButton,
 } from "@/app/wiki/components/WikiAIChatPanel";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import {
+  useGetAdminWikiPagesQuery,
+  useGetAdminWikiMetadataQuery,
+} from "@/src/redux/feature/adminApi";
+import { useGetUserWorkspacesQuery } from "@/src/redux/feature/workspaceApi";
 
 const typeConfigs: Record<string, { label: string; className: string }> = {
   concept: {
@@ -67,9 +73,14 @@ export function AdminWikiDashboard() {
   const currentWorkspaceId = useSelector(
     (state: RootState) => state.workspace.currentWorkspaceId
   );
-  const workspaceId = currentWorkspaceId || "default-workspace";
 
   const isSuperAdmin = useHasRole("SUPER_ADMIN");
+  const isAdmin = useHasRole("ADMIN");
+  const isSystemAdmin = isSuperAdmin || isAdmin;
+
+  const [viewAllWiki, setViewAllWiki] = React.useState(isSystemAdmin);
+  const workspaceId = viewAllWiki && isSystemAdmin ? "all" : (currentWorkspaceId || "default-workspace");
+
   const [showAIChat, setShowAIChat] = React.useState(false);
   const [activeTab, setActiveTab] = React.useState<"knowledge" | "documents">(
     "knowledge"
@@ -87,11 +98,39 @@ export function AdminWikiDashboard() {
     setPage(0);
   }, [searchQuery, selectedType]);
 
-  const { data: wikiPagesMetadata } = useGetWikiPagesMetadataQuery({
-    workspaceId,
-  });
-  const { data: wikiPagesData, isLoading: isPagesLoading } =
-    useGetWikiPagesQuery({ workspaceId, page, size });
+  const showAdminWiki = isSystemAdmin && viewAllWiki;
+
+  const { data: workspaces = [] } = useGetUserWorkspacesQuery();
+
+  const { data: userWikiMetadata } = useGetWikiPagesMetadataQuery(
+    { workspaceId },
+    { skip: showAdminWiki }
+  );
+  const { data: adminWikiMetadata } = useGetAdminWikiMetadataQuery(
+    undefined,
+    { skip: !showAdminWiki }
+  );
+  const wikiPagesMetadata = showAdminWiki ? adminWikiMetadata : userWikiMetadata;
+
+  const { data: userWikiPagesData, isLoading: isUserPagesLoading } = useGetWikiPagesQuery(
+    { workspaceId, page, size },
+    { skip: showAdminWiki }
+  );
+  const { data: adminWikiPagesData, isLoading: isAdminPagesLoading } = useGetAdminWikiPagesQuery(
+    { page, size },
+    { skip: !showAdminWiki }
+  );
+  const wikiPagesData = showAdminWiki ? adminWikiPagesData : userWikiPagesData;
+  const isPagesLoading = showAdminWiki ? isAdminPagesLoading : isUserPagesLoading;
+
+  const getWorkspaceLabel = React.useCallback((wsId?: string) => {
+    if (!wsId || wsId === 'default-workspace' || wsId === 'GLOBAL') {
+      return 'Hệ thống';
+    }
+    const ws = workspaces.find((w: any) => w.id === wsId);
+    return ws ? ws.name : wsId;
+  }, [workspaces]);
+
   const { data: workspaceDrafts, refetch: refetchWorkspaceDrafts } =
     useGetDraftsByWorkspaceQuery(workspaceId, { skip: isSuperAdmin });
   const { data: allPendingDrafts, refetch: refetchPendingDrafts } =
@@ -155,7 +194,7 @@ export function AdminWikiDashboard() {
         ? wikiPagesData.content
         : [];
 
-    return pages.filter((p) => {
+    return pages.filter((p: WikiPage) => {
       const matchesSearch =
         p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         p.slug.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -224,7 +263,7 @@ export function AdminWikiDashboard() {
     <div className="font-sans flex gap-4 w-full text-foreground mx-auto p-2 md:p-4 h-full overflow-y-auto relative">
       {/* Left sidebar */}
       <div className="hidden md:block">
-        {activeTab === "documents" ? <WikiDocumentTree /> : <WikiPageTree />}
+        {activeTab === "documents" ? <WikiDocumentTree /> : <WikiPageTree workspaceId={workspaceId} />}
       </div>
 
       {/* Mobile sidebar */}
@@ -246,7 +285,7 @@ export function AdminWikiDashboard() {
               {activeTab === "documents" ? (
                 <WikiDocumentTree />
               ) : (
-                <WikiPageTree />
+                <WikiPageTree workspaceId={workspaceId} />
               )}
             </div>
           </SheetContent>
@@ -280,7 +319,7 @@ export function AdminWikiDashboard() {
               Tìm nhanh (Ctrl+K)
             </button>
             <Link
-              href="/wiki/graph"
+              href={`/wiki/graph${viewAllWiki && isSystemAdmin ? "?workspaceId=all" : ""}`}
               className="px-2.5 py-1.5 text-xs font-semibold bg-primary hover:bg-primary/90 text-primary-foreground transition-all rounded-md shadow-sm active:translate-y-[0.5px] flex items-center gap-1.5 cursor-pointer"
             >
               <Compass className="w-3.5 h-3.5" />
@@ -406,26 +445,42 @@ export function AdminWikiDashboard() {
                     />
                     <Search className="absolute left-3 top-2.5 w-4 h-4 text-muted-foreground" />
                   </div>
-                  <div className="flex flex-wrap items-center gap-1 bg-muted p-1 rounded-md text-[10px] font-semibold">
-                    {[
-                      { id: "all", label: "TẤT CẢ" },
-                      { id: "concept", label: "KHÁI NIỆM" },
-                      { id: "entity", label: "THỰC THỂ" },
-                      { id: "topic", label: "CHỦ ĐỀ" },
-                      { id: "source", label: "NGUỒN TIN" },
-                    ].map((tab) => (
+                  <div className="flex flex-wrap items-center gap-2">
+                    {isSystemAdmin && (
                       <button
-                        key={tab.id}
-                        onClick={() => setSelectedType(tab.id)}
-                        className={`px-2.5 py-1 transition-all rounded-md cursor-pointer ${
-                          selectedType === tab.id
-                            ? "bg-primary text-primary-foreground shadow-sm"
-                            : "hover:bg-muted-foreground/10 text-foreground"
+                        onClick={() => setViewAllWiki((v) => !v)}
+                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 border rounded-md text-[10px] font-bold transition-all cursor-pointer select-none active:scale-[0.97] whitespace-nowrap h-7 ${
+                          viewAllWiki
+                            ? "border-primary bg-primary/10 text-primary font-bold shadow-xs"
+                            : "border-border bg-background text-muted-foreground hover:bg-accent font-bold"
                         }`}
+                        title={viewAllWiki ? "Đang hiển thị wiki từ tất cả Workspace" : "Chỉ hiển thị wiki của Workspace hiện tại"}
                       >
-                        {tab.label}
+                        <Globe className="w-3 h-3 text-emerald-500 shrink-0" />
+                        {viewAllWiki ? "Tất cả Workspace" : "Không gian hiện tại"}
                       </button>
-                    ))}
+                    )}
+                    <div className="flex flex-wrap items-center gap-1 bg-muted p-1 rounded-md text-[10px] font-semibold h-7">
+                      {[
+                        { id: "all", label: "TẤT CẢ" },
+                        { id: "concept", label: "KHÁI NIỆM" },
+                        { id: "entity", label: "THỰC THỂ" },
+                        { id: "topic", label: "CHỦ ĐỀ" },
+                        { id: "source", label: "NGUỒN TIN" },
+                      ].map((tab) => (
+                        <button
+                          key={tab.id}
+                          onClick={() => setSelectedType(tab.id)}
+                          className={`px-2 py-0.5 transition-all rounded-md cursor-pointer leading-tight ${
+                            selectedType === tab.id
+                              ? "bg-primary text-primary-foreground shadow-sm font-bold"
+                              : "hover:bg-muted-foreground/10 text-foreground"
+                          }`}
+                        >
+                          {tab.label}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
 
@@ -450,7 +505,7 @@ export function AdminWikiDashboard() {
                 ) : (
                   <>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      {filteredPages.map((article) => {
+                      {filteredPages.map((article: WikiPage) => {
                         const type = getPageType(article);
                         const config =
                           typeConfigs[type] || typeConfigs.concept;
@@ -463,12 +518,19 @@ export function AdminWikiDashboard() {
                           >
                             <div>
                               <div className="flex items-start justify-between gap-2 mb-1.5">
-                                <span
-                                  className={`text-[9px] font-semibold uppercase tracking-wider px-1.5 py-0.5 border rounded-md ${config.className}`}
-                                >
-                                  {config.label}
-                                </span>
-                                <span className="text-[9px] font-mono text-muted-foreground select-none">
+                                <div className="flex items-center gap-1.5 min-w-0">
+                                  <span
+                                    className={`text-[9px] font-semibold uppercase tracking-wider px-1.5 py-0.5 border rounded-md shrink-0 ${config.className}`}
+                                  >
+                                    {config.label}
+                                  </span>
+                                  {viewAllWiki && (
+                                    <span className="text-[9px] font-semibold bg-muted border border-border text-muted-foreground px-1.5 py-0.5 rounded-md truncate max-w-[100px]" title={getWorkspaceLabel(article.workspaceId)}>
+                                      {getWorkspaceLabel(article.workspaceId)}
+                                    </span>
+                                  )}
+                                </div>
+                                <span className="text-[9px] font-mono text-muted-foreground select-none shrink-0">
                                   V.{article.version}
                                 </span>
                               </div>

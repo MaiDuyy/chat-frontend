@@ -42,7 +42,22 @@ type Props = {
   mini?: boolean;
   height?: number;
   onNodeClick?: (slug: string) => void;
+  communityMap?: Record<string, number>;
 };
+
+const COMMUNITY_COLORS = [
+  "#3b82f6", "#ef4444", "#10b981", "#f59e0b", "#8b5cf6",
+  "#ec4899", "#06b6d4", "#f97316", "#14b8a6", "#a855f7",
+];
+
+function getCommunityNodeColors(communityId: number, isDark: boolean): { bg: string; border: string; text: string } {
+  const color = COMMUNITY_COLORS[communityId % COMMUNITY_COLORS.length];
+  return {
+    bg: isDark ? `${color}33` : `${color}22`,
+    border: color,
+    text: isDark ? color : color,
+  };
+}
 
 // Dynamic theme colors helper
 function getGraphNodeColors(type: string, isDark: boolean): { bg: string; border: string; text: string } {
@@ -108,6 +123,7 @@ export function WikiGraph({
   mini = false,
   height,
   onNodeClick,
+  communityMap,
 }: Props) {
   const router = useRouter();
   const containerRef = React.useRef<HTMLDivElement>(null);
@@ -124,6 +140,9 @@ export function WikiGraph({
     obs.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
     return () => obs.disconnect();
   }, []);
+
+  const [colorMode, setColorMode] = React.useState<"pageType" | "community">("pageType");
+  const hasCommunities = communityMap && Object.keys(communityMap).length > 0;
 
   const EDGE_COLOR = isDarkMode ? "rgba(71, 85, 105, 0.55)" : "rgba(203, 213, 225, 0.85)"; // stroke-slate-700 / stroke-slate-300 mờ
   const EDGE_HIGHLIGHT = isDarkMode ? "#3b82f6" : "#2563eb"; // Project primary blue highlight
@@ -304,7 +323,9 @@ export function WikiGraph({
       const n = rawNode as Node;
       if (n.x === undefined || n.y === undefined) return;
       const r = nodeRadius(n.degree ?? 0, mini);
-      const nodeColors = getGraphNodeColors(n.page_type, isDarkMode);
+      const nodeColors = (colorMode === "community" && communityMap && communityMap[n.id] !== undefined)
+        ? getCommunityNodeColors(communityMap[n.id], isDarkMode)
+        : getGraphNodeColors(n.page_type, isDarkMode);
       const hovered = hoveredIdRef.current;
       const neighborSet = neighborIdsRef.current;
       const isHovered = hovered === n.id;
@@ -361,7 +382,7 @@ export function WikiGraph({
         ctx.globalAlpha = 1;
       }
     },
-    [mini, centerSlug, hoverVersion]
+    [mini, centerSlug, hoverVersion, colorMode, communityMap, isDarkMode]
   );
 
   const linkColor = React.useCallback(
@@ -553,6 +574,20 @@ export function WikiGraph({
           >
             <Maximize2 className="w-3.5 h-3.5" />
           </button>
+          {hasCommunities && (
+            <>
+              <div className="w-5 border-t border-border my-0.5" />
+              <button
+                onClick={() => setColorMode(prev => prev === "pageType" ? "community" : "pageType")}
+                className={`w-7 h-7 flex items-center justify-center hover:bg-muted border rounded-md transition-all cursor-pointer ${
+                  colorMode === "community" ? "border-primary bg-primary/10 text-primary" : "border-transparent text-foreground"
+                }`}
+                title={colorMode === "pageType" ? "Hiển thị theo cộng đồng" : "Hiển thị theo loại trang"}
+              >
+                <Tag className="w-3.5 h-3.5" />
+              </button>
+            </>
+          )}
         </div>
       )}
     </div>

@@ -12,6 +12,9 @@ export interface TreeNode {
 /**
  * Parses a flat list of Documents along with workspaces and departments
  * into a hierarchical tree structure with Zero-Trust pruning.
+ *
+ * Admin mode: documents may belong to workspaces not in the user's workspace list.
+ * These are handled by creating virtual workspace nodes from the workspaceId directly.
  */
 export function parseDocumentsToTree(
     documents: Document[],
@@ -35,7 +38,7 @@ export function parseDocumentsToTree(
         rootNodes.push(deptNode);
     });
 
-    // 2. Initialize Workspace Nodes
+    // 2. Initialize Workspace Nodes (from known workspaces)
     workspaces.forEach(ws => {
         const wsNode: TreeNode = {
             id: `workspace:${ws.id}`,
@@ -67,6 +70,23 @@ export function parseDocumentsToTree(
     wsNodeMap.set('workspace-default', globalWsNode);
     wsNodeMap.set('default-workspace', globalWsNode); // alias
     rootNodes.push(globalWsNode);
+
+    // Helper: get or create a virtual workspace node for unknown workspace IDs (admin mode)
+    function getOrCreateWsNode(wsId: string): TreeNode {
+        if (wsNodeMap.has(wsId)) return wsNodeMap.get(wsId)!;
+        // Create virtual node for unknown workspace (admin sees docs from all workspaces)
+        const shortId = wsId.length > 20 ? wsId.slice(0, 16) + '…' : wsId;
+        const virtualNode: TreeNode = {
+            id: `workspace:${wsId}`,
+            name: `Không gian: ${shortId}`,
+            type: 'workspace',
+            path: wsId,
+            children: []
+        };
+        wsNodeMap.set(wsId, virtualNode);
+        rootNodes.push(virtualNode);
+        return virtualNode;
+    }
 
     // Helper function to insert a document into a parent node (Workspace, Department, or Global)
     function insertDocIntoNode(doc: Document, parentNode: TreeNode) {
@@ -106,14 +126,15 @@ export function parseDocumentsToTree(
     documents.forEach(doc => {
         // Normalize workspaceId
         let originalWsId = doc.workspaceId;
-        if (originalWsId === '' || originalWsId === 'all') originalWsId = undefined;
+        if (originalWsId === '' || originalWsId === 'all' || originalWsId === 'GLOBAL') {
+            originalWsId = undefined;
+        }
 
         if (originalWsId && originalWsId !== 'default-workspace' && originalWsId !== 'workspace-default') {
-            // Workspace-specific document
-            const wsNode = wsNodeMap.get(originalWsId);
-            if (wsNode) {
-                insertDocIntoNode(doc, wsNode);
-            }
+            // Workspace-specific document — get or create the workspace node
+            // getOrCreateWsNode handles unknown workspaceIds in admin mode
+            const wsNode = getOrCreateWsNode(originalWsId);
+            insertDocIntoNode(doc, wsNode);
         } else {
             // Global or Department-wide document
             if (doc.departmentId && doc.departmentId !== '') {

@@ -9,6 +9,11 @@ import {
   useGetWikiGraphQuery,
   WikiPage,
 } from "@/src/redux/feature/mrpApi";
+import {
+  useGetAdminWikiMetadataQuery,
+  useGetAdminWikiGraphQuery,
+} from "@/src/redux/feature/adminApi";
+import { useHasRole } from "@/src/lib/rbac/usePermission";
 import { WikiGraph } from "../components/WikiGraph";
 import {
   wikiTypeColor,
@@ -42,15 +47,36 @@ export default function WikiGraphPage() {
   const currentWorkspaceId = useSelector((state: any) => state.workspace.currentWorkspaceId);
   const workspaceId = searchParams.get("workspaceId") || currentWorkspaceId || "default-workspace";
 
-  const { data: allPages = [], isLoading: isMetadataLoading } = useGetWikiPagesMetadataQuery({
-    workspaceId,
-  });
+  const isSuperAdmin = useHasRole("SUPER_ADMIN");
+  const isAdmin = useHasRole("ADMIN");
+  const isSystemAdmin = isSuperAdmin || isAdmin;
 
-  const { data: graphDataFromBackend, isLoading: isGraphLoading } = useGetWikiGraphQuery({
-    workspaceId,
-  });
+  const showAdminWiki = isSystemAdmin && workspaceId === "all";
 
-  const isLoading = isMetadataLoading || isGraphLoading;
+  // RTK Query calls
+  const { data: userWikiMetadata, isLoading: isMetadataLoadingUser } = useGetWikiPagesMetadataQuery(
+    { workspaceId },
+    { skip: showAdminWiki }
+  );
+  const { data: adminWikiMetadata, isLoading: isMetadataLoadingAdmin } = useGetAdminWikiMetadataQuery(
+    undefined,
+    { skip: !showAdminWiki }
+  );
+
+  const { data: userGraphData, isLoading: isGraphLoadingUser } = useGetWikiGraphQuery(
+    { workspaceId },
+    { skip: showAdminWiki }
+  );
+  const { data: adminGraphData, isLoading: isGraphLoadingAdmin } = useGetAdminWikiGraphQuery(
+    undefined,
+    { skip: !showAdminWiki }
+  );
+
+  const allPages = (showAdminWiki ? adminWikiMetadata : userWikiMetadata) || [];
+  const graphDataFromBackend = showAdminWiki ? adminGraphData : userGraphData;
+  const isLoading = showAdminWiki
+    ? (isMetadataLoadingAdmin || isGraphLoadingAdmin)
+    : (isMetadataLoadingUser || isGraphLoadingUser);
 
 
   const [activeTypes, setActiveTypes] = React.useState<Set<PageType>>(

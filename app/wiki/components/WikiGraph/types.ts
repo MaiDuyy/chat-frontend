@@ -5,6 +5,7 @@ export type GraphNode = SimulationNodeDatum & {
   title: string;
   page_type: string; // concept, entity, topic, source
   degree?: number;
+  communityId?: number;
 };
 
 export type GraphLink = SimulationLinkDatum<GraphNode> & {

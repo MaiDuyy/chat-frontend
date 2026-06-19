@@ -20,7 +20,8 @@ import {
 } from "lucide-react";
 import { useGetDocumentsQuery, Document } from "@/src/redux/feature/knowledgeApi";
 import { useGetUserWorkspacesQuery } from "@/src/redux/feature/workspaceApi";
-import { useListDepartmentsQuery } from "@/src/redux/feature/departmentApi";
+import { useListDepartmentsQuery, useGetUserDepartmentsQuery } from "@/src/redux/feature/departmentApi";
+import { useGetAdminDocumentsQuery } from "@/src/redux/feature/adminApi";
 import { parseDocumentsToTree, TreeNode } from "@/src/features/admin/FolderTreeParser";
 import { toast } from "sonner";
 
@@ -41,8 +42,21 @@ export function WikiDocumentTree() {
   // States for expanded nodes
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
 
+  // Role details
+  const user = useSelector((state: any) => state.auth.user);
+  const globalRoles = useSelector((state: any) => state.auth.roles) || [];
+  const userId = user?.id || '';
+  const { data: userDepts = [] } = useGetUserDepartmentsQuery(userId, { skip: !userId });
+
+  const isGlobalAdmin = globalRoles.some((r: string) => r.includes('ADMIN') || r.includes('SUPER_ADMIN'));
+  const isLeader = isGlobalAdmin || userDepts.some((d: any) => d.userRole === 'HEAD' || d.userRole === 'MANAGER');
+
   // API Queries
-  const { data: documentsData, isLoading: isDocsLoading } = useGetDocumentsQuery({ workspaceId: "all" });
+  const { data: adminDocs, isLoading: isAdminDocsLoading } = useGetAdminDocumentsQuery(undefined, { skip: !isLeader });
+  const { data: userDocs, isLoading: isUserDocsLoading } = useGetDocumentsQuery({ workspaceId: "all" }, { skip: isLeader });
+
+  const documentsData = isLeader ? adminDocs : userDocs;
+  const isDocsLoading = isLeader ? isAdminDocsLoading : isUserDocsLoading;
   const { data: workspaces = [], isLoading: isWorkspacesLoading } = useGetUserWorkspacesQuery();
   const { data: departments = [], isLoading: isDeptsLoading } = useListDepartmentsQuery();
 

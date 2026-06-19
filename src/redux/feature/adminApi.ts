@@ -1,7 +1,6 @@
-// src/redux/feature/adminApi.ts
-// Admin API endpoints for user and organization management
-
 import { apiSlice } from '../api/baseApi';
+import type { Document, DocumentUploadResponse } from './knowledgeApi';
+import type { WikiPage } from './mrpApi';
 
 // Types
 export interface User {
@@ -421,6 +420,106 @@ export const adminApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ['AISettings'],
     }),
+
+    // Get all documents system-wide (Admin only)
+    getAdminDocuments: builder.query<Document[], { page?: number; size?: number } | void>({
+      query: (params) => {
+        if (params && (params.page !== undefined || params.size !== undefined)) {
+          const q = new URLSearchParams();
+          if (params.page !== undefined) q.append('page', String(params.page));
+          if (params.size !== undefined) q.append('size', String(params.size));
+          return `/admin/documents?${q.toString()}`;
+        }
+        return '/admin/documents';
+      },
+      transformResponse: (response: Document[] | { content: Document[] }) => {
+        const normalizeDoc = (doc: Document): Document => ({
+          ...doc,
+          workspaceId: doc.workspaceId === 'GLOBAL' ? 'default-workspace' : doc.workspaceId,
+        });
+        if (Array.isArray(response)) return response.map(normalizeDoc);
+        if ('content' in response && Array.isArray(response.content)) return response.content.map(normalizeDoc);
+        return [];
+      },
+      providesTags: ['Documents'],
+    }),
+
+    // Get details of any document system-wide (Admin only)
+    getAdminDocument: builder.query<Document, number | string>({
+      query: (id) => `/admin/documents/${id}`,
+      transformResponse: (response: Document): Document => ({
+        ...response,
+        workspaceId: response.workspaceId === 'GLOBAL' ? 'default-workspace' : response.workspaceId,
+      }),
+      providesTags: (_r, _e, id) => [{ type: 'Documents', id }],
+    }),
+
+    // Delete any document system-wide (Admin only)
+    deleteAdminDocument: builder.mutation<{ message: string }, number | string>({
+      query: (id) => ({
+        url: `/admin/documents/${id}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['Documents'],
+    }),
+
+    // Admin upload: upload a document without workspace scope restriction
+    // Builds URL string manually (same pattern as knowledgeApi.uploadDocument) for reliable multipart forwarding
+    uploadAdminDocument: builder.mutation<
+      DocumentUploadResponse,
+      {
+        formData: FormData;
+        preview?: boolean;
+        parser?: 'gemini' | 'tika';
+        workspaceId?: string;
+        departmentId?: string;
+        allowedRoles?: string;
+        securityClassification?: string;
+        folderPath?: string;
+      }
+    >({
+      query: ({ formData, preview, parser, workspaceId, departmentId, allowedRoles, securityClassification, folderPath }) => {
+        let url = `/admin/documents/upload?preview=${preview ?? false}&parser=${parser || 'gemini'}`;
+        if (workspaceId) url += `&workspaceId=${encodeURIComponent(workspaceId)}`;
+        if (departmentId) url += `&departmentId=${encodeURIComponent(departmentId)}`;
+        if (allowedRoles) url += `&allowedRoles=${encodeURIComponent(allowedRoles)}`;
+        if (securityClassification) url += `&securityClassification=${encodeURIComponent(securityClassification)}`;
+        if (folderPath) url += `&folderPath=${encodeURIComponent(folderPath)}`;
+        return { url, method: 'POST', body: formData };
+      },
+      invalidatesTags: ['Documents'],
+    }),
+
+    // Get all wiki pages system-wide (Admin only)
+    getAdminWikiPages: builder.query<any, { page?: number; size?: number } | void>({
+      query: (params) => ({
+        url: '/admin/mrp/wiki',
+        params: params || {},
+      }),
+      providesTags: ['Documents'],
+    }),
+
+    // Get lightweight wiki metadata system-wide (Admin only)
+    getAdminWikiMetadata: builder.query<WikiPage[], void>({
+      query: () => '/admin/mrp/wiki/metadata',
+      providesTags: ['Documents'],
+    }),
+
+    // Get wiki link graph system-wide (Admin only)
+    getAdminWikiGraph: builder.query<{ nodes: Array<{ slug: string; title: string; pageType: string }>; edges: Array<{ from: string; to: string }> }, void>({
+      query: () => '/admin/mrp/wiki/graph',
+      providesTags: ['Documents'],
+    }),
+
+    // Get a single wiki page by slug across all workspaces (Admin only)
+    // Optional workspaceId to prefer a specific workspace when slug conflicts exist
+    getAdminWikiPageBySlug: builder.query<WikiPage, { slug: string; workspaceId?: string }>({
+      query: ({ slug, workspaceId }) => {
+        const params = workspaceId && workspaceId !== 'all' ? `?workspaceId=${encodeURIComponent(workspaceId)}` : '';
+        return `/admin/mrp/wiki/slug/${slug}${params}`;
+      },
+      providesTags: (_r, _e, { slug }) => [{ type: 'Documents', id: `admin-slug-${slug}` }],
+    }),
   }),
 });
 
@@ -456,6 +555,16 @@ export const {
   useUpdateAiSettingsMutation,
   useGetLlmCatalogQuery,
   useSwitchLlmModelMutation,
+  // Admin Document & Wiki endpoints
+  useGetAdminDocumentsQuery,
+  useGetAdminDocumentQuery,
+  useDeleteAdminDocumentMutation,
+  useUploadAdminDocumentMutation,
+  useGetAdminWikiPagesQuery,
+  useGetAdminWikiMetadataQuery,
+  useGetAdminWikiGraphQuery,
+  useGetAdminWikiPageBySlugQuery,
+  useLazyGetAdminWikiPageBySlugQuery,
   // Lazy
   useLazyListUsersQuery,
   useLazyGetUserByIdQuery,
