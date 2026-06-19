@@ -119,7 +119,7 @@ const normalizeDoc = (doc: Document): Document => {
   if (!doc) return doc;
   return {
     ...doc,
-    workspaceId: doc.workspaceId === 'GLOBAL' ? 'default-workspace' : doc.workspaceId,
+    workspaceId: (doc.workspaceId === 'GLOBAL' || doc.workspaceId === 'ALL') ? 'default-workspace' : doc.workspaceId,
   };
 };
 

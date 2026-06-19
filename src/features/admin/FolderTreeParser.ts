@@ -126,7 +126,7 @@ export function parseDocumentsToTree(
     documents.forEach(doc => {
         // Normalize workspaceId
         let originalWsId = doc.workspaceId;
-        if (originalWsId === '' || originalWsId === 'all' || originalWsId === 'GLOBAL') {
+        if (originalWsId === '' || originalWsId === 'all' || originalWsId === 'GLOBAL' || originalWsId === 'ALL') {
             originalWsId = undefined;
         }
 

@@ -23,6 +23,9 @@ import { useHasRole } from "@/src/lib/rbac/usePermission";
 import { useSelector } from "react-redux";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { WikiAIChatPanel, WikiAIChatButton } from "../components/WikiAIChatPanel";
+import { useGetUserWorkspacesQuery } from "@/src/redux/feature/workspaceApi";
+import { useListDepartmentsQuery } from "@/src/redux/feature/departmentApi";
+import { formatScopeLabel } from "@/src/utils/scope-utils";
 import {
   Calendar,
   Layers,
@@ -55,6 +58,9 @@ export default function WikiPageDetail() {
   const canManageWiki = isSuperAdmin || isAdmin || isWorkspaceManager;
   const isSystemAdmin = isSuperAdmin || isAdmin;
 
+  const { data: workspaces = [] } = useGetUserWorkspacesQuery();
+  const { data: departments = [] } = useListDepartmentsQuery();
+
   // Admin users always use the global slug query so workspace scoping never blocks them.
   // urlWorkspaceId (if present) is used as a preference hint to resolve slug conflicts
   // (e.g. same slug in multiple workspaces — prefer the one matching the hint).
@@ -62,12 +68,12 @@ export default function WikiPageDetail() {
   const isAdminGlobalView = isSystemAdmin; // Admins can always view any page globally
 
   // For scoped query: use URL param > Redux workspace > fallback
-  const workspaceId = (urlWorkspaceId && urlWorkspaceId !== 'all' && urlWorkspaceId !== 'GLOBAL')
+  const workspaceId = (urlWorkspaceId && urlWorkspaceId !== 'all' && urlWorkspaceId !== 'GLOBAL' && urlWorkspaceId !== 'ALL')
     ? urlWorkspaceId
     : (currentWorkspaceId || "default-workspace");
 
   // Preferred workspace for conflict resolution (null means "pick most recent globally")
-  const preferredWorkspaceId = (urlWorkspaceId && urlWorkspaceId !== 'all' && urlWorkspaceId !== 'GLOBAL')
+  const preferredWorkspaceId = (urlWorkspaceId && urlWorkspaceId !== 'all' && urlWorkspaceId !== 'GLOBAL' && urlWorkspaceId !== 'ALL')
     ? urlWorkspaceId
     : (currentWorkspaceId ?? undefined);
 
@@ -89,10 +95,17 @@ export default function WikiPageDetail() {
   const isPageLoading = isAdminGlobalView ? isAdminPageLoading : isScopedPageLoading;
   const pageError = isAdminGlobalView ? adminPageError : scopedPageError;
 
+  const scopeLabel = page ? formatScopeLabel({
+    workspaceId: page.workspaceId,
+    departmentId: page.departmentId,
+    workspaces,
+    departments
+  }) : '';
+
   // Metadata for backlinks & mini-graph:
   // Admins use global metadata so backlinks from ALL workspaces are resolved correctly.
   // Non-admins use the page's own workspace scope. Fallback to active workspaceId for global pages.
-  const metadataWorkspaceId = (page?.workspaceId && page.workspaceId !== 'default-workspace' && page.workspaceId !== 'GLOBAL')
+  const metadataWorkspaceId = (page?.workspaceId && page.workspaceId !== 'default-workspace' && page.workspaceId !== 'GLOBAL' && page.workspaceId !== 'ALL')
     ? page.workspaceId
     : workspaceId;
   const { data: adminAllPages } = useGetAdminWikiMetadataQuery(undefined, { skip: !isAdminGlobalView });
@@ -258,7 +271,7 @@ export default function WikiPageDetail() {
     <div className="font-sans flex gap-3 w-full text-foreground mx-auto p-2 md:p-3 h-full overflow-y-auto text-xs md:text-sm relative">
       {/* Collapsible Left Sidebar */}
       <div className="hidden md:block">
-        <WikiPageTree activeSlug={slug} />
+        <WikiPageTree activeSlug={slug} workspaceId={isAdminGlobalView ? "all" : workspaceId} />
       </div>
 
       {/* Mobile Floating Wiki Tree Toggle */}
@@ -274,7 +287,7 @@ export default function WikiPageDetail() {
           </SheetTrigger>
           <SheetContent side="left" className="p-0 w-72 bg-card border-r border-border">
             <div className="h-full p-3 overflow-y-auto select-none">
-              <WikiPageTree activeSlug={slug} />
+              <WikiPageTree activeSlug={slug} workspaceId={isAdminGlobalView ? "all" : workspaceId} />
             </div>
           </SheetContent>
         </Sheet>
@@ -321,11 +334,11 @@ export default function WikiPageDetail() {
           <div className="flex items-center gap-1.5">
             {isAdminGlobalView && (
               <span className="flex items-center gap-1 text-[9px] font-mono font-bold bg-amber-500/15 border border-amber-500/30 text-amber-600 dark:text-amber-400 px-1.5 py-0.5 rounded-md">
-                <Globe className="w-3 h-3" /> ADMIN · GLOBAL
+                <Globe className="w-3 h-3" /> ADMIN · ALL
               </span>
             )}
             <span className="text-[9px] font-mono font-bold bg-muted px-1.5 py-0.5 rounded-md border border-border text-muted-foreground">
-              Workspace: {page.workspaceId}
+              Phạm vi: {scopeLabel}
             </span>
             <span className="text-[9px] font-mono font-bold bg-muted px-1.5 py-0.5 rounded-md border border-border text-muted-foreground">
               Phiên bản: V.{page.version}

@@ -122,7 +122,7 @@ const normalizeWikiPage = (page: WikiPage): WikiPage => {
   if (!page) return page;
   return {
     ...page,
-    workspaceId: page.workspaceId === 'GLOBAL' ? 'default-workspace' : page.workspaceId,
+    workspaceId: (page.workspaceId === 'GLOBAL' || page.workspaceId === 'ALL') ? 'default-workspace' : page.workspaceId,
   };
 };
 
@@ -130,7 +130,7 @@ const normalizeWikiDraft = (draft: WikiPageDraft): WikiPageDraft => {
   if (!draft) return draft;
   return {
     ...draft,
-    workspaceId: draft.workspaceId === 'GLOBAL' ? 'default-workspace' : draft.workspaceId,
+    workspaceId: (draft.workspaceId === 'GLOBAL' || draft.workspaceId === 'ALL') ? 'default-workspace' : draft.workspaceId,
   };
 };
 

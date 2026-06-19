@@ -435,7 +435,7 @@ export const adminApi = apiSlice.injectEndpoints({
       transformResponse: (response: Document[] | { content: Document[] }) => {
         const normalizeDoc = (doc: Document): Document => ({
           ...doc,
-          workspaceId: doc.workspaceId === 'GLOBAL' ? 'default-workspace' : doc.workspaceId,
+          workspaceId: (doc.workspaceId === 'GLOBAL' || doc.workspaceId === 'ALL') ? 'default-workspace' : doc.workspaceId,
         });
         if (Array.isArray(response)) return response.map(normalizeDoc);
         if ('content' in response && Array.isArray(response.content)) return response.content.map(normalizeDoc);
@@ -449,7 +449,7 @@ export const adminApi = apiSlice.injectEndpoints({
       query: (id) => `/admin/documents/${id}`,
       transformResponse: (response: Document): Document => ({
         ...response,
-        workspaceId: response.workspaceId === 'GLOBAL' ? 'default-workspace' : response.workspaceId,
+        workspaceId: (response.workspaceId === 'GLOBAL' || response.workspaceId === 'ALL') ? 'default-workspace' : response.workspaceId,
       }),
       providesTags: (_r, _e, id) => [{ type: 'Documents', id }],
     }),

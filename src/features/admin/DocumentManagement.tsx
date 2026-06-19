@@ -16,7 +16,7 @@ import {
     useUploadAdminDocumentMutation,
 } from '@/src/redux/feature/adminApi';
 import { useCompileDocumentMutation } from '@/src/redux/feature/mrpApi';
-import { useGetUserWorkspacesQuery } from '@/src/redux/feature/workspaceApi';
+import { useGetUserWorkspacesQuery, Workspace } from '@/src/redux/feature/workspaceApi';
 import { MarkdownEditorModal } from '@/src/features/knowledge/MarkdownEditorModal';
 import { DocumentMetadataModal } from '@/src/features/knowledge/DocumentMetadataModal';
 import { ChunkInspectorModal } from './ChunkInspectorModal';
@@ -33,9 +33,6 @@ import { Badge } from '@/components/ui/badge';
 import {
     Card,
     CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
 } from '@/components/ui/card';
 import {
     DropdownMenu,
@@ -52,7 +49,6 @@ import {
     AlertCircle,
     Loader2,
     Search,
-    Filter,
     Download,
     FileUp,
     RefreshCw,
@@ -62,7 +58,6 @@ import {
     Database,
     Building2,
     Globe,
-    X,
     Lock,
     Folder,
     FolderOpen,
@@ -70,13 +65,13 @@ import {
     ChevronDown,
 } from 'lucide-react';
 import { parseDocumentsToTree, TreeNode } from './FolderTreeParser';
-import { format, formatDistanceToNow } from 'date-fns';
-import { vi } from 'date-fns/locale';
+import { format } from 'date-fns';
 import { cn, formatFileSize } from '@/lib/utils';
 import { toast } from 'sonner';
 import { Input } from '@/components/ui/input';
 import { WikiPagination } from '@/app/wiki/components/WikiPagination';
-import { useListDepartmentsQuery, useGetUserDepartmentsQuery } from '@/src/redux/feature/departmentApi';
+import { useListDepartmentsQuery, useGetUserDepartmentsQuery, Department } from '@/src/redux/feature/departmentApi';
+import { formatScopeLabel } from '@/src/utils/scope-utils';
 
 const statusConfig = {
     PENDING: { icon: Clock, color: 'bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-400 border border-amber-250/30 dark:border-amber-900/30', label: 'Pending' },
@@ -92,7 +87,7 @@ export function DocumentManagement() {
     const [searchTerm, setSearchTerm] = useState('');
     const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
     const [filterWorkspaceId, setFilterWorkspaceId] = useState<string>('default-workspace');
-    const [filterPendingOnly, setFilterPendingOnly] = useState(false);
+    const [filterPendingOnly] = useState(false);
     const currentWorkspaceId = useSelector((state: RootState) => state.workspace.currentWorkspaceId);
 
     const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
@@ -108,27 +103,13 @@ export function DocumentManagement() {
     const isGlobalAdmin = globalRoles.some(r => r.includes('ADMIN') || r.includes('SUPER_ADMIN'));
     const isLeader = isGlobalAdmin || userDepts.some(d => d.userRole === 'HEAD' || d.userRole === 'MANAGER');
 
-    // Group workspaces client-side for visual categorization (Hierarchical Model)
-    const groupedWorkspaces = useMemo(() => {
-        const depts: any[] = [];
-        const projs: any[] = [];
-        workspaces.forEach((ws: any) => {
-            if (ws.departmentId) {
-                depts.push(ws);
-            } else {
-                projs.push(ws);
-            }
-        });
-        return { departments: depts, projects: projs };
-    }, [workspaces]);
-
     // Expand workspaces and departments by default when loaded
     useEffect(() => {
         setExpandedNodes(prev => {
             const next = new Set(prev);
             next.add("workspace:workspace-default"); // always expand global shared folder
-            workspaces.forEach((ws: any) => next.add(`workspace:${ws.id}`));
-            departments.forEach((dept: any) => next.add(`dept:${dept.id}`));
+            workspaces.forEach((ws) => next.add(`workspace:${ws.id}`));
+            departments.forEach((dept) => next.add(`dept:${dept.id}`));
             return next;
         });
     }, [workspaces, departments]);
@@ -174,9 +155,8 @@ export function DocumentManagement() {
     const isLoading = isAdminQuery ? isAdminLoading : isUserLoading;
     const refetch = isAdminQuery ? refetchAdmin : refetchUser;
 
-    const [deleteUserDocument, { isLoading: isDeletingUser }] = useDeleteDocumentMutation();
-    const [deleteAdminDocument, { isLoading: isDeletingAdmin }] = useDeleteAdminDocumentMutation();
-    const isDeleting = isDeletingUser || isDeletingAdmin;
+    const [deleteUserDocument] = useDeleteDocumentMutation();
+    const [deleteAdminDocument] = useDeleteAdminDocumentMutation();
     const [approveDocument, { isLoading: isApproving }] = useApproveDocumentMutation();
     const [uploadDocument, { isLoading: isUploadingUser }] = useUploadDocumentMutation();
     const [uploadAdminDocument, { isLoading: isUploadingAdmin }] = useUploadAdminDocumentMutation();
@@ -200,7 +180,8 @@ export function DocumentManagement() {
                 : (doc.workspaceId || (workspaceIdForQuery && workspaceIdForQuery !== 'all' ? workspaceIdForQuery : null) || currentWorkspaceId || 'default-workspace');
             await compileDocument({ documentId: doc.id, workspaceId: targetWorkspaceId, autoApprove: false }).unwrap();
             toast.success('Kích hoạt quy trình biên soạn MRP thành công! Kế hoạch mới đang chờ duyệt.');
-        } catch (error: any) {
+        } catch (err: unknown) {
+            const error = err as { data?: { message?: string } };
             console.error('MRP compilation error:', error);
             toast.error(error.data?.message || 'Lỗi khi khởi chạy quy trình MRP compilation');
         }
@@ -217,7 +198,7 @@ export function DocumentManagement() {
         // User endpoint: check for paged response
         if (Array.isArray(data)) return data as Document[];
         if (typeof data === 'object' && data !== null && 'content' in data) {
-            return (data as any).content as Document[];
+            return (data as { content?: Document[] }).content as Document[];
         }
         return [];
     }, [data, isAdminQuery]);
@@ -254,7 +235,7 @@ export function DocumentManagement() {
                 if (doc.tags?.some(t => t === `ws:${filterWorkspaceId}` || t.includes(filterWorkspaceId))) return true;
 
                 if (isDocWorkspaceEmpty) {
-                    const ws = workspaces.find((w: any) => w.id === filterWorkspaceId);
+                    const ws = workspaces.find((w: Workspace) => w.id === filterWorkspaceId);
                     if (ws && ws.departmentId && doc.departmentId === ws.departmentId) {
                         return true;
                     }
@@ -333,7 +314,8 @@ export function DocumentManagement() {
                 await deleteUserDocument(id.toString()).unwrap();
             }
             toast.success('Đã xóa tài liệu thành công');
-        } catch (error: any) {
+        } catch (err: unknown) {
+            const error = err as { data?: { message?: string } };
             toast.error(error.data?.message || 'Lỗi khi xóa tài liệu');
         }
     };
@@ -342,7 +324,7 @@ export function DocumentManagement() {
         try {
             await approveDocument(id.toString()).unwrap();
             toast.success('Document approved successfully');
-        } catch (error) {
+        } catch {
             toast.error('Failed to approve document');
         }
     };
@@ -364,7 +346,7 @@ export function DocumentManagement() {
         securityClassification: 'PUBLIC' | 'INTERNAL' | 'CONFIDENTIAL' | 'RESTRICTED';
         departmentId: string;
         allowedRoles: string;
-        uploadScope: 'DEPARTMENT' | 'WORKSPACE' | 'GLOBAL';
+        uploadScope: 'DEPARTMENT' | 'WORKSPACE' | 'ALL';
         workspaceId?: string;
         folderPath?: string;
     }) => {
@@ -373,7 +355,7 @@ export function DocumentManagement() {
         const formData = new FormData();
         formData.append('file', uploadPendingFile);
 
-        const targetUploadWorkspaceId = meta.uploadScope === 'GLOBAL'
+        const targetUploadWorkspaceId = meta.uploadScope === 'ALL'
             ? 'default-workspace'
             : (meta.uploadScope === 'DEPARTMENT'
                 ? ''
@@ -397,12 +379,13 @@ export function DocumentManagement() {
                 setEditingDoc({
                     id: result.documentId,
                     fileName: result.fileName,
-                    status: result.status as any,
+                    status: result.status as Document['status'],
                     markdownContent: result.markdownContent,
-                } as any);
+                } as unknown as Document);
                 setEditorOpen(true);
             }
-        } catch (error: any) {
+        } catch (err: unknown) {
+            const error = err as { data?: { message?: string } };
             console.error('Upload error:', error);
             toast.error(error.data?.message || 'Lỗi khi tải lên tài liệu');
         } finally {
@@ -433,7 +416,7 @@ export function DocumentManagement() {
                 <div className="flex-1 min-w-[260px] flex items-center gap-2">
                     {isAdminQuery && (
                         <span className="inline-flex items-center gap-1 text-[9px] font-mono font-bold bg-amber-500/15 border border-amber-500/30 text-amber-600 dark:text-amber-400 px-1.5 py-0.5 rounded-md whitespace-nowrap shrink-0">
-                            <Globe className="w-2.5 h-2.5" /> ADMIN · GLOBAL ({allDocs.length})
+                            <Globe className="w-2.5 h-2.5" /> ADMIN · ALL ({allDocs.length})
                         </span>
                     )}
                     <div className="relative flex-1">
@@ -670,23 +653,51 @@ export function DocumentManagement() {
                                                         {doc.departmentId && (
                                                             <span className="text-[8px] font-bold text-blue-550 dark:text-blue-400 flex items-center gap-0.5 mt-0.5">
                                                                 <Building2 className="w-2.5 h-2.5" />
-                                                                {departments.find((d: any) => d.id === doc.departmentId)?.name || 'Phòng ban'} ({doc.allowedRoles || 'ALL'})
+                                                                {departments.find((d: Department) => d.id === doc.departmentId)?.name || 'Phòng ban'} ({doc.allowedRoles || 'ALL'})
                                                             </span>
                                                         )}
                                                     </div>
                                                 </TableCell>
                                                 <TableCell className="py-1.5 text-xs font-semibold text-muted-foreground">
-                                                    {doc.workspaceId ? (
-                                                        <span className="flex items-center gap-1.5">
-                                                            <Database className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                                                            {workspaces.find((ws: any) => ws.id === doc.workspaceId)?.name || doc.workspaceId}
-                                                        </span>
-                                                    ) : (
-                                                        <span className="flex items-center gap-1.5 text-slate-550 dark:text-slate-400">
-                                                            <Globe className="w-3.5 h-3.5 text-slate-450 shrink-0" />
-                                                            Dùng chung
-                                                        </span>
-                                                    )}
+                                                    {(() => {
+                                                        const isDeptWide = doc.departmentId && 
+                                                                           doc.departmentId !== '' && 
+                                                                           doc.departmentId !== 'ALL' && 
+                                                                           doc.departmentId !== 'GLOBAL' && 
+                                                                           (!doc.workspaceId || doc.workspaceId === 'default-workspace' || doc.workspaceId === 'ALL' || doc.workspaceId === 'GLOBAL');
+                                                        
+                                                        const label = formatScopeLabel({
+                                                            workspaceId: doc.workspaceId,
+                                                            departmentId: doc.departmentId,
+                                                            workspaces,
+                                                            departments
+                                                        });
+
+                                                        if (isDeptWide) {
+                                                            return (
+                                                                <span className="flex items-center gap-1.5 text-blue-550 dark:text-blue-400">
+                                                                    <Building2 className="w-3.5 h-3.5 text-blue-500 shrink-0" />
+                                                                    {label}
+                                                                </span>
+                                                            );
+                                                        }
+
+                                                        if (doc.workspaceId && doc.workspaceId !== 'default-workspace' && doc.workspaceId !== 'ALL' && doc.workspaceId !== 'GLOBAL') {
+                                                            return (
+                                                                <span className="flex items-center gap-1.5">
+                                                                    <Database className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                                                                    {label}
+                                                                </span>
+                                                            );
+                                                        }
+
+                                                        return (
+                                                            <span className="flex items-center gap-1.5 text-slate-550 dark:text-slate-400">
+                                                                <Globe className="w-3.5 h-3.5 text-slate-450 shrink-0" />
+                                                                {label}
+                                                            </span>
+                                                        );
+                                                    })()}
                                                 </TableCell>
                                                 <TableCell className="py-1.5">
                                                     <Badge className={cn('rounded-md text-[9px] font-bold px-2 py-0.5 shadow-sm', status.color)}>

@@ -124,7 +124,7 @@ export function AdminWikiDashboard() {
   const isPagesLoading = showAdminWiki ? isAdminPagesLoading : isUserPagesLoading;
 
   const getWorkspaceLabel = React.useCallback((wsId?: string) => {
-    if (!wsId || wsId === 'default-workspace' || wsId === 'GLOBAL') {
+    if (!wsId || wsId === 'default-workspace' || wsId === 'GLOBAL' || wsId === 'ALL') {
       return 'Hệ thống';
     }
     const ws = workspaces.find((w: any) => w.id === wsId);

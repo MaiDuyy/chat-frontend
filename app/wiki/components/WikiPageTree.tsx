@@ -48,8 +48,8 @@ export function WikiPageTree({
   const isAdmin = useHasRole("ADMIN");
   const isSystemAdmin = isSuperAdmin || isAdmin;
 
-  // Admins always see the global catalog so the tree reflects all pages system-wide
-  const showAdminWiki = isSystemAdmin;
+  // Admins see the global catalog if workspaceId is "all" or "ALL"
+  const showAdminWiki = isSystemAdmin && (workspaceId === "all" || workspaceId === "ALL");
 
   // RTK query to load pages
   const { data: userWikiPages, isLoading: isUserLoading } = useGetWikiPagesMetadataQuery(
@@ -145,7 +145,7 @@ export function WikiPageTree({
         <div className="flex items-center gap-2">
           {showAdminWiki && (
             <span className="text-[8px] font-mono font-bold bg-amber-500/15 border border-amber-500/30 text-amber-600 dark:text-amber-400 px-1 py-0.5 rounded">
-              GLOBAL
+              ALL
             </span>
           )}
           <span className="text-[9px] font-mono font-bold bg-primary text-primary-foreground px-1.5 py-0.5 rounded-md shadow-xs">
@@ -252,7 +252,7 @@ export function WikiPageTree({
                               title={page.title}
                             >
                               <span className="truncate">{page.title}</span>
-                              {showAdminWiki && page.workspaceId && page.workspaceId !== 'GLOBAL' && (
+                              {showAdminWiki && page.workspaceId && page.workspaceId !== 'GLOBAL' && page.workspaceId !== 'ALL' && (
                                 <span className="text-[8px] font-mono text-muted-foreground/60 shrink-0 truncate max-w-[50px]" title={page.workspaceId}>
                                   {page.workspaceId.length > 6 ? page.workspaceId.slice(0, 6) + '…' : page.workspaceId}
                                 </span>
@@ -268,7 +268,7 @@ export function WikiPageTree({
                               title={page.title}
                             >
                               <span className="truncate">{page.title}</span>
-                              {showAdminWiki && page.workspaceId && page.workspaceId !== 'GLOBAL' && (
+                              {showAdminWiki && page.workspaceId && page.workspaceId !== 'GLOBAL' && page.workspaceId !== 'ALL' && (
                                 <span className="text-[8px] font-mono text-muted-foreground/60 shrink-0 truncate max-w-[50px]" title={page.workspaceId}>
                                   {page.workspaceId.length > 6 ? page.workspaceId.slice(0, 6) + '…' : page.workspaceId}
                                 </span>
