@@ -37,7 +37,7 @@ export const InsightsWidget: React.FC = () => {
   const { data: friendsData, isLoading, isError, refetch } = useGetFriendsQuery();
   
   // Lọc chỉ lấy những người bạn đang online
-  const onlineFriends = friendsData?.friends?.filter(f => f.status === 'ONLINE' || f.customStatus) || [];
+  const onlineFriends = friendsData?.friends?.filter(f => f.status === 'ONLINE' || (f as any).customStatus) || [];
   const status = isError ? 'error' : isLoading ? 'loading' : 'success';
 
   return (
@@ -65,9 +65,9 @@ export const InsightsWidget: React.FC = () => {
             )}
             
             {onlineFriends.slice(0, 4).map((friend) => {
-              const badge = getStatusBadge(friend.status, friend.customStatus);
+              const badge = getStatusBadge(friend.status || '', (friend as any).customStatus);
               // Fallback initial
-              const initial = (friend.name || friend.email || 'U').charAt(0).toUpperCase();
+              const initial = (friend.name || (friend as any).email || 'U').charAt(0).toUpperCase();
               
               return (
                 <div key={friend.id} className="flex items-center gap-3 p-2 hover:bg-muted/50 rounded-sm cursor-pointer transition-colors group border border-transparent hover:border-border/50">

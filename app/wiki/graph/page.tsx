@@ -8,6 +8,8 @@ import { RootState } from "@/src/redux/store";
 import {
   useGetWikiPagesMetadataQuery,
   useGetWikiGraphQuery,
+  useGetWikiGraphCommunitiesQuery,
+  useGetWikiPageBySlugQuery,
 } from "@/src/redux/feature/mrpApi";
 import {
   useGetAdminWikiMetadataQuery,
@@ -27,7 +29,14 @@ import {
   SlidersHorizontal,
   Maximize2,
   RotateCcw,
+  BookOpenCheck,
+  ChevronLeft,
+  Eye,
+  GitBranch,
+  ArrowRightLeft,
 } from "lucide-react";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { WikiContent } from "../components/WikiContent";
 
 const PAGE_TYPES = ["entity", "concept", "topic", "source"] as const;
 type PageType = (typeof PAGE_TYPES)[number];
@@ -79,6 +88,51 @@ export default function WikiGraphPage() {
   const [showFilters, setShowFilters] = React.useState(false);
   const [isFullscreen, setIsFullscreen] = React.useState(false);
 
+  // Upgrade state for Ego Mode & In-place Drawer
+  const [selectedSlug, setSelectedSlug] = React.useState<string | null>(null);
+  const [drawerHistory, setDrawerHistory] = React.useState<string[]>([]);
+  const [egoCenterSlug, setEgoCenterSlug] = React.useState<string | null>(null);
+  const [bloomDepth, setBloomDepth] = React.useState<number>(1);
+
+  // Fetch communities for community detection coloring
+  const { data: communitiesData } = useGetWikiGraphCommunitiesQuery({ workspaceId });
+  const communityMap = React.useMemo(() => {
+    const map: Record<string, number> = {};
+    if (!communitiesData?.communities) return map;
+    communitiesData.communities.forEach((c) => {
+      c.pageSlugs.forEach((slug) => {
+        map[slug] = c.id;
+      });
+    });
+    return map;
+  }, [communitiesData]);
+
+  // Query details for active drawer slug
+  const { data: pageData, isLoading: isPageLoading } = useGetWikiPageBySlugQuery(
+    { slug: selectedSlug ?? "", workspaceId },
+    { skip: !selectedSlug }
+  );
+
+  const handleDrawerLinkClick = (nextSlug: string) => {
+    setDrawerHistory((prev) => [...prev, nextSlug]);
+    setSelectedSlug(nextSlug);
+    setHighlightSlug(nextSlug);
+  };
+
+  const handleDrawerBack = () => {
+    setDrawerHistory((prev) => {
+      if (prev.length <= 1) {
+        setSelectedSlug(null);
+        return [];
+      }
+      const nextHistory = prev.slice(0, -1);
+      const prevSlug = nextHistory[nextHistory.length - 1];
+      setSelectedSlug(prevSlug);
+      setHighlightSlug(prevSlug);
+      return nextHistory;
+    });
+  };
+
   const graphData: GraphData = React.useMemo(() => {
     if (!graphDataFromBackend) return { nodes: [], edges: [] };
     return {
@@ -93,15 +147,55 @@ export default function WikiGraphPage() {
 
   const filteredData = React.useMemo(() => {
     if (!graphData.nodes.length) return null;
-    const nodes = graphData.nodes.filter((n) =>
+    
+    // 1. Initial page type filtering
+    let nodes = graphData.nodes.filter((n) =>
       activeTypes.has(n.page_type as PageType)
     );
-    const slugSet = new Set(nodes.map((n) => n.slug));
-    const edges = graphData.edges.filter(
+    let slugSet = new Set(nodes.map((n) => n.slug));
+    let edges = graphData.edges.filter(
       (e) => slugSet.has(e.from) && slugSet.has(e.to)
     );
+
+    // 2. Client-side Ego Mode BFS filtering (1-hop or 2-hop)
+    if (egoCenterSlug && slugSet.has(egoCenterSlug)) {
+      const visited = new Set<string>([egoCenterSlug]);
+      let currentQueue = [egoCenterSlug];
+
+      for (let d = 0; d < bloomDepth; d++) {
+        const nextQueue: string[] = [];
+        for (const currentSlug of currentQueue) {
+          for (const edge of edges) {
+            if (edge.from === currentSlug && !visited.has(edge.to)) {
+              visited.add(edge.to);
+              nextQueue.push(edge.to);
+            } else if (edge.to === currentSlug && !visited.has(edge.from)) {
+              visited.add(edge.from);
+              nextQueue.push(edge.from);
+            }
+          }
+        }
+        currentQueue = nextQueue;
+      }
+
+      nodes = nodes.filter((n) => visited.has(n.slug));
+      const finalSlugSet = new Set(nodes.map((n) => n.slug));
+      edges = edges.filter(
+        (e) => finalSlugSet.has(e.from) && finalSlugSet.has(e.to)
+      );
+    }
+
     return { nodes, edges };
-  }, [graphData, activeTypes]);
+  }, [graphData, activeTypes, egoCenterSlug, bloomDepth]);
+
+  // Compute backlinks client-side from overall graph
+  const backlinkNodes = React.useMemo(() => {
+    if (!selectedSlug) return [];
+    const fromSlugs = graphData.edges
+      .filter((e) => e.to === selectedSlug)
+      .map((e) => e.from);
+    return graphData.nodes.filter((n) => fromSlugs.includes(n.slug));
+  }, [selectedSlug, graphData]);
 
   const searchMatches = React.useMemo(() => {
     if (!searchQuery || !graphData.nodes.length) return [];
@@ -280,6 +374,8 @@ export default function WikiGraphPage() {
               key={n.slug}
               onClick={() => {
                 setHighlightSlug(n.slug);
+                setSelectedSlug(n.slug);
+                setDrawerHistory([n.slug]);
                 setSearchQuery("");
               }}
               className="w-full flex items-center gap-2 px-3 py-2.5 text-left text-xs hover:bg-accent transition-colors cursor-pointer"
@@ -349,12 +445,57 @@ export default function WikiGraphPage() {
           <WikiGraph
             nodes={filteredData.nodes}
             edges={filteredData.edges}
-            centerSlug={highlightSlug ?? undefined}
+            centerSlug={highlightSlug ?? egoCenterSlug ?? undefined}
             height={undefined}
             onNodeClick={(slug) => {
-              router.push(`/wiki/${slug}`);
+              setSelectedSlug(slug);
+              setDrawerHistory([slug]);
+              setHighlightSlug(slug);
             }}
+            onNodeDoubleClick={(slug) => {
+              setEgoCenterSlug(slug);
+              setBloomDepth(1);
+            }}
+            communityMap={communityMap}
           />
+        )}
+
+        {/* Ego mode banner overlay */}
+        {egoCenterSlug && (
+          <div className="absolute top-4 left-4 bg-card/95 backdrop-blur-sm border border-border rounded-lg p-3 shadow-xl z-20 flex flex-col gap-2 max-w-xs animate-in slide-in-from-left duration-200">
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-2">
+                <GitBranch className="w-4 h-4 text-primary animate-pulse" />
+                <span className="text-xs font-bold text-foreground">
+                  Chế độ tập trung (Ego Mode)
+                </span>
+              </div>
+              <button
+                onClick={() => setEgoCenterSlug(null)}
+                className="text-muted-foreground hover:text-foreground hover:bg-accent p-1 rounded-md transition-colors cursor-pointer"
+                title="Thoát chế độ tập trung"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+            <p className="text-[11px] text-muted-foreground leading-relaxed">
+              Đang hiển thị các trang liên kết với <span className="font-semibold text-foreground">"{graphData.nodes.find(n => n.slug === egoCenterSlug)?.title || egoCenterSlug}"</span> trong phạm vi {bloomDepth} liên kết.
+            </p>
+            <div className="flex items-center gap-2 mt-1">
+              <button
+                onClick={() => setBloomDepth((prev) => (prev === 1 ? 2 : 1))}
+                className="flex-1 py-1 px-2.5 rounded border border-border text-[10px] font-semibold bg-background hover:bg-accent text-foreground transition-all cursor-pointer text-center"
+              >
+                {bloomDepth === 1 ? "Mở rộng 2 liên kết" : "Thu hẹp 1 liên kết"}
+              </button>
+              <button
+                onClick={() => setEgoCenterSlug(null)}
+                className="flex-1 py-1 px-2.5 rounded border border-transparent text-[10px] font-semibold bg-primary text-primary-foreground hover:bg-primary/95 transition-all cursor-pointer text-center"
+              >
+                Trở lại tổng quan
+              </button>
+            </div>
+          </div>
         )}
 
         {/* Legend overlay */}
@@ -389,6 +530,143 @@ export default function WikiGraphPage() {
           </div>
         )}
       </div>
+
+      {/* ── Page Details Sheet (Drawer) ────────────────────── */}
+      <Sheet open={!!selectedSlug} onOpenChange={(open) => {
+        if (!open) {
+          setSelectedSlug(null);
+          setDrawerHistory([]);
+        }
+      }}>
+        <SheetContent className="w-full sm:w-[540px] md:w-[640px] max-w-[90vw] p-0 flex flex-col h-full bg-background border-l border-border shadow-2xl overflow-hidden z-50">
+          {/* Drawer Header */}
+          <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-card shrink-0 gap-2">
+            <div className="flex items-center gap-2 min-w-0">
+              {drawerHistory.length > 1 && (
+                <button
+                  onClick={handleDrawerBack}
+                  className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors cursor-pointer"
+                  title="Quay lại trang trước"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+              )}
+              <SheetTitle className="text-sm font-bold text-foreground truncate max-w-[280px]">
+                {pageData?.title || selectedSlug}
+              </SheetTitle>
+            </div>
+            
+            <div className="flex items-center gap-1.5 shrink-0">
+              {pageData?.pageType && (
+                <span
+                  className="text-[10px] font-bold px-2 py-0.5 rounded-full border"
+                  style={{
+                    color: wikiTypeColor(pageData.pageType),
+                    borderColor: `${wikiTypeColor(pageData.pageType)}30`,
+                    backgroundColor: `${wikiTypeColor(pageData.pageType)}10`,
+                  }}
+                >
+                  {wikiTypeGroupLabel(pageData.pageType)}
+                </span>
+              )}
+              {pageData?.version && (
+                <span className="text-[10px] font-mono font-medium text-muted-foreground bg-muted px-1.5 py-0.5 rounded border border-border">
+                  v{pageData.version}
+                </span>
+              )}
+              <Link
+                href={`/wiki/${encodeURIComponent(selectedSlug)}${workspaceId && workspaceId !== 'default-workspace' ? `?workspaceId=${encodeURIComponent(workspaceId)}` : ''}`}
+                className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent border border-border transition-colors cursor-pointer"
+                title="Mở trang toàn màn hình"
+              >
+                <Eye className="w-3.5 h-3.5" />
+              </Link>
+              <button
+                onClick={() => {
+                  setSelectedSlug(null);
+                  setDrawerHistory([]);
+                }}
+                className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors border border-border cursor-pointer"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </div>
+
+          {/* Drawer Body */}
+          <div className="flex-1 overflow-y-auto p-5 space-y-6">
+            {isPageLoading ? (
+              <div className="flex flex-col items-center justify-center py-12 gap-3">
+                <div className="w-6 h-6 border-2 border-primary border-t-transparent animate-spin rounded-full" />
+                <p className="text-xs font-medium text-muted-foreground">Đang tải nội dung wiki...</p>
+              </div>
+            ) : pageData ? (
+              <>
+                {/* Summary */}
+                {pageData.summary && (
+                  <div className="p-3 bg-muted/40 rounded-lg border border-border/80 text-xs text-muted-foreground leading-relaxed italic">
+                    {pageData.summary}
+                  </div>
+                )}
+
+                {/* Markdown content */}
+                <div className="border-t border-border/60 pt-4">
+                  <WikiContent
+                    markdown={pageData.content}
+                    onWikiLinkClick={handleDrawerLinkClick}
+                    allPages={graphData.nodes}
+                  />
+                </div>
+
+                {/* Source Document Reference */}
+                {pageData.sourceDocumentId && (
+                  <div className="border-t border-border/60 pt-4 border-dashed">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2">Tài liệu nguồn</p>
+                    <Link
+                      href={`/knowledge/${pageData.sourceDocumentId}`}
+                      className="inline-flex items-center gap-1.5 text-xs text-primary hover:underline font-medium border border-primary/20 bg-primary/5 px-2.5 py-1.5 rounded-md transition-all cursor-pointer"
+                    >
+                      <BookOpenCheck className="w-3.5 h-3.5" />
+                      <span>Xem tài liệu gốc (ID #{pageData.sourceDocumentId})</span>
+                    </Link>
+                  </div>
+                )}
+
+                {/* Backlinks */}
+                <div className="border-t border-border/60 pt-4 border-dashed">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2 flex items-center gap-1.5">
+                    <ArrowRightLeft className="w-3.5 h-3.5 text-primary" />
+                    Liên kết trỏ đến đây (Backlinks) ({backlinkNodes.length})
+                  </p>
+                  {backlinkNodes.length > 0 ? (
+                    <div className="flex flex-wrap gap-2">
+                      {backlinkNodes.map((bn) => (
+                        <button
+                          key={bn.slug}
+                          onClick={() => handleDrawerLinkClick(bn.slug)}
+                          className="inline-flex items-center gap-1.5 text-[11px] font-medium text-foreground hover:text-primary bg-muted hover:bg-primary/5 border border-border hover:border-primary/20 px-2 py-1 rounded transition-all cursor-pointer"
+                        >
+                          <span
+                            className="w-1.5 h-1.5 rounded-full shrink-0"
+                            style={{ background: wikiTypeColor(bn.page_type) }}
+                          />
+                          {bn.title}
+                        </button>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-[11px] text-muted-foreground italic">Không có trang nào liên kết đến trang này.</p>
+                  )}
+                </div>
+              </>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-12 text-center text-muted-foreground text-xs">
+                Không tìm thấy dữ liệu cho trang này.
+              </div>
+            )}
+          </div>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }

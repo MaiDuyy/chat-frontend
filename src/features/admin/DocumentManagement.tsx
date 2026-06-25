@@ -19,6 +19,7 @@ import { useCompileDocumentMutation } from '@/src/redux/feature/mrpApi';
 import { useGetUserWorkspacesQuery, Workspace } from '@/src/redux/feature/workspaceApi';
 import { MarkdownEditorModal } from '@/src/features/knowledge/MarkdownEditorModal';
 import { DocumentMetadataModal } from '@/src/features/knowledge/DocumentMetadataModal';
+import { PipelineVisualizer } from '@/src/features/knowledge/PipelineVisualizer';
 import { ChunkInspectorModal } from './ChunkInspectorModal';
 import {
     Table,
@@ -63,6 +64,7 @@ import {
     FolderOpen,
     ChevronRight,
     ChevronDown,
+    GitBranch,
 } from 'lucide-react';
 import { parseDocumentsToTree, TreeNode } from './FolderTreeParser';
 import { format } from 'date-fns';
@@ -202,6 +204,15 @@ export function DocumentManagement() {
         }
         return [];
     }, [data, isAdminQuery]);
+
+    const pipelineStats = useMemo(() => {
+        const counts: Record<string, number> = { PENDING: 0, PREVIEW: 0, PROCESSING: 0, COMPLETED: 0, FAILED: 0, FINALIZING: 0 };
+        allDocs.forEach((d: Document) => {
+            if (counts[d.status] !== undefined) counts[d.status]++;
+            if (d.processingStage === 'FINALIZING') counts.FINALIZING++;
+        });
+        return counts;
+    }, [allDocs]);
 
     // Build the hierarchical tree structure
     const treeData = useMemo(() => {
@@ -560,8 +571,8 @@ export function DocumentManagement() {
                         <RefreshCw className={cn("w-3.5 h-3.5 mr-1.5", isLoading && "animate-spin")} />
                         Làm mới
                     </Button>
-                    <Button 
-                        className="rounded-md h-8 text-xs px-3 bg-primary text-primary-foreground hover:bg-primary/90" 
+                    <Button
+                        className="rounded-md h-8 text-xs px-3 bg-primary text-primary-foreground hover:bg-primary/90"
                         onClick={handleUploadClick}
                         disabled={isUploading}
                     >
@@ -573,6 +584,30 @@ export function DocumentManagement() {
                         {isUploading ? 'Đang tải...' : 'Tải tài liệu'}
                     </Button>
                 </div>
+            </div>
+
+            {/* Pipeline Status Dashboard */}
+            <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
+                {([
+                    { key: 'PENDING', label: 'Chờ xử lý', icon: Clock, color: 'text-amber-600 bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800' },
+                    { key: 'PREVIEW', label: 'Chờ duyệt', icon: Eye, color: 'text-emerald-600 bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800' },
+                    { key: 'PROCESSING', label: 'Đang xử lý', icon: Loader2, color: 'text-blue-600 bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800', animate: true },
+                    { key: 'FINALIZING', label: 'Hậu xử lý', icon: GitBranch, color: 'text-purple-600 bg-purple-50 dark:bg-purple-950/20 border-purple-200 dark:border-purple-800', animate: true },
+                    { key: 'COMPLETED', label: 'Hoàn thành', icon: CheckCircle, color: 'text-green-600 bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800' },
+                    { key: 'FAILED', label: 'Thất bại', icon: AlertCircle, color: 'text-red-600 bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800' },
+                ] as const).map(stat => {
+                    const Icon = stat.icon;
+                    const count = pipelineStats[stat.key] || 0;
+                    return (
+                        <div key={stat.key} className={cn("flex items-center gap-2 p-2.5 rounded-lg border", stat.color)}>
+                            <Icon className={cn("w-4 h-4 shrink-0 opacity-60", 'animate' in stat && stat.animate && count > 0 && "animate-spin")} />
+                            <div className="min-w-0">
+                                <p className="text-lg font-bold leading-none">{count}</p>
+                                <p className="text-[9px] font-bold uppercase tracking-wider opacity-70 mt-0.5">{stat.label}</p>
+                            </div>
+                        </div>
+                    );
+                })}
             </div>
 
             <Card className="border border-border shadow-sm rounded-lg overflow-hidden bg-card">
@@ -700,10 +735,26 @@ export function DocumentManagement() {
                                                     })()}
                                                 </TableCell>
                                                 <TableCell className="py-1.5">
-                                                    <Badge className={cn('rounded-md text-[9px] font-bold px-2 py-0.5 shadow-sm', status.color)}>
-                                                        <StatusIcon className={cn("w-2.5 h-2.5 mr-1", doc.status === 'PROCESSING' && "animate-spin")} />
-                                                        {status.label}
-                                                    </Badge>
+                                                    <div className="flex flex-col gap-1">
+                                                        <Badge className={cn('rounded-md text-[9px] font-bold px-2 py-0.5 shadow-sm w-fit', status.color)}>
+                                                            <StatusIcon className={cn("w-2.5 h-2.5 mr-1", doc.status === 'PROCESSING' && "animate-spin")} />
+                                                            {status.label}
+                                                        </Badge>
+                                                        {doc.processingStage === 'FINALIZING' && (
+                                                            <span className="text-[8px] font-semibold text-purple-600 dark:text-purple-400 flex items-center gap-0.5 animate-pulse">
+                                                                <GitBranch className="w-2.5 h-2.5" />
+                                                                Hậu xử lý ({doc.pendingSubtasks ?? 0} tác vụ)
+                                                            </span>
+                                                        )}
+                                                        {doc.status === 'COMPLETED' && (
+                                                            <PipelineVisualizer document={doc} compact className="mt-0.5" />
+                                                        )}
+                                                        {doc.summary && (
+                                                            <span className="text-[8px] text-muted-foreground line-clamp-1 max-w-[140px]" title={doc.summary}>
+                                                                {doc.summary}
+                                                            </span>
+                                                        )}
+                                                    </div>
                                                 </TableCell>
                                                 <TableCell className="text-[10px] text-muted-foreground font-medium py-1.5">
                                                     {format(new Date(doc.createdAt), 'dd/MM/yyyy HH:mm')}
@@ -950,6 +1001,7 @@ export function DocumentManagement() {
                 documentId={inspectingDoc?.id || 0}
                 fileName={inspectingDoc?.fileName || ''}
             />
+
         </div>
     );
 }

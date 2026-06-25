@@ -8,6 +8,7 @@ import { Check, Copy, ExternalLink, Hash, Info, List } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { WikiImage } from "./WikiImage";
 import { useImageResolver } from "@/src/hooks/useImageResolver";
+import { resolveWikiSlug } from "@/src/utils/wiki-utils";
 
 const IMAGE_REF_RE = /image:\/\/([0-9a-fA-F-]{36})/g;
 
@@ -18,81 +19,13 @@ function wikiUrlTransform(url: string): string {
 }
 
 export function preprocessWikilinks(md: string, allPages?: { title: string; slug: string }[]): string {
-  if (!allPages || allPages.length === 0) {
-    return md
-      .replace(/\[\[([^\]|]+)\|([^\]]+)\]\]/g, "[$2](/wiki/$1)")
-      .replace(/\[\[([^\]]+)\]\]/g, "[$1](/wiki/$1)");
-  }
-
-  const titleToSlug = new Map<string, string>();
-  const slugToSlug = new Map<string, string>();
-  const normalizedTitleToSlug = new Map<string, string>();
-
-  const removeAccents = (str: string) => 
-    str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-
-  for (const p of allPages) {
-    const lowerTitle = p.title.toLowerCase();
-    const lowerSlug = p.slug.toLowerCase();
-    titleToSlug.set(lowerTitle, p.slug);
-    slugToSlug.set(lowerSlug, p.slug);
-    normalizedTitleToSlug.set(removeAccents(lowerTitle), p.slug);
-    normalizedTitleToSlug.set(removeAccents(lowerSlug), p.slug);
-  }
-
-  const getResolvedSlug = (target: string) => {
-    const norm = target.trim().toLowerCase();
-    
-    // 1. Direct match on slug or title
-    if (slugToSlug.has(norm)) return slugToSlug.get(norm);
-    if (titleToSlug.has(norm)) return titleToSlug.get(norm);
-    if (slugToSlug.has(`source/${norm}`)) return slugToSlug.get(`source/${norm}`);
-
-    // 2. Direct match with accents removed (for flexible Vietnamese typing)
-    const normNoAccents = removeAccents(norm);
-    if (normalizedTitleToSlug.has(normNoAccents)) return normalizedTitleToSlug.get(normNoAccents);
-
-    // 3. Match after standard slugification
-    const slugified = norm.replace(/[^a-z0-9\s-]/g, "").replace(/\s+/g, "-").replace(/-+/g, "-").trim();
-    if (slugToSlug.has(slugified)) return slugToSlug.get(slugified);
-    if (slugToSlug.has(`source/${slugified}`)) return slugToSlug.get(`source/${slugified}`);
-
-    // 4. English plural fallback (e.g. "containers" -> "container")
-    if (norm.endsWith("s")) {
-      const singular = norm.slice(0, -1);
-      if (slugToSlug.has(singular)) return slugToSlug.get(singular);
-      if (titleToSlug.has(singular)) return titleToSlug.get(singular);
-      if (slugToSlug.has(`source/${singular}`)) return slugToSlug.get(`source/${singular}`);
-      if (normalizedTitleToSlug.has(removeAccents(singular))) return normalizedTitleToSlug.get(removeAccents(singular));
-      
-      const slugifiedSingular = slugified.slice(0, -1);
-      if (slugToSlug.has(slugifiedSingular)) return slugToSlug.get(slugifiedSingular);
-      if (slugToSlug.has(`source/${slugifiedSingular}`)) return slugToSlug.get(`source/${slugifiedSingular}`);
-    }
-    if (norm.endsWith("es")) {
-      const singular = norm.slice(0, -2);
-      if (slugToSlug.has(singular)) return slugToSlug.get(singular);
-      if (titleToSlug.has(singular)) return titleToSlug.get(singular);
-      if (slugToSlug.has(`source/${singular}`)) return slugToSlug.get(`source/${singular}`);
-      if (normalizedTitleToSlug.has(removeAccents(singular))) return normalizedTitleToSlug.get(removeAccents(singular));
-      
-      const slugifiedSingular = slugified.slice(0, -2);
-      if (slugToSlug.has(slugifiedSingular)) return slugToSlug.get(slugifiedSingular);
-      if (slugToSlug.has(`source/${slugifiedSingular}`)) return slugToSlug.get(`source/${slugifiedSingular}`);
-    }
-
-    return target; // fallback
-  };
-
-  // Replace [[target|label]]
-  let processed = md.replace(/\[\[([^\]|]+)\|([^\]]+)\]\]/g, (match, target, label) => {
-    const resolved = getResolvedSlug(target);
+  let processed = md.replace(/\[\[([^\]|]+)\|([^\]]+)\]\]/g, (_match, target, label) => {
+    const resolved = resolveWikiSlug(target, allPages);
     return `[${label}](/wiki/${resolved})`;
   });
 
-  // Replace [[target]]
-  processed = processed.replace(/\[\[([^\]]+)\]\]/g, (match, target) => {
-    const resolved = getResolvedSlug(target);
+  processed = processed.replace(/\[\[([^\]]+)\]\]/g, (_match, target) => {
+    const resolved = resolveWikiSlug(target, allPages);
     return `[${target}](/wiki/${resolved})`;
   });
 

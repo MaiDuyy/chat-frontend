@@ -15,9 +15,11 @@ import {
 } from "lucide-react";
 import {
   useGetWikiPagesQuery,
+  useGetWikiPagesMetadataQuery,
   WikiPage,
   PaginatedResponse,
 } from "@/src/redux/feature/mrpApi";
+import { WikiCompilationStatus } from "@/app/wiki/components/WikiCompilationStatus";
 import { WikiPageTree } from "@/app/wiki/components/WikiPageTree";
 import { WikiSearchDialog } from "@/app/wiki/components/WikiSearchDialog";
 import { getPageType } from "@/app/wiki/components/WikilinkAutocomplete";
@@ -71,6 +73,19 @@ export function EmployeeWikiView() {
 
   const { data: wikiPagesData, isLoading: isPagesLoading } =
     useGetWikiPagesQuery({ workspaceId, page, size });
+
+  const { data: wikiMetadata } = useGetWikiPagesMetadataQuery({ workspaceId });
+
+  const stats = React.useMemo(() => {
+    if (!wikiMetadata) return { total: 0, concepts: 0, entities: 0, topics: 0, sources: 0 };
+    return {
+      total: wikiMetadata.length,
+      concepts: wikiMetadata.filter((p) => getPageType(p) === "concept").length,
+      entities: wikiMetadata.filter((p) => getPageType(p) === "entity").length,
+      topics: wikiMetadata.filter((p) => getPageType(p) === "topic").length,
+      sources: wikiMetadata.filter((p) => getPageType(p) === "source").length,
+    };
+  }, [wikiMetadata]);
 
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -202,6 +217,25 @@ export function EmployeeWikiView() {
           </div>
         </div>
 
+        {/* Quick Stats Cards */}
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
+          {([
+            { label: 'Tổng trang', val: stats.total, color: 'text-primary' },
+            { label: 'Khái niệm', val: stats.concepts, color: 'text-emerald-600 dark:text-emerald-400' },
+            { label: 'Thực thể', val: stats.entities, color: 'text-sky-600 dark:text-sky-400' },
+            { label: 'Chủ đề', val: stats.topics, color: 'text-amber-600 dark:text-amber-400' },
+            { label: 'Nguồn tin', val: stats.sources, color: 'text-rose-600 dark:text-rose-400' },
+          ]).map((item, idx) => (
+            <div key={idx} className="border border-border bg-card p-2.5 rounded-lg shadow-sm flex flex-col gap-0.5">
+              <span className="text-[9px] font-semibold uppercase text-muted-foreground tracking-wide">{item.label}</span>
+              <span className={`text-lg font-display font-semibold ${item.color}`}>{item.val}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Compilation Status */}
+        <WikiCompilationStatus workspaceId={workspaceId} compact />
+
         {/* Search & filter bar */}
         <div className="border border-border bg-card p-3 rounded-lg shadow-sm flex flex-col md:flex-row gap-3 items-center justify-between">
           <div className="relative w-full md:w-64">
@@ -258,19 +292,23 @@ export function EmployeeWikiView() {
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
               {filteredPages.map((article) => {
                 const type = getPageType(article);
                 const config = typeConfigs[type] || typeConfigs.concept;
+                const summary = article.summary || article.content
+                  .replace(/#+\s+/g, "")
+                  .replace(/\[\[|\]\]/g, "")
+                  .substring(0, 120);
 
                 return (
                   <Link
                     key={article.id}
                     href={`/wiki/${article.slug}`}
-                    className="group border border-border bg-card hover:border-primary/20 p-4 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between min-h-[110px]"
+                    className="group border border-border bg-card hover:border-primary/20 p-4 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between min-h-[130px]"
                   >
                     <div>
-                      <div className="flex items-start justify-between gap-2 mb-1.5">
+                      <div className="flex items-start justify-between gap-2 mb-2">
                         <span
                           className={`text-[9px] font-semibold uppercase tracking-wider px-1.5 py-0.5 border rounded-md ${config.className}`}
                         >
@@ -280,22 +318,18 @@ export function EmployeeWikiView() {
                           V.{article.version}
                         </span>
                       </div>
-                      <h2 className="text-xs font-semibold text-foreground group-hover:text-primary transition-colors leading-snug line-clamp-1">
+                      <h2 className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors leading-snug line-clamp-2">
                         {article.title}
                       </h2>
-                      <p className="text-[10px] text-muted-foreground leading-normal mt-1 line-clamp-2">
-                        {article.content
-                          .replace(/#+\s+/g, "")
-                          .replace(/\[\[|\]\]/g, "")}
+                      <p className="text-[11px] text-muted-foreground leading-relaxed mt-1.5 line-clamp-3">
+                        {summary}
                       </p>
                     </div>
 
-                    <div className="flex items-center justify-between border-t border-border pt-1.5 mt-2 text-[9px] text-muted-foreground select-none">
+                    <div className="flex items-center justify-between border-t border-border pt-2 mt-3 text-[9px] text-muted-foreground select-none">
                       <span className="flex items-center gap-1">
                         <Clock className="w-3 h-3" />
-                        {new Date(article.updatedAt).toLocaleDateString(
-                          "vi-VN"
-                        )}
+                        {new Date(article.updatedAt).toLocaleDateString("vi-VN")}
                       </span>
                       {article.tags && (
                         <span className="truncate max-w-[120px] bg-muted px-1.5 py-0.5 rounded-md border border-border text-[9.5px]">

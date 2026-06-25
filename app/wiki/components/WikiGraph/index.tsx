@@ -42,6 +42,7 @@ type Props = {
   mini?: boolean;
   height?: number;
   onNodeClick?: (slug: string) => void;
+  onNodeDoubleClick?: (slug: string) => void;
   communityMap?: Record<string, number>;
 };
 
@@ -123,6 +124,7 @@ export function WikiGraph({
   mini = false,
   height,
   onNodeClick,
+  onNodeDoubleClick,
   communityMap,
 }: Props) {
   const router = useRouter();
@@ -414,7 +416,7 @@ export function WikiGraph({
     (rawNode: object) => {
       const n = rawNode as Node;
       if (onNodeClick) onNodeClick(n.id);
-      else router.push(`/wiki/${n.id}`);
+      else router.push(`/wiki/${encodeURIComponent(n.id)}`);
     },
     [onNodeClick, router]
   );
@@ -484,6 +486,10 @@ export function WikiGraph({
         linkColor={linkColor}
         linkWidth={linkWidth}
         onNodeClick={handleNodeClick}
+        onNodeDoubleClick={(rawNode: object) => {
+          const n = rawNode as Node;
+          if (onNodeDoubleClick) onNodeDoubleClick(n.id);
+        }}
         onNodeHover={handleNodeHover}
         cooldownTicks={mini ? 50 : 90}
         d3AlphaDecay={0.06}

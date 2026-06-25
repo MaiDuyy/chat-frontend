@@ -10,6 +10,8 @@ import { apiSlice } from '../api/baseApi';
 
 // ============= Types matching Spring Boot Entity =============
 
+export type ChunkType = 'TEXT' | 'PARENT_TEXT' | 'SUMMARY' | 'FAQ' | 'WIKI_PAGE' | 'IMAGE_OCR' | 'IMAGE_CAPTION' | 'ENTITY' | 'RELATIONSHIP';
+
 export interface Document {
   id: number;
   userId: string;
@@ -28,6 +30,9 @@ export interface Document {
   parserMethod?: string;
   tags?: string[];
   folderPath?: string;
+  summary?: string;
+  pendingSubtasks?: number;
+  processingStage?: 'IDLE' | 'FINALIZING' | 'COMPLETED';
   createdAt: string;
   updatedAt: string;
 }
@@ -40,6 +45,10 @@ export interface DocumentChunk {
   tokenCount: number;
   charCount: number;
   similarity?: number;
+  chunkType?: ChunkType;
+  contextHeader?: string;
+  sectionPath?: string;
+  parentId?: number;
 }
 
 export interface DocumentChunksResponse {
@@ -76,6 +85,8 @@ export interface ChunkSearchResult {
   text: string;
   similarity: number;
   tokenCount: number;
+  chunkType?: ChunkType;
+  contextHeader?: string;
 }
 
 export interface ChunkSearchResponse {
@@ -251,6 +262,14 @@ export const knowledgeApi = apiSlice.injectEndpoints({
       }),
     }),
 
+    hybridSearchChunks: builder.mutation<ChunkSearchResponse, ChunkSearchRequest>({
+      query: (body) => ({
+        url: '/documents/search/hybrid',
+        method: 'POST',
+        body,
+      }),
+    }),
+
     updateDocumentMetadata: builder.mutation<Document, { id: string | number; securityClassification?: string; tags?: string[]; departmentId?: string; allowedRoles?: string; folderPath?: string; workspaceId?: string }>({
       query: ({ id, ...body }) => ({
         url: `/documents/${id}/metadata`,
@@ -303,6 +322,7 @@ export const {
   useGetDocumentChunkQuery,
   useGetDocumentStatsQuery,
   useSearchChunksMutation,
+  useHybridSearchChunksMutation,
   useUpdateDocumentMetadataMutation,
   useApproveDocumentMutation,
   useIngestDocumentMutation,

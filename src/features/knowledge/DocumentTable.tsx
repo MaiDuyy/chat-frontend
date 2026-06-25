@@ -291,16 +291,28 @@ export function DocumentTable({ onDocumentClick, className }: DocumentTableProps
                                             </div>
                                         </TableCell>
                                         <TableCell className="py-2 px-4">
-                                            <Badge
-                                                variant="outline"
-                                                className={cn(
-                                                    "gap-1 px-1.5 py-0.5 font-bold border-transparent shadow-none rounded-md text-[10px]",
-                                                    status.className
+                                            <div className="flex flex-col gap-1">
+                                                <Badge
+                                                    variant="outline"
+                                                    className={cn(
+                                                        "gap-1 px-1.5 py-0.5 font-bold border-transparent shadow-none rounded-md text-[10px] w-fit",
+                                                        status.className
+                                                    )}
+                                                >
+                                                    <StatusIcon className={cn("w-3 h-3", doc.status === 'PROCESSING' && "animate-spin")} />
+                                                    {status.label}
+                                                </Badge>
+                                                {doc.processingStage === 'FINALIZING' && (
+                                                    <span className="text-[9px] text-amber-600 font-medium animate-pulse">
+                                                        Hậu xử lý ({doc.pendingSubtasks ?? 0} tác vụ)
+                                                    </span>
                                                 )}
-                                            >
-                                                <StatusIcon className={cn("w-3 h-3", doc.status === 'PROCESSING' && "animate-spin")} />
-                                                {status.label}
-                                            </Badge>
+                                                {doc.summary && (
+                                                    <span className="text-[9px] text-muted-foreground line-clamp-1 max-w-[160px]" title={doc.summary}>
+                                                        {doc.summary}
+                                                    </span>
+                                                )}
+                                            </div>
                                         </TableCell>
                                         <TableCell className="py-2 px-4">
                                             <div className="flex items-center gap-1 text-muted-foreground text-xs">

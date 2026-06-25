@@ -214,11 +214,11 @@ export function AuditLogTable({ className }: AuditLogTableProps) {
                                 </div>
                             </div>
 
-                            {selectedLog.data && (
+                            {selectedLog.details && (
                                 <div>
                                     <div className="text-muted-foreground mb-1 text-sm">Additional Data</div>
                                     <pre className="bg-muted p-3 rounded-md text-xs overflow-auto max-h-40">
-                                        {JSON.stringify(selectedLog.data, null, 2)}
+                                        {JSON.stringify(selectedLog.details, null, 2)}
                                     </pre>
                                 </div>
                             )}

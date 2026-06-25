@@ -21,6 +21,7 @@ export function SettingsTab({
     isAdmin,
     isLeader,
     handleUpdateJoinPolicy,
+    handleUpdateReadOnly,
     onLeaveGroup,
     onDeleteGroup,
 }: SettingsTabProps) {

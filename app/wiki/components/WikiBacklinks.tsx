@@ -129,7 +129,7 @@ export function WikiBacklinks({ currentPageTitle, currentPageSlug, allWikiPages 
             {backlinks.map((page) => (
               <Link
                 key={page.id}
-                href={`/wiki/${page.slug}`}
+                href={`/wiki/${encodeURIComponent(page.slug)}`}
                 className="flex items-center gap-2 p-2 border border-border hover:border-primary/30 bg-muted/15 hover:bg-primary/5 hover:-translate-y-[0.5px] active:scale-[0.98] transition-all duration-200 rounded-md group"
               >
                 <FileText className="w-3.5 h-3.5 text-muted-foreground group-hover:text-primary shrink-0 transition-colors" />

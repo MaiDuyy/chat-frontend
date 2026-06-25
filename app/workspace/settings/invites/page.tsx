@@ -61,7 +61,10 @@ export default function InvitesManagement() {
     }
   );
 
-  const { data: searchResults, isFetching: isSearching } = useSearchDirectoryQuery(inviteSearchQuery, {
+  const { data: searchResults, isFetching: isSearching } = useSearchDirectoryQuery({
+    searchTerm: inviteSearchQuery,
+    workspaceId: currentWorkspaceId ?? undefined
+  }, {
     skip: inviteSearchQuery.length < 2
   });
 

@@ -16,6 +16,7 @@ import { WikiContent } from "../components/WikiContent";
 import { WikiDraftBanner } from "../components/WikiDraftBanner";
 import { WikiBacklinks } from "../components/WikiBacklinks";
 import { WikiPageTree } from "../components/WikiPageTree";
+import { WikiIndexBrowser } from "../components/WikiIndexBrowser";
 import { WikiGraphMini } from "../components/WikiGraph/WikiGraphMini";
 import { WikiSearchDialog } from "../components/WikiSearchDialog";
 import { getPageType } from "../components/WikilinkAutocomplete";
@@ -389,6 +390,12 @@ export default function WikiPageDetail() {
  
               {/* Markdown Content Render */}
               <WikiContent markdown={page.content} allPages={allPages} />
+
+              {slug === "index" && (
+                <div className="mt-6 border-t border-border pt-6 w-full">
+                  <WikiIndexBrowser workspaceId={workspaceId} />
+                </div>
+              )}
             </div>
  
           </div>
@@ -431,7 +438,12 @@ export default function WikiPageDetail() {
                     {page.sourceDocumentId && (
                       <div className="flex items-center justify-between">
                         <span className="text-muted-foreground flex items-center gap-1"><Shield className="w-3 h-3" /> ID Nguồn thô</span>
-                        <span className="font-mono font-bold text-primary">{page.sourceDocumentId}</span>
+                        <Link
+                          href={`/knowledge/${page.sourceDocumentId}`}
+                          className="font-mono font-bold text-primary hover:underline transition-colors cursor-pointer"
+                        >
+                          {page.sourceDocumentId}
+                        </Link>
                       </div>
                     )}
                   </div>

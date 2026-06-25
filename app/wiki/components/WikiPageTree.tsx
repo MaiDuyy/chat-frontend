@@ -11,7 +11,8 @@ import {
   X, 
   PanelLeftClose, 
   PanelLeft,
-  FolderOpen
+  FolderOpen,
+  Compass
 } from "lucide-react";
 import { useGetWikiPagesMetadataQuery, WikiPage } from "@/src/redux/feature/mrpApi";
 import { useGetAdminWikiMetadataQuery } from "@/src/redux/feature/adminApi";
@@ -185,6 +186,21 @@ export function WikiPageTree({
 
       {/* Pages Tree Listing */}
       <div className="flex-1 overflow-y-auto py-2 px-1 max-h-[580px] bg-background">
+        {/* Pinned Index Overview Link */}
+        <div className="mb-2 px-1">
+          <Link
+            href={showAdminWiki ? "/wiki/index?workspaceId=all" : `/wiki/index`}
+            className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-md transition-all text-left text-xs font-semibold border ${
+              currentSlug === "index"
+                ? "bg-primary/10 text-primary border-primary/20 font-bold shadow-xs"
+                : "hover:bg-muted/50 border-transparent hover:border-border text-foreground/90"
+            }`}
+          >
+            <Compass className="w-3.5 h-3.5 text-primary shrink-0" />
+            <span className="flex-1">Trang Tổng Quan (Index)</span>
+          </Link>
+        </div>
+
         {isLoading ? (
           <div className="px-2 space-y-2 mt-1 select-none">
             {Array.from({ length: 5 }).map((_, i) => (
@@ -263,7 +279,7 @@ export function WikiPageTree({
                             </button>
                           ) : (
                             <Link
-                              href={`/wiki/${page.slug}`}
+                              href={`/wiki/${encodeURIComponent(page.slug)}`}
                               className={`flex-1 px-2 py-0.5 text-xs truncate transition-all flex items-center gap-1`}
                               title={page.title}
                             >

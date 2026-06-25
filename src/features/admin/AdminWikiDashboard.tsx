@@ -31,6 +31,8 @@ import {
 import { WikiPageTree } from "@/app/wiki/components/WikiPageTree";
 import { WikiDocumentTree } from "@/app/wiki/components/WikiDocumentTree";
 import { WikiSearchDialog } from "@/app/wiki/components/WikiSearchDialog";
+import { WikiCompilationStatus } from "@/app/wiki/components/WikiCompilationStatus";
+import { WikiActivityLog } from "@/app/wiki/components/WikiActivityLog";
 import { getPageType } from "@/app/wiki/components/WikilinkAutocomplete";
 import { useHasRole } from "@/src/lib/rbac/usePermission";
 import { WikiPagination } from "@/app/wiki/components/WikiPagination";
@@ -82,7 +84,7 @@ export function AdminWikiDashboard() {
   const workspaceId = viewAllWiki && isSystemAdmin ? "all" : (currentWorkspaceId || "default-workspace");
 
   const [showAIChat, setShowAIChat] = React.useState(false);
-  const [activeTab, setActiveTab] = React.useState<"knowledge" | "documents">(
+  const [activeTab, setActiveTab] = React.useState<"knowledge" | "documents" | "activity">(
     "knowledge"
   );
   const [page, setPage] = React.useState(0);
@@ -303,6 +305,7 @@ export function AdminWikiDashboard() {
             <h1 className="text-lg font-display font-semibold text-foreground leading-tight flex items-center gap-2 mt-0.5">
               <BookOpen className="w-5 h-5 text-primary shrink-0" />
               Quản lý Wiki
+              <WikiCompilationStatus workspaceId={workspaceId} compact />
             </h1>
           </div>
 
@@ -355,6 +358,9 @@ export function AdminWikiDashboard() {
           </div>
         </div>
 
+        {/* Wiki Compilation Status (WeKnora-style polling) */}
+        <WikiCompilationStatus workspaceId={workspaceId} />
+
         {/* Tab switcher */}
         <div className="flex border-b border-border select-none gap-1">
           <button
@@ -377,10 +383,62 @@ export function AdminWikiDashboard() {
           >
             Tài nguyên & Tài liệu gốc
           </button>
+          <button
+            onClick={() => setActiveTab("activity")}
+            className={`px-4 py-2 text-xs font-semibold border-b-2 transition-all cursor-pointer ${
+              activeTab === "activity"
+                ? "border-primary text-foreground"
+                : "border-transparent text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            Nhật ký hoạt động
+          </button>
         </div>
 
         {/* Tab content */}
-        {activeTab === "documents" ? (
+        {activeTab === "activity" ? (
+          <div className="mt-1 grid grid-cols-1 lg:grid-cols-12 gap-4">
+            <div className="lg:col-span-8">
+              <WikiActivityLog workspaceId={workspaceId} limit={30} />
+            </div>
+            <div className="lg:col-span-4 flex flex-col gap-3">
+              <WikiCompilationStatus workspaceId={workspaceId} />
+              <div className="border border-border bg-card p-4 rounded-lg shadow-sm flex flex-col gap-3">
+                <div className="border-b border-border pb-2 flex items-center gap-2">
+                  <Activity className="w-4 h-4 text-primary shrink-0" />
+                  <span className="text-xs font-semibold text-foreground uppercase tracking-wide">
+                    Trình biên soạn MRP Pipeline
+                  </span>
+                </div>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  Nhập ID tài liệu thô để kích hoạt quy trình Map-Reduce và tự động đề xuất bản thảo.
+                </p>
+                <form onSubmit={handleCompile} className="flex flex-col gap-2">
+                  <input
+                    type="text"
+                    value={docIdInput}
+                    onChange={(e) => setDocIdInput(e.target.value)}
+                    placeholder="ID Tài liệu (ví dụ: 1, 2, 45...)"
+                    required
+                    className="px-3 py-2 text-sm border border-border bg-background rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary font-mono transition-all"
+                  />
+                  {compileError && (
+                    <div className="text-xs p-2 border border-rose-500/20 bg-rose-500/5 text-rose-600 rounded-md">{compileError}</div>
+                  )}
+                  {compileSuccess && (
+                    <div className="text-xs p-2 border border-emerald-500/20 bg-emerald-500/5 text-emerald-600 rounded-md flex items-center gap-1.5">
+                      <CheckCircle className="w-3.5 h-3.5" /> Kích hoạt MRP thành công!
+                    </div>
+                  )}
+                  <button type="submit" disabled={isCompiling || !docIdInput}
+                    className="w-full px-3 py-2 text-sm font-semibold bg-primary hover:bg-primary/90 text-primary-foreground transition-all rounded-md shadow-sm disabled:opacity-50 cursor-pointer">
+                    {isCompiling ? "Đang xử lý..." : "Khởi chạy biên soạn"}
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        ) : activeTab === "documents" ? (
           <div className="mt-1">
             <DocumentManagement />
           </div>
@@ -626,6 +684,9 @@ export function AdminWikiDashboard() {
                     </button>
                   </form>
                 </div>
+
+                {/* Wiki Activity Log (WeKnora-style operation feed) */}
+                <WikiActivityLog workspaceId={workspaceId} limit={15} />
 
                 {/* Wiki syntax guide */}
                 <div className="border border-border bg-card p-4 rounded-lg shadow-sm flex flex-col gap-2">

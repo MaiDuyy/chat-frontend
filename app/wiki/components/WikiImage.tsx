@@ -7,6 +7,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Lock, ImageOff, Loader2 } from "lucide-react";
+import { useFetchWikiImageRawQuery } from "@/src/redux/feature/mrpApi";
 
 type Status = "ok" | "loading" | "denied" | "missing";
 
@@ -19,7 +20,32 @@ export function WikiImage({
   alt?: string;
   status: Status;
 }) {
-  if (status === "loading") {
+  const match = src?.match(/\/api\/wiki\/images\/raw\/([0-9a-fA-F-]{36})/i);
+  const uuid = match ? match[1] : null;
+
+  const { data: blobUrl, isLoading: isImageLoading, error: imageError } = useFetchWikiImageRawQuery(uuid || "", {
+    skip: !uuid || status !== "ok",
+  });
+
+  let effectiveStatus = status;
+  if (uuid && status === "ok") {
+    if (isImageLoading) {
+      effectiveStatus = "loading";
+    } else if (imageError) {
+      const errStatus = imageError && typeof imageError === "object" && "status" in imageError
+        ? (imageError as { status?: number | string }).status
+        : undefined;
+      if (errStatus === 401 || errStatus === 403 || errStatus === "401" || errStatus === "403") {
+        effectiveStatus = "denied";
+      } else {
+        effectiveStatus = "missing";
+      }
+    }
+  }
+
+  const displaySrc = blobUrl || src;
+
+  if (effectiveStatus === "loading") {
     return (
       <span className="block my-3 rounded-lg border border-border bg-muted p-4 text-center text-xs font-mono font-bold text-muted-foreground flex items-center justify-center gap-2 shadow-sm">
         <Loader2 className="w-4 h-4 animate-spin text-primary" />
@@ -28,7 +54,7 @@ export function WikiImage({
     );
   }
 
-  if (status === "denied") {
+  if (effectiveStatus === "denied") {
     return (
       <span className="block my-3 rounded-lg border border-dashed border-rose-500 bg-rose-500/5 p-4 text-center text-xs font-mono font-bold text-rose-600 flex flex-col items-center justify-center gap-1 shadow-sm">
         <Lock className="w-5 h-5 mb-1" />
@@ -38,7 +64,7 @@ export function WikiImage({
     );
   }
 
-  if (status === "missing" || !src) {
+  if (effectiveStatus === "missing" || !displaySrc) {
     return (
       <span className="block my-3 rounded-lg border border-dashed border-border bg-muted/10 p-4 text-center text-xs font-mono font-bold text-muted-foreground flex flex-col items-center justify-center gap-1 shadow-sm">
         <ImageOff className="w-5 h-5 mb-1" />
@@ -58,7 +84,7 @@ export function WikiImage({
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={src}
+            src={displaySrc}
             alt={alt || ""}
             loading="lazy"
             className="rounded-lg border border-border max-w-full max-h-[480px] object-contain mx-auto bg-muted/20 shadow-md transition-colors duration-200"
@@ -76,7 +102,7 @@ export function WikiImage({
         <div className="flex flex-col items-center gap-4">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={src}
+            src={displaySrc}
             alt={alt || ""}
             className="max-h-[75vh] max-w-full object-contain rounded-lg border border-border"
           />
@@ -85,7 +111,7 @@ export function WikiImage({
               {alt || ""}
             </span>
             <a
-              href={src}
+              href={displaySrc}
               target="_blank"
               rel="noopener noreferrer"
               download

@@ -111,11 +111,57 @@ export interface WikiHealthDto {
   summary: WikiHealthSummary;
 }
 
+export interface WikiIndexEntry {
+  slug: string;
+  title: string;
+  summary: string;
+  parent_slug?: string;
+  category_path?: string[];
+  wiki_path?: string;
+  depth?: number;
+  sort_order?: number;
+}
+
+export interface WikiIndexGroup {
+  type: string;
+  total: number;
+  items: WikiIndexEntry[];
+  next_cursor?: string;
+}
+
+export interface WikiIndexResponse {
+  intro: string;
+  version: number;
+  groups: WikiIndexGroup[];
+}
+
 export interface ReindexResult {
   reindexed: number;
   errors: number;
   durationMs: number;
   total: number;
+}
+
+export interface WikiStatsDto {
+  totalPages: number;
+  pendingDrafts: number;
+  activeCompilations: number;
+  finalizingDocs: number;
+  isIndexing: boolean;
+}
+
+export interface WikiActivityEntry {
+  action: string;
+  pageId?: number;
+  draftId?: number;
+  title: string;
+  slug?: string;
+  pageType?: string;
+  authorId?: string;
+  timestamp: string;
+  version?: number;
+  revisionRound?: number;
+  reviewerNote?: string;
 }
 
 const normalizeWikiPage = (page: WikiPage): WikiPage => {
@@ -431,6 +477,37 @@ fetchWikiImageRaw: builder.query<string, string>({
         method: 'POST',
       }),
     }),
+
+    // --- Wiki Stats (compilation status polling) ---
+    getWikiStats: builder.query<WikiStatsDto, { workspaceId: string }>({
+      query: ({ workspaceId }) => `/mrp/wiki/stats?workspaceId=${workspaceId}`,
+      providesTags: ['Documents', 'Tasks'],
+    }),
+
+    // --- Wiki Activity Log ---
+    getWikiActivity: builder.query<WikiActivityEntry[], { workspaceId: string; limit?: number }>({
+      query: ({ workspaceId, limit = 20 }) => `/mrp/wiki/activity?workspaceId=${workspaceId}&limit=${limit}`,
+      providesTags: ['Documents', 'Tasks'],
+    }),
+
+    // --- Wiki Index View ---
+    getWikiIndex: builder.query<WikiIndexResponse, { workspaceId?: string; types?: string[]; limit?: number; cursor?: string }>({
+      query: ({ workspaceId = 'default-workspace', types, limit, cursor }) => {
+        const params = new URLSearchParams();
+        params.set('workspaceId', workspaceId);
+        if (types && types.length > 0) {
+          params.set('types', types.join(','));
+        }
+        if (limit !== undefined) {
+          params.set('limit', String(limit));
+        }
+        if (cursor) {
+          params.set('cursor', cursor);
+        }
+        return `/mrp/wiki/index?${params.toString()}`;
+      },
+      providesTags: ['Documents'],
+    }),
   }),
 });
 
@@ -459,4 +536,8 @@ export const {
   useGetWikiGraphCommunitiesQuery,
   useGetWikiHealthQuery,
   useReindexWikiPagesMutation,
+  useGetWikiIndexQuery,
+  useLazyGetWikiIndexQuery,
+  useGetWikiStatsQuery,
+  useGetWikiActivityQuery,
 } = mrpApi;

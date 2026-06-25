@@ -168,7 +168,7 @@ export function ChannelManagement() {
                 </TableRow>
               ) : (
                 filteredChannels.map(channel => {
-                  const typeCfg = TYPE_CONFIG[channel.type] || TYPE_CONFIG.PUBLIC;
+                  const typeCfg = (channel.type && TYPE_CONFIG[channel.type as keyof typeof TYPE_CONFIG]) || TYPE_CONFIG.PUBLIC;
                   const TypeIcon = typeCfg.icon;
                   return (
                     <TableRow key={channel.id} className={cn('hover:bg-muted/40 dark:hover:bg-slate-800/40 border-b border-border/50 last:border-0 transition-opacity', channel.isArchived && 'opacity-50')}>

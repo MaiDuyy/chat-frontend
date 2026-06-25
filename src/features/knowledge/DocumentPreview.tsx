@@ -25,12 +25,18 @@ import {
     ChevronDown,
     ChevronRight,
     User,
+    Sparkles,
+    MessageSquareQuote,
+    GitBranch,
+    Image,
+    Link2,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
 import { format } from 'date-fns';
 import { Card } from '@/components/ui/card';
 import { MarkdownContent } from './MarkdownContent';
+import { PipelineVisualizer } from './PipelineVisualizer';
 
 // =========================================================================
 //  Markdown Parsing & Custom Element Rendering (Docling-Style)
@@ -354,6 +360,45 @@ function deduplicateInlineText(text: string): string {
 }
 
 // =========================================================================
+//  Chunk Type Badge Mapping (WeKnora-inspired typed chunks)
+// =========================================================================
+
+const CHUNK_TYPE_CONFIG: Record<string, { label: string; color: string; icon: typeof FileText }> = {
+    TEXT:            { label: 'Văn bản',     color: 'bg-blue-50 text-blue-700 border-blue-100',       icon: FileText },
+    PARENT_TEXT:     { label: 'Đoạn cha',    color: 'bg-purple-50 text-purple-700 border-purple-100', icon: GitBranch },
+    SUMMARY:         { label: 'Tóm tắt',     color: 'bg-amber-50 text-amber-700 border-amber-100',   icon: Sparkles },
+    FAQ:             { label: 'Q&A',          color: 'bg-green-50 text-green-700 border-green-100',   icon: MessageSquareQuote },
+    WIKI_PAGE:       { label: 'Wiki',         color: 'bg-indigo-50 text-indigo-700 border-indigo-100', icon: BookOpen },
+    IMAGE_OCR:       { label: 'OCR',          color: 'bg-rose-50 text-rose-700 border-rose-100',      icon: Image },
+    IMAGE_CAPTION:   { label: 'Caption',      color: 'bg-pink-50 text-pink-700 border-pink-100',     icon: Image },
+    ENTITY:          { label: 'Thực thể',     color: 'bg-teal-50 text-teal-700 border-teal-100',     icon: Link2 },
+    RELATIONSHIP:    { label: 'Quan hệ',      color: 'bg-cyan-50 text-cyan-700 border-cyan-100',     icon: Link2 },
+};
+
+function ChunkTypeBadge({ type }: { type?: string }) {
+    if (!type) return null;
+    const config = CHUNK_TYPE_CONFIG[type];
+    if (!config) return null;
+    const Icon = config.icon;
+    return (
+        <span className={cn("inline-flex items-center gap-0.5 px-1.5 py-0 text-[9px] font-semibold rounded-sm border", config.color)}>
+            <Icon className="w-2.5 h-2.5" />
+            {config.label}
+        </span>
+    );
+}
+
+function ProcessingStageIndicator({ stage, pendingSubtasks }: { stage?: string; pendingSubtasks?: number }) {
+    if (!stage || stage === 'IDLE' || stage === 'COMPLETED') return null;
+    return (
+        <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-100 text-[10px] rounded-sm px-1.5 py-0 animate-pulse">
+            <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+            Đang xử lý ({pendingSubtasks ?? 0} tác vụ còn lại)
+        </Badge>
+    );
+}
+
+// =========================================================================
 //  MAIN DOCUMENT PREVIEW COMPONENT
 // =========================================================================
 
@@ -488,6 +533,7 @@ export function DocumentPreview({
                             Đã lập chỉ mục
                         </Badge>
                     )}
+                    <ProcessingStageIndicator stage={doc.processingStage} pendingSubtasks={doc.pendingSubtasks} />
                 </div>
             </div>
 
@@ -505,6 +551,14 @@ export function DocumentPreview({
         <span className="flex items-center gap-1"><Info className="w-3 h-3" /> {formatSize(doc.fileSize)}</span>
     </div>
 </div>
+
+            {/* Pipeline Visualizer — compact for completed, inline for in-progress */}
+            {doc.status === 'COMPLETED' && (
+                <PipelineVisualizer document={doc} compact />
+            )}
+            {doc.status !== 'COMPLETED' && (
+                <PipelineVisualizer document={doc} compact />
+            )}
 
             {/* Main Workspace Layout */}
             <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-4 items-stretch lg:h-[calc(100vh-10.5rem)] lg:min-h-[550px]">
@@ -601,12 +655,20 @@ export function DocumentPreview({
                                                     {chunk.chunkIndex + 1}
                                                 </div>
                                                 <div className="flex-1 min-w-0">
-                                                    <h3 className={cn(
-                                                        'text-[11px] font-semibold truncate transition-colors',
-                                                        activeChunk?.chunkIndex === chunk.chunkIndex ? 'text-foreground' : 'text-muted-foreground'
-                                                    )}>
-                                                        {chunk.chunkTitle || `Đoạn ${chunk.chunkIndex + 1}`}
-                                                    </h3>
+                                                    <div className="flex items-center gap-1">
+                                                        <h3 className={cn(
+                                                            'text-[11px] font-semibold truncate transition-colors',
+                                                            activeChunk?.chunkIndex === chunk.chunkIndex ? 'text-foreground' : 'text-muted-foreground'
+                                                        )}>
+                                                            {chunk.chunkTitle || `Đoạn ${chunk.chunkIndex + 1}`}
+                                                        </h3>
+                                                        <ChunkTypeBadge type={chunk.chunkType} />
+                                                    </div>
+                                                    {chunk.contextHeader && (
+                                                        <p className="text-[8px] text-muted-foreground font-mono truncate mt-0.5">
+                                                            {chunk.contextHeader}
+                                                        </p>
+                                                    )}
                                                     <p className="text-[9px] text-muted-foreground line-clamp-1 mt-0.5">
                                                         {chunk.text?.substring(0, 45)}...
                                                     </p>
@@ -621,6 +683,11 @@ export function DocumentPreview({
                             )}
                         </ScrollArea>
                     </div>
+
+                    {/* Vertical Processing Timeline (WeKnora-style) */}
+                    <Card className="p-3.5 border-border shadow-none bg-muted/20 space-y-1.5 rounded-md">
+                        <PipelineVisualizer document={doc} vertical />
+                    </Card>
 
                     {/* Metadata Card */}
                     <Card className="p-3.5 border-border shadow-none bg-muted space-y-2.5 rounded-md">
@@ -844,6 +911,7 @@ export function DocumentPreview({
                                                     )}>
                                                         {chunk.chunkTitle || `Đoạn ${chunk.chunkIndex + 1}`}
                                                     </h3>
+                                                    <ChunkTypeBadge type={chunk.chunkType} />
                                                 </div>
                                             </div>
                                             <Badge variant="outline" className="text-[9px] text-muted-foreground hover:bg-transparent shrink-0 rounded-[3px] py-0">

@@ -14,6 +14,7 @@ import {
     useGetDocumentChunksQuery,
     useGetDocumentStatsQuery,
     useSearchChunksMutation,
+    useHybridSearchChunksMutation,
     DocumentChunk,
     ChunkSearchResult
 } from '@/src/redux/feature/knowledgeApi';
@@ -73,7 +74,10 @@ export function ChunkInspectorModal({
         isLoading: isStatsLoading 
     } = useGetDocumentStatsQuery(documentId.toString(), { skip: !isOpen || activeTab !== 'inspector' });
 
-    const [searchChunks, { isLoading: isSearching }] = useSearchChunksMutation();
+    const [searchMode, setSearchMode] = useState<'vector' | 'hybrid'>('hybrid');
+    const [searchChunks, { isLoading: isSearchingVector }] = useSearchChunksMutation();
+    const [hybridSearchChunks, { isLoading: isSearchingHybrid }] = useHybridSearchChunksMutation();
+    const isSearching = searchMode === 'hybrid' ? isSearchingHybrid : isSearchingVector;
 
     const chunks = chunksData?.chunks || [];
     const selectedChunk = chunks.find(c => c.chunkIndex === selectedChunkIndex) || chunks[0];
@@ -99,7 +103,8 @@ export function ChunkInspectorModal({
         }
 
         try {
-            const response = await searchChunks({
+            const searchFn = searchMode === 'hybrid' ? hybridSearchChunks : searchChunks;
+            const response = await searchFn({
                 query: searchQuery,
                 topK,
                 minSimilarity,
@@ -418,6 +423,20 @@ export function ChunkInspectorModal({
                                                 />
                                             </div>
 
+                                            <div className="space-y-1 w-24">
+                                                <label className="text-[9px] uppercase font-bold text-muted-foreground tracking-wider block">
+                                                    Chế độ
+                                                </label>
+                                                <select
+                                                    value={searchMode}
+                                                    onChange={(e) => setSearchMode(e.target.value as 'vector' | 'hybrid')}
+                                                    className="w-full h-8 bg-background border border-border rounded-md px-2 text-xs font-semibold text-foreground focus:outline-none focus:border-emerald-500"
+                                                >
+                                                    <option value="hybrid">Hybrid</option>
+                                                    <option value="vector">Vector</option>
+                                                </select>
+                                            </div>
+
                                             <Button
                                                 type="submit"
                                                 disabled={isSearching}
@@ -428,7 +447,7 @@ export function ChunkInspectorModal({
                                                 ) : (
                                                     <Sparkles className="w-3.5 h-3.5" />
                                                 )}
-                                                {isSearching ? 'Đang tìm...' : 'Vector Search'}
+                                                {isSearching ? 'Đang tìm...' : searchMode === 'hybrid' ? 'Hybrid Search' : 'Vector Search'}
                                             </Button>
                                         </div>
                                     </div>
