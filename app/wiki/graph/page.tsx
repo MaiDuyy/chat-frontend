@@ -26,13 +26,12 @@ import {
   X,
   Search,
   Network,
-  SlidersHorizontal,
   Maximize2,
   RotateCcw,
-  BookOpenCheck,
   ChevronLeft,
   Eye,
   GitBranch,
+  BookOpenCheck,
   ArrowRightLeft,
 } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
@@ -85,7 +84,6 @@ export default function WikiGraphPage() {
   );
   const [searchQuery, setSearchQuery] = React.useState("");
   const [highlightSlug, setHighlightSlug] = React.useState<string | null>(null);
-  const [showFilters, setShowFilters] = React.useState(false);
   const [isFullscreen, setIsFullscreen] = React.useState(false);
 
   // Upgrade state for Ego Mode & In-place Drawer
@@ -291,28 +289,14 @@ export default function WikiGraphPage() {
 
         {/* Right: controls */}
         <div className="flex items-center gap-1.5 shrink-0">
-          <button
-            onClick={() => setShowFilters(!showFilters)}
-            className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium border transition-colors cursor-pointer ${
-              showFilters
-                ? "border-primary bg-primary/10 text-primary"
-                : "border-border bg-card text-muted-foreground hover:bg-accent hover:text-foreground"
-            }`}
-          >
-            <SlidersHorizontal className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Bộ lọc</span>
-            {activeTypes.size < PAGE_TYPES.length && (
-              <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-            )}
-          </button>
-
           {activeTypes.size < PAGE_TYPES.length && (
             <button
               onClick={resetFilters}
-              title="Đặt lại bộ lọc"
-              className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors border border-border cursor-pointer"
+              title="Hiển thị tất cả loại trang"
+              className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium border border-primary/40 bg-primary/5 text-primary hover:bg-primary/10 transition-colors cursor-pointer"
             >
               <RotateCcw className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Đặt lại bộ lọc</span>
             </button>
           )}
 
@@ -326,45 +310,6 @@ export default function WikiGraphPage() {
         </div>
       </div>
 
-      {/* ── Filter Panel ─────────────────────────────────────── */}
-      {showFilters && (
-        <div className="shrink-0 px-4 py-3 border-b border-border bg-muted/20 flex flex-wrap items-center gap-3">
-          <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-            Loại trang
-          </span>
-          <div className="flex flex-wrap gap-2">
-            {PAGE_TYPES.map((type) => {
-              const active = activeTypes.has(type);
-              const color = wikiTypeColor(type);
-              const count = typeStats[type] ?? 0;
-              return (
-                <button
-                  key={type}
-                  onClick={() => toggleType(type)}
-                  className="flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs border transition-all cursor-pointer"
-                  style={{
-                    background: active ? `${color}15` : "transparent",
-                    color: active ? color : "var(--muted-foreground)",
-                    borderColor: active ? `${color}40` : "var(--border)",
-                  }}
-                >
-                  <span
-                    className="w-2 h-2 rounded-full shrink-0"
-                    style={{ background: active ? color : "currentColor" }}
-                  />
-                  {wikiTypeGroupLabel(type)}
-                  <span className="opacity-60 tabular-nums">({count})</span>
-                </button>
-              );
-            })}
-          </div>
-
-          <div className="ml-auto text-[10px] text-muted-foreground">
-            Hiển thị {filteredData?.nodes.length ?? 0} /{" "}
-            {graphData.nodes.length} trang
-          </div>
-        </div>
-      )}
 
       {/* Search results dropdown */}
       {searchQuery && searchMatches.length > 0 && (
@@ -457,6 +402,9 @@ export default function WikiGraphPage() {
               setBloomDepth(1);
             }}
             communityMap={communityMap}
+            allTypeCounts={typeStats}
+            activeTypes={activeTypes}
+            onTypeToggle={(type) => toggleType(type as PageType)}
           />
         )}
 
@@ -498,30 +446,6 @@ export default function WikiGraphPage() {
           </div>
         )}
 
-        {/* Legend overlay */}
-        {filteredData && filteredData.nodes.length > 0 && (
-          <div className="absolute bottom-4 left-4 bg-card/90 backdrop-blur-sm border border-border rounded-lg px-3 py-2 shadow-lg">
-            <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground mb-2">
-              Chú thích
-            </p>
-            <div className="flex flex-col gap-1.5">
-              {PAGE_TYPES.filter((t) => activeTypes.has(t)).map((type) => (
-                <div key={type} className="flex items-center gap-1.5">
-                  <span
-                    className="w-2.5 h-2.5 rounded-full shrink-0"
-                    style={{ background: wikiTypeColor(type) }}
-                  />
-                  <span className="text-[10px] text-muted-foreground">
-                    {wikiTypeGroupLabel(type)}
-                  </span>
-                  <span className="text-[9px] text-muted-foreground/60 tabular-nums ml-auto">
-                    {typeStats[type] ?? 0}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
 
         {/* Hint */}
         {filteredData && filteredData.nodes.length > 0 && (

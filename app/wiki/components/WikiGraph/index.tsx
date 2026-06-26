@@ -44,6 +44,12 @@ type Props = {
   onNodeClick?: (slug: string) => void;
   onNodeDoubleClick?: (slug: string) => void;
   communityMap?: Record<string, number>;
+  /** All type counts (before filtering) — enables clickable legend */
+  allTypeCounts?: Record<string, number>;
+  /** Which types are currently active (used to dim legend items) */
+  activeTypes?: Set<string>;
+  /** Called when user clicks a legend item */
+  onTypeToggle?: (type: string) => void;
 };
 
 const COMMUNITY_COLORS = [
@@ -126,6 +132,9 @@ export function WikiGraph({
   onNodeClick,
   onNodeDoubleClick,
   communityMap,
+  allTypeCounts,
+  activeTypes,
+  onTypeToggle,
 }: Props) {
   const router = useRouter();
   const containerRef = React.useRef<HTMLDivElement>(null);
@@ -525,30 +534,41 @@ export function WikiGraph({
         </div>
       )}
 
-      {/* Legend */}
+      {/* Legend — clickable to toggle type filters */}
       {!mini && (
         <div className="absolute bottom-3 left-3 border border-border bg-card/90 backdrop-blur-sm p-2 rounded-lg shadow-md text-[10.5px] font-sans max-w-[200px] select-none">
-          <div className="mb-2 font-mono font-extrabold text-[10px] text-muted-foreground uppercase tracking-wider">CHÚ GIẢI LOẠI</div>
-          <div className="flex flex-col gap-1.5">
-            {Object.entries(typeCounts)
+          <div className="mb-2 font-mono font-extrabold text-[10px] text-muted-foreground uppercase tracking-wider flex items-center gap-1">
+            CHÚ GIẢI LOẠI
+            {onTypeToggle && (
+              <span className="text-[8px] normal-case font-normal opacity-60">(click để lọc)</span>
+            )}
+          </div>
+          <div className="flex flex-col gap-1">
+            {Object.entries(allTypeCounts ?? typeCounts)
               .sort((a, b) => b[1] - a[1])
               .map(([type, count]) => {
                 const nodeColors = getGraphNodeColors(type, isDarkMode);
+                const isActive = !activeTypes || activeTypes.has(type);
                 return (
-                  <div
+                  <button
                     key={type}
-                    className="flex items-center gap-2 px-1 py-0.5"
+                    onClick={() => onTypeToggle?.(type)}
+                    className={`flex items-center gap-2 px-1.5 py-1 rounded-md w-full text-left transition-all ${
+                      onTypeToggle ? "cursor-pointer hover:bg-muted/60" : "cursor-default"
+                    } ${!isActive ? "opacity-40" : ""}`}
                   >
                     <span
-                      className="w-2.5 h-2.5 rounded-full shrink-0 border"
+                      className="w-2.5 h-2.5 rounded-full shrink-0 border transition-all"
                       style={{
-                        background: nodeColors.bg,
+                        background: isActive ? nodeColors.bg : "transparent",
                         borderColor: nodeColors.border,
                       }}
                     />
-                    <span className="text-foreground font-bold">{wikiTypeGroupLabel(type)}</span>
-                    <span className="text-muted-foreground ml-auto font-mono">{count}</span>
-                  </div>
+                    <span className={`font-bold transition-colors ${isActive ? "text-foreground" : "text-muted-foreground line-through"}`}>
+                      {wikiTypeGroupLabel(type)}
+                    </span>
+                    <span className="text-muted-foreground ml-auto font-mono text-[9px]">{count}</span>
+                  </button>
                 );
               })}
           </div>

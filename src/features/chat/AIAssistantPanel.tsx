@@ -54,23 +54,14 @@ export function AIAssistantPanel({ chatId, initialQuery, onClose }: AIAssistantP
   const [forceNewConv, setForceNewConv] = useState(false);
   const { data: conversations, isLoading: isLoadingConv, refetch: refetchConversations } = useGetConversationsQuery();
   
-  // Find the relevant conversation for this chatId and mode
-  // Agent titles start with "Agent", RAG titles do not
+  // Both RAG and Agent share the same conversation for a given chatId
   const activeConv = useMemo(() => {
     if (forceNewConv) return null;
     if (!conversations || !chatId) return null;
-    return conversations.find(c => {
-      const isAgentTitle = c.title.startsWith('Agent');
-      return c.chatId === chatId && (agentMode ? isAgentTitle : !isAgentTitle);
-    });
-  }, [conversations, chatId, agentMode, forceNewConv]);
+    return conversations.find(c => c.chatId === chatId);
+  }, [conversations, chatId, forceNewConv]);
 
   const { aiMessages: currentMessages, isStreaming, sendAIQuery, sendAgentQuery, clearAI } = useAIAssistant(chatId, activeConv?.id || undefined);
-
-  // Clear active session messages when toggling mode
-  useEffect(() => {
-    clearAI();
-  }, [agentMode, clearAI]);
 
   const { data: historyMessages, isLoading: isLoadingHistoryMessages } = useGetConversationMessagesQuery(
     activeConv?.id as number,
@@ -138,6 +129,16 @@ export function AIAssistantPanel({ chatId, initialQuery, onClose }: AIAssistantP
     setInputValue('');
     textareaRef.current?.focus();
   }, [inputValue, isStreaming, agentMode, sendAIQuery, sendAgentQuery, currentWorkspaceId]);
+
+  const handleFollowUp = useCallback((question: string) => {
+    if (isStreaming) return;
+    setForceNewConv(false);
+    if (agentMode) {
+      sendAgentQuery(question, currentWorkspaceId || undefined);
+    } else {
+      sendAIQuery(question);
+    }
+  }, [isStreaming, agentMode, sendAIQuery, sendAgentQuery, currentWorkspaceId]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -287,6 +288,7 @@ export function AIAssistantPanel({ chatId, initialQuery, onClose }: AIAssistantP
                   content={msg.content}
                   isStreaming={msg.isStreaming}
                   mode={msg.mode}
+                  onFollowUpClick={handleFollowUp}
                 />
               ))}
               <div ref={scrollEndRef} className="h-4" />

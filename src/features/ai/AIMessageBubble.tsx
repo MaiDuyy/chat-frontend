@@ -1,7 +1,7 @@
 'use client';
 
 import { cn } from '@/lib/utils';
-import { Bot, User, Bookmark, Copy, Check, AlertCircle, Zap } from 'lucide-react';
+import { Bot, User, Bookmark, Copy, Check, AlertCircle, Zap, ShieldCheck, ShieldAlert, Shield, MessageSquarePlus, Wrench } from 'lucide-react';
 import { CitationList } from './CitationList';
 import { Button } from '@/components/ui/button';
 import type { Citation } from '@/src/redux/feature/aiApi';
@@ -16,10 +16,26 @@ interface AIMessageBubbleProps {
     isStreaming?: boolean;
     timestamp?: string;
     onCitationClick?: (citation: Citation) => void;
+    onFollowUpClick?: (question: string) => void;
     onSave?: () => void;
     className?: string;
     mode?: 'agent' | 'rag';
     error?: boolean;
+}
+
+function renderWikiLinks(text: string) {
+    const parts = text.split(/\[\[([^\]]+)\]\]/g);
+    return parts.map((part, i) => {
+        if (i % 2 === 1) {
+            const [, display] = part.split('|');
+            return (
+                <span key={i} className="inline-flex items-center gap-0.5 px-1 py-0.5 rounded bg-primary/10 text-primary text-[11px] font-medium">
+                    {display ?? part}
+                </span>
+            );
+        }
+        return <span key={i}>{part}</span>;
+    });
 }
 
 function parseAIResponse(content: string) {
@@ -34,6 +50,59 @@ function parseAIResponse(content: string) {
     }
 }
 
+const TOOL_LABELS: Record<string, string> = {
+    searchKnowledge: 'RAG Search',
+    search_wiki: 'Wiki Search',
+    read_wiki_page: 'Wiki Read',
+    list_wiki_pages: 'Wiki List',
+    create_wiki_page: 'Wiki Create',
+    edit_wiki_page: 'Wiki Edit',
+    summarizeChat: 'Summarize',
+    getChatInfo: 'Chat Info',
+    searchMessages: 'Msg Search',
+    getPinnedMessages: 'Pinned Msgs',
+    togglePinMessage: 'Pin Toggle',
+    createTask: 'Create Task',
+    listTasks: 'List Tasks',
+    updateTaskStatus: 'Task Update',
+    createPoll: 'Create Poll',
+};
+
+function ToolBadges({ tools }: { tools: string[] }) {
+    if (!tools?.length) return null;
+    return (
+        <div className="flex flex-wrap gap-1 items-center">
+            <Wrench className="w-3 h-3 text-muted-foreground shrink-0" />
+            {tools.map((tool) => (
+                <span
+                    key={tool}
+                    className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-muted border border-border text-muted-foreground"
+                >
+                    {TOOL_LABELS[tool] ?? tool}
+                </span>
+            ))}
+        </div>
+    );
+}
+
+function ConfidenceBadge({ level, score }: { level: string; score?: number }) {
+    if (!level || level === 'NONE') return null;
+    const cfg = {
+        HIGH:   { icon: ShieldCheck,  cls: 'text-emerald-600 bg-emerald-50 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-900/40', label: 'Độ tin cậy cao' },
+        MEDIUM: { icon: Shield,       cls: 'text-amber-600 bg-amber-50 border-amber-200 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-900/40',     label: 'Độ tin cậy trung bình' },
+        LOW:    { icon: ShieldAlert,  cls: 'text-rose-500 bg-rose-50 border-rose-200 dark:bg-rose-950/30 dark:text-rose-400 dark:border-rose-900/40',           label: 'Độ tin cậy thấp' },
+    }[level as 'HIGH' | 'MEDIUM' | 'LOW'];
+    if (!cfg) return null;
+    const Icon = cfg.icon;
+    return (
+        <span className={cn('inline-flex items-center gap-1 px-2 py-0.5 rounded border text-[10px] font-semibold', cfg.cls)}>
+            <Icon className="w-3 h-3" />
+            {cfg.label}
+            {score !== undefined && <span className="opacity-60 ml-0.5">({Math.round(score * 100)}%)</span>}
+        </span>
+    );
+}
+
 export function AIMessageBubble({
     role,
     content,
@@ -41,6 +110,7 @@ export function AIMessageBubble({
     isStreaming = false,
     timestamp,
     onCitationClick,
+    onFollowUpClick,
     onSave,
     className,
     mode,
@@ -148,17 +218,31 @@ export function AIMessageBubble({
                     >
                         {parsed ? (
                             <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                                {/* Confidence badge + tools used */}
+                                {!isStreaming && (parsed.confidence || parsed.toolsUsed?.length > 0) && (
+                                    <div className="flex flex-wrap items-center gap-2">
+                                        {parsed.confidence && parsed.confidence !== 'NONE' && (
+                                            <ConfidenceBadge level={parsed.confidence} score={parsed.confidenceScore} />
+                                        )}
+                                        {parsed.toolsUsed?.length > 0 && (
+                                            <ToolBadges tools={parsed.toolsUsed} />
+                                        )}
+                                    </div>
+                                )}
+
                                 <p className="text-sm font-medium text-foreground leading-snug">
-                                    {parsed.summary}
+                                    {renderWikiLinks(parsed.summary ?? '')}
                                 </p>
+
                                 <div className="space-y-2 pl-4 border-l-2 border-primary/20">
                                     {parsed.details?.map((item: string, idx: number) => (
                                         <div key={idx} className="flex gap-2 text-muted-foreground text-sm">
                                             <span className="text-primary font-bold mt-0.5">•</span>
-                                            <span>{item}</span>
+                                            <span>{renderWikiLinks(item)}</span>
                                         </div>
                                     ))}
                                 </div>
+
                                 {parsed.sources?.length > 0 && (
                                     <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-border">
                                         <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest w-full mb-1">
@@ -172,6 +256,34 @@ export function AIMessageBubble({
                                                 {src}
                                             </span>
                                         ))}
+                                    </div>
+                                )}
+
+                                {/* Suggested follow-up questions */}
+                                {!isStreaming && parsed.suggestedFollowUps?.length > 0 && (
+                                    <div className="pt-3 border-t border-border">
+                                        <div className="flex items-center gap-1.5 mb-2">
+                                            <MessageSquarePlus className="w-3 h-3 text-muted-foreground" />
+                                            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                                                Câu hỏi gợi ý
+                                            </span>
+                                        </div>
+                                        <div className="flex flex-wrap gap-2">
+                                            {parsed.suggestedFollowUps.map((q: string, i: number) => (
+                                                <button
+                                                    key={i}
+                                                    onClick={() => onFollowUpClick?.(q)}
+                                                    className={cn(
+                                                        'text-[11px] px-2.5 py-1.5 rounded-md border text-left',
+                                                        'bg-muted/50 border-border text-muted-foreground',
+                                                        'hover:bg-primary/5 hover:border-primary/30 hover:text-foreground',
+                                                        'transition-colors duration-150 cursor-pointer'
+                                                    )}
+                                                >
+                                                    {q}
+                                                </button>
+                                            ))}
+                                        </div>
                                     </div>
                                 )}
                             </div>

@@ -120,6 +120,15 @@ export function AIChatWindow({ conversationId, className }: AIChatWindowProps) {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const handleCitationClick = useCallback((_citation: Citation) => {}, []);
 
+    const handleFollowUp = useCallback((question: string) => {
+        if (isStreaming) return;
+        if (aiMode === 'agent') {
+            sendAgentQuery(question, currentWorkspaceId || 'default-workspace');
+        } else {
+            sendAIQuery(question);
+        }
+    }, [isStreaming, aiMode, sendAIQuery, sendAgentQuery, currentWorkspaceId]);
+
     if (isFetching && allMessages.length === 0) {
         return (
             <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground gap-3">
@@ -189,6 +198,7 @@ export function AIChatWindow({ conversationId, className }: AIChatWindowProps) {
                                     isStreaming={!!message.isStreaming}
                                     timestamp={new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                     onCitationClick={handleCitationClick}
+                                    onFollowUpClick={handleFollowUp}
                                 />
                             ))}
                             <div ref={scrollEndRef} className="h-1" />

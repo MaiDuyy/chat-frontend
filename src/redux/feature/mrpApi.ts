@@ -164,6 +164,37 @@ export interface WikiActivityEntry {
   reviewerNote?: string;
 }
 
+export interface WikiIssue {
+  id: number;
+  wikiPageSlug: string;
+  issueType: 'MIXED_ENTITIES' | 'CONTRADICTORY_FACTS' | 'OUT_OF_DATE' | 'MISSING_LINKS' | 'POOR_QUALITY' | 'HALLUCINATION';
+  status: 'OPEN' | 'IN_PROGRESS' | 'FIXED' | 'IGNORED';
+  workspaceId: string;
+  description: string;
+  evidence: string;
+  suggestedFix: string;
+  detectedBy: string;
+  resolvedBy: string;
+  resolvedNote: string;
+  resolvedAt: string;
+  createdAt: string;
+}
+
+export interface CreateWikiIssueRequest {
+  wikiPageSlug: string;
+  issueType: WikiIssue['issueType'];
+  workspaceId: string;
+  description: string;
+  evidence?: string;
+  suggestedFix?: string;
+}
+
+export interface UpdateWikiIssueRequest {
+  status?: WikiIssue['status'];
+  resolvedNote?: string;
+  resolvedBy?: string;
+}
+
 const normalizeWikiPage = (page: WikiPage): WikiPage => {
   if (!page) return page;
   return {
@@ -508,6 +539,53 @@ fetchWikiImageRaw: builder.query<string, string>({
       },
       providesTags: ['Documents'],
     }),
+
+    // --- Wiki Issues ---
+    getWikiIssues: builder.query({
+      query: ({ slug, workspaceId }) =>
+        '/mrp/wiki/issues?slug=' + encodeURIComponent(slug) + '&workspaceId=' + encodeURIComponent(workspaceId),
+      providesTags: ['Documents'],
+    }),
+
+    getWikiIssueCount: builder.query({
+      query: ({ slug }) => '/mrp/wiki/issues/count?slug=' + encodeURIComponent(slug),
+      providesTags: ['Documents'],
+    }),
+
+    getAllWikiIssues: builder.query({
+      query: ({ workspaceId, status }) => {
+        const params = new URLSearchParams({ workspaceId });
+        if (status) params.set('status', status);
+        return '/mrp/wiki/issues/all?' + params.toString();
+      },
+      providesTags: ['Documents'],
+    }),
+
+    createWikiIssue: builder.mutation({
+      query: (body) => ({
+        url: '/mrp/wiki/issues',
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: ['Documents'],
+    }),
+
+    updateWikiIssue: builder.mutation({
+      query: ({ id, ...body }) => ({
+        url: '/mrp/wiki/issues/' + id,
+        method: 'PATCH',
+        body,
+      }),
+      invalidatesTags: ['Documents'],
+    }),
+
+    deleteWikiIssue: builder.mutation({
+      query: (id) => ({
+        url: '/mrp/wiki/issues/' + id,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['Documents'],
+    }),
   }),
 });
 
@@ -540,4 +618,10 @@ export const {
   useLazyGetWikiIndexQuery,
   useGetWikiStatsQuery,
   useGetWikiActivityQuery,
+  useGetWikiIssuesQuery,
+  useGetWikiIssueCountQuery,
+  useGetAllWikiIssuesQuery,
+  useCreateWikiIssueMutation,
+  useUpdateWikiIssueMutation,
+  useDeleteWikiIssueMutation,
 } = mrpApi;
