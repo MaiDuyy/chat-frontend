@@ -16,6 +16,7 @@ import {
   Layers,
   Menu,
   Globe,
+  RefreshCw,
 } from "lucide-react";
 import {
   useGetWikiPagesQuery,
@@ -45,6 +46,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
   useGetAdminWikiPagesQuery,
   useGetAdminWikiMetadataQuery,
+  useRebuildWikiLinksMutation,
 } from "@/src/redux/feature/adminApi";
 import { useGetUserWorkspacesQuery } from "@/src/redux/feature/workspaceApi";
 
@@ -140,6 +142,9 @@ export function AdminWikiDashboard() {
   const { data: plans } = useGetCompilationPlansQuery({ workspaceId });
   const [compileDocument, { isLoading: isCompiling }] =
     useCompileDocumentMutation();
+  const [rebuildWikiLinks, { isLoading: isRebuilding }] =
+    useRebuildWikiLinksMutation();
+  const [rebuildMsg, setRebuildMsg] = React.useState<string | null>(null);
 
   const refetchDrafts = React.useCallback(() => {
     if (isSuperAdmin) {
@@ -328,6 +333,32 @@ export function AdminWikiDashboard() {
               <Compass className="w-3.5 h-3.5" />
               Đồ thị
             </Link>
+            <button
+              onClick={async () => {
+                setRebuildMsg(null);
+                try {
+                  const result = await rebuildWikiLinks({
+                    workspaceId: viewAllWiki && isSystemAdmin ? undefined : (currentWorkspaceId || undefined),
+                  }).unwrap();
+                  setRebuildMsg(`✓ Đã rebuild ${result.pagesRefreshed}/${result.pagesTotal} trang`);
+                  setTimeout(() => setRebuildMsg(null), 5000);
+                } catch {
+                  setRebuildMsg("Lỗi rebuild — kiểm tra console");
+                  setTimeout(() => setRebuildMsg(null), 4000);
+                }
+              }}
+              disabled={isRebuilding}
+              title="Tái tạo wiki graph links và index page từ tất cả trang đã approved"
+              className="px-2.5 py-1.5 text-xs font-semibold border border-border bg-card hover:bg-muted/50 text-foreground transition-all rounded-md shadow-sm active:translate-y-[0.5px] flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${isRebuilding ? "animate-spin" : ""}`} />
+              {isRebuilding ? "Đang rebuild..." : "Rebuild Index"}
+            </button>
+            {rebuildMsg && (
+              <span className="text-xs font-medium text-emerald-600 dark:text-emerald-400 whitespace-nowrap">
+                {rebuildMsg}
+              </span>
+            )}
             <Link
               href="/wiki/plans"
               className={`px-2.5 py-1.5 text-xs font-semibold border transition-all rounded-md shadow-sm active:translate-y-[0.5px] flex items-center gap-1.5 cursor-pointer ${

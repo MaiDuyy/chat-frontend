@@ -511,6 +511,18 @@ export const adminApi = apiSlice.injectEndpoints({
       providesTags: ['Documents'],
     }),
 
+    // Rebuild all wiki graph links and index page for a workspace (Admin only)
+    rebuildWikiLinks: builder.mutation<{ pagesRefreshed: number; pagesTotal: number; errors: number; workspaceId: string }, { workspaceId?: string; departmentId?: string }>({
+      query: ({ workspaceId, departmentId } = {}) => {
+        const params = new URLSearchParams();
+        if (workspaceId) params.set('workspaceId', workspaceId);
+        if (departmentId) params.set('departmentId', departmentId);
+        const qs = params.toString();
+        return { url: `/admin/mrp/wiki/rebuild-links${qs ? `?${qs}` : ''}`, method: 'POST' };
+      },
+      invalidatesTags: ['Documents'],
+    }),
+
     // Get a single wiki page by slug across all workspaces (Admin only)
     // Optional workspaceId to prefer a specific workspace when slug conflicts exist
     getAdminWikiPageBySlug: builder.query<WikiPage, { slug: string; workspaceId?: string }>({
@@ -563,6 +575,7 @@ export const {
   useGetAdminWikiPagesQuery,
   useGetAdminWikiMetadataQuery,
   useGetAdminWikiGraphQuery,
+  useRebuildWikiLinksMutation,
   useGetAdminWikiPageBySlugQuery,
   useLazyGetAdminWikiPageBySlugQuery,
   // Lazy

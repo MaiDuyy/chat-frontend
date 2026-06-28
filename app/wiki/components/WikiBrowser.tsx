@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React from "react";
 import Link from "next/link";
@@ -6,12 +6,13 @@ import {
   Search, X, ChevronLeft, Eye, Network,
   Folder, FileText, ChevronRight, ChevronDown, List,
   Compass, Menu, BookOpen, ArrowUpRight, Link2,
-  HelpCircle, Loader2, FolderTree,
+  HelpCircle, Loader2, FolderTree, AlertTriangle,
 } from "lucide-react";
 import {
   useGetWikiPageBySlugQuery,
   useGetWikiIndexQuery,
   useGetWikiPagesMetadataQuery,
+  useGetWikiIssueCountQuery,
   WikiIndexEntry,
 } from "@/src/redux/feature/mrpApi";
 import { WikiContent } from "./WikiContent";
@@ -19,6 +20,8 @@ import { wikiTypeColor, wikiTypeGroupLabel, wikiTypeIcon } from "./WikiTypeBadge
 import { MarkdownContent } from "@/src/features/knowledge/MarkdownContent";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
+import { WikiIssuePanel } from "./WikiIssuePanel";
+import { WikiFixerChat } from "./WikiFixerChat";
 
 // ── Tree types ────────────────────────────────────────────────────────
 interface TreeNode {
@@ -323,6 +326,10 @@ interface ReaderProps {
 }
 
 function WikiReader({ workspaceId, selectedSlug, systemView, navHistory, onNavigate, onBack }: ReaderProps) {
+  const [showIssues, setShowIssues] = React.useState(false);
+  const [fixerOpen, setFixerOpen] = React.useState(false);
+  const [fixerIssueId, setFixerIssueId] = React.useState<number | undefined>(undefined);
+
   const { data: indexData, isLoading: indexLoading } = useGetWikiIndexQuery(
     { workspaceId, limit: 200 },
     { skip: systemView !== "index" }
@@ -332,6 +339,11 @@ function WikiReader({ workspaceId, selectedSlug, systemView, navHistory, onNavig
     { skip: !selectedSlug }
   );
   const { data: allPagesData } = useGetWikiPagesMetadataQuery({ workspaceId });
+  const { data: issueCount } = useGetWikiIssueCountQuery(
+    { slug: selectedSlug ?? "" },
+    { skip: !selectedSlug || systemView === "index" }
+  );
+  const openIssueCount = typeof issueCount === "number" ? issueCount : 0;
 
   const allPages = React.useMemo(
     () => (Array.isArray(allPagesData) ? allPagesData : []).map((p) => ({ title: p.title, slug: p.slug })),
@@ -524,6 +536,23 @@ function WikiReader({ workspaceId, selectedSlug, systemView, navHistory, onNavig
                   >
                     <Network className="w-3.5 h-3.5" />
                   </Link>
+                  <button
+                    onClick={() => setShowIssues((v) => !v)}
+                    className={cn(
+                      "relative p-1.5 rounded-md border transition-colors",
+                      showIssues
+                        ? "bg-amber-500/10 border-amber-400/30 text-amber-600 dark:text-amber-400"
+                        : "text-muted-foreground hover:text-foreground hover:bg-accent border-border"
+                    )}
+                    title="Vấn đề chất lượng trang"
+                  >
+                    <AlertTriangle className="w-3.5 h-3.5" />
+                    {openIssueCount > 0 && (
+                      <span className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-red-500 text-[8px] font-bold text-white flex items-center justify-center">
+                        {openIssueCount > 9 ? "9+" : openIssueCount}
+                      </span>
+                    )}
+                  </button>
                 </div>
               </div>
               {pageData.summary && (
@@ -532,6 +561,18 @@ function WikiReader({ workspaceId, selectedSlug, systemView, navHistory, onNavig
                 </p>
               )}
             </div>
+
+            {/* Wiki Issue Panel */}
+            {showIssues && selectedSlug && (
+              <WikiIssuePanel
+                slug={selectedSlug}
+                workspaceId={workspaceId}
+                onOpenFixer={(issueId, _issueslug) => {
+                  setFixerIssueId(issueId);
+                  setFixerOpen(true);
+                }}
+              />
+            )}
 
             {/* Backlinks bar */}
             {backlinkPages.length > 0 && (
@@ -589,6 +630,16 @@ function WikiReader({ workspaceId, selectedSlug, systemView, navHistory, onNavig
           </div>
         )}
       </div>
+      {/* Wiki Fixer Chat Sheet */}
+      {selectedSlug && (
+        <WikiFixerChat
+          open={fixerOpen}
+          onClose={() => { setFixerOpen(false); setFixerIssueId(undefined); }}
+          slug={selectedSlug}
+          issueId={fixerIssueId}
+          workspaceId={workspaceId}
+        />
+      )}
     </div>
   );
 }

@@ -8,10 +8,12 @@ export interface SourceCompilationPlan {
   sourceDocumentId: number;
   sourceDocumentName?: string;
   planJson: string;
-  status: 'PENDING_REVIEW' | 'APPROVED' | 'DONE' | string;
+  status: 'PENDING_REVIEW' | 'APPROVED' | 'DONE' | 'FAILED' | 'REJECTED' | string;
   reviewedBy?: string;
   reviewNote?: string;
   reviewedAt?: string;
+  workspaceId?: string;
+  departmentId?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -230,6 +232,27 @@ export const mrpApi = apiSlice.injectEndpoints({
         method: 'POST',
       }),
       invalidatesTags: ['Documents', 'Tasks'],
+    }),
+
+    // Từ chối Kế hoạch biên soạn (Admin only)
+    rejectPlan: builder.mutation<SourceCompilationPlan, { planId: number; workspaceId: string; note: string }>({
+      query: ({ planId, workspaceId, note }) => ({
+        url: `/mrp/plan/${planId}/reject?workspaceId=${workspaceId}`,
+        method: 'POST',
+        body: { note },
+      }),
+      invalidatesTags: ['Tasks'],
+    }),
+
+    // Chỉnh sửa trực tiếp nội dung Bản thảo (Admin only)
+    updateDraft: builder.mutation<WikiPageDraft, { draftId: number; content?: string; title?: string; summary?: string; tags?: string; note?: string }>({
+      query: ({ draftId, ...body }) => ({
+        url: `/mrp/drafts/${draftId}`,
+        method: 'PATCH',
+        body,
+      }),
+      transformResponse: (response: WikiPageDraft) => normalizeWikiDraft(response),
+      invalidatesTags: ['Tasks'],
     }),
 
     // Lấy tất cả bản thảo đang chờ duyệt (Hỗ trợ phân trang server-side)
@@ -586,12 +609,23 @@ fetchWikiImageRaw: builder.query<string, string>({
       }),
       invalidatesTags: ['Documents'],
     }),
+
+    // Upload standalone wiki image (multipart/form-data)
+    uploadWikiImage: builder.mutation<{ id: string; url: string }, FormData>({
+      query: (formData) => ({
+        url: '/wiki/images/upload',
+        method: 'POST',
+        body: formData,
+      }),
+    }),
   }),
 });
 
 export const {
   useCompileDocumentMutation,
   useApprovePlanMutation,
+  useRejectPlanMutation,
+  useUpdateDraftMutation,
   useGetPendingDraftsQuery,
   useGetDraftsByWorkspaceQuery,
   useGetDraftsByStatusQuery,
@@ -624,4 +658,5 @@ export const {
   useCreateWikiIssueMutation,
   useUpdateWikiIssueMutation,
   useDeleteWikiIssueMutation,
+  useUploadWikiImageMutation,
 } = mrpApi;

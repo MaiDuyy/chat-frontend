@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import {
   useGetCompilationPlansQuery,
   useApprovePlanMutation,
+  useRejectPlanMutation,
   useGetPlanByIdQuery,
   SourceCompilationPlan
 } from "@/src/redux/feature/mrpApi";
@@ -25,7 +26,8 @@ import {
   Check,
   ChevronRight,
   ShieldCheck,
-  Sparkles
+  Sparkles,
+  XCircle
 } from "lucide-react";
 import { useHasRole } from "@/src/lib/rbac/usePermission";
 import { useSelector } from "react-redux";
@@ -55,10 +57,13 @@ export default function CompilationPlansPage({ isEmbedded = false }: { isEmbedde
   // RTK Query hooks
   const { data: plansResponse, isLoading: isPlansLoading, refetch: refetchPlans } = useGetCompilationPlansQuery({ workspaceId, page, size }, { skip: !canManageWiki });
   const [approvePlan, { isLoading: isApproving }] = useApprovePlanMutation();
+  const [rejectPlan, { isLoading: isRejecting }] = useRejectPlanMutation();
   // State
   const [selectedPlanId, setSelectedPlanId] = React.useState<number | null>(null);
   const [runAutoApproveDrafts, setRunAutoApproveDrafts] = React.useState(false);
   const [message, setMessage] = React.useState<{ text: string; type: "success" | "error" } | null>(null);
+  const [showRejectBox, setShowRejectBox] = React.useState(false);
+  const [rejectNote, setRejectNote] = React.useState("");
   // Extract plans list and total elements
   const plans = React.useMemo(() => {
     if (!plansResponse) return [];
@@ -154,22 +159,51 @@ export default function CompilationPlansPage({ isEmbedded = false }: { isEmbedde
     if (!activePlan) return;
     setMessage(null);
     try {
-      const response = await approvePlan({
+      await approvePlan({
         planId: activePlan.id,
         workspaceId,
         runAutoApproveDrafts
       }).unwrap();
-      
+
       setMessage({
         text: `Kế hoạch biên soạn #${activePlan.id} đã được duyệt & thực thi thành công! Các bản thảo nháp tương ứng đã được khởi tạo.`,
         type: "success"
       });
-      
+
       refetchPlans();
     } catch (err) {
       const error = err as { data?: { message?: string } } | undefined;
       setMessage({
         text: error?.data?.message || "Lỗi xảy ra khi duyệt kế hoạch biên soạn.",
+        type: "error"
+      });
+    }
+  };
+
+  const handleRejectPlan = async () => {
+    if (!activePlan) return;
+    if (!rejectNote.trim()) {
+      setMessage({ text: "Vui lòng nhập lý do từ chối kế hoạch.", type: "error" });
+      return;
+    }
+    setMessage(null);
+    try {
+      await rejectPlan({
+        planId: activePlan.id,
+        workspaceId,
+        note: rejectNote
+      }).unwrap();
+      setMessage({
+        text: `Kế hoạch biên soạn #${activePlan.id} đã bị từ chối kèm lý do.`,
+        type: "success"
+      });
+      setShowRejectBox(false);
+      setRejectNote("");
+      refetchPlans();
+    } catch (err) {
+      const error = err as { data?: { message?: string } } | undefined;
+      setMessage({
+        text: error?.data?.message || "Lỗi xảy ra khi từ chối kế hoạch biên soạn.",
         type: "error"
       });
     }
@@ -312,9 +346,12 @@ export default function CompilationPlansPage({ isEmbedded = false }: { isEmbedde
               <div className="flex flex-col gap-2 max-h-[500px] overflow-y-auto pr-1">
                 {paginatedPlans.map((plan) => {
                   const isPending = plan.status === "PENDING_REVIEW";
-                  
-                  const statusClass = isPending 
+                  const isRejectedPlan = plan.status === "REJECTED";
+
+                  const statusClass = isPending
                     ? "bg-amber-500/10 border-amber-500 text-amber-800 dark:text-amber-400"
+                    : isRejectedPlan
+                    ? "bg-rose-500/10 border-rose-500 text-rose-800 dark:text-rose-400"
                     : "bg-emerald-500/10 border-emerald-500 text-emerald-800 dark:text-emerald-400";
                     
                   return (
@@ -504,17 +541,15 @@ export default function CompilationPlansPage({ isEmbedded = false }: { isEmbedde
                   <div className="border border-border bg-muted/40 p-3 rounded-md mt-1 flex flex-col gap-2">
                     <div className="flex items-center justify-between">
                       <span className="font-mono text-xs uppercase font-extrabold text-foreground">
-                        PHÊ DUYỆT THỰC THI (PLAN APPROVAL)
+                        PHÊ DUYỆT / TỪ CHỐI KẾ HOẠCH
                       </span>
                     </div>
 
                     <p className="text-[11px] text-foreground/80 leading-relaxed font-sans">
-                      Khi phê duyệt, tiến trình nền song song Spring Batch và Java Virtual Threads sẽ tiến hành <strong>Refine & Commit</strong>. Nội dung sẽ được trộn nâng cao (Prompt Merge) với các bài viết hiện tại và các bản thảo (Drafts) mới sẽ tự động được sinh ra trong Review Console.
+                      Khi phê duyệt, tiến trình nền sẽ tiến hành <strong>Refine & Commit</strong>. Nội dung sẽ được trộn nâng cao (Prompt Merge) với các bài viết hiện tại và các bản thảo mới sẽ tự động được sinh ra trong Review Console.
                     </p>
 
                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-t border-border pt-2.5 gap-3">
-                      
-                      {/* Run auto approve drafts flag */}
                       <label className="flex items-center gap-2 cursor-pointer font-sans text-xs font-bold text-foreground select-none">
                         <input
                           type="checkbox"
@@ -522,17 +557,71 @@ export default function CompilationPlansPage({ isEmbedded = false }: { isEmbedde
                           onChange={(e) => setRunAutoApproveDrafts(e.target.checked)}
                           className="w-4 h-4 border border-border bg-background rounded text-primary focus:ring-0 cursor-pointer"
                         />
-                        <span>Tự động phê duyệt & Trộn trực tiếp (Run Auto-Approve Drafts)</span>
+                        <span>Tự động phê duyệt & Trộn trực tiếp (Auto-Approve Drafts)</span>
                       </label>
 
-                      <button
-                        onClick={handleApprovePlan}
-                        disabled={isApproving}
-                        className="w-full sm:w-auto px-4 py-2 text-xs font-semibold bg-emerald-600 hover:bg-emerald-600/95 text-white transition-all duration-200 rounded-md shadow-sm hover:shadow-md hover:-translate-y-[0.5px] active:scale-[0.98] disabled:opacity-50 disabled:translate-y-0 disabled:shadow-sm flex items-center justify-center gap-1.5 select-none cursor-pointer"
-                      >
-                        <Play className="w-3.5 h-3.5" />
-                        {isApproving ? "Đang thực thi..." : "Phê duyệt & Chạy (D)"}
-                      </button>
+                      <div className="flex items-center gap-2 w-full sm:w-auto">
+                        <button
+                          onClick={() => { setShowRejectBox((v) => !v); setMessage(null); }}
+                          disabled={isApproving || isRejecting}
+                          className="flex-1 sm:flex-none px-3 py-2 text-xs font-semibold bg-rose-600 hover:bg-rose-600/95 text-white transition-all duration-200 rounded-md shadow-sm hover:shadow-md hover:-translate-y-[0.5px] active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-1.5 select-none cursor-pointer"
+                        >
+                          <XCircle className="w-3.5 h-3.5" />
+                          Từ chối (Reject)
+                        </button>
+                        <button
+                          onClick={handleApprovePlan}
+                          disabled={isApproving || isRejecting}
+                          className="flex-1 sm:flex-none px-4 py-2 text-xs font-semibold bg-emerald-600 hover:bg-emerald-600/95 text-white transition-all duration-200 rounded-md shadow-sm hover:shadow-md hover:-translate-y-[0.5px] active:scale-[0.98] disabled:opacity-50 disabled:translate-y-0 disabled:shadow-sm flex items-center justify-center gap-1.5 select-none cursor-pointer"
+                        >
+                          <Play className="w-3.5 h-3.5" />
+                          {isApproving ? "Đang thực thi..." : "Phê duyệt & Chạy (D)"}
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Reject note box */}
+                    {showRejectBox && (
+                      <div className="border border-rose-500/30 bg-rose-500/5 p-3 rounded-md flex flex-col gap-2 mt-1">
+                        <span className="font-mono text-[10px] uppercase font-extrabold text-rose-600">Lý do từ chối kế hoạch</span>
+                        <textarea
+                          value={rejectNote}
+                          onChange={(e) => setRejectNote(e.target.value)}
+                          placeholder="Nhập lý do từ chối kế hoạch biên soạn này..."
+                          rows={2}
+                          className="w-full border border-rose-500/30 bg-background rounded-md p-2 text-xs font-sans focus:outline-none focus:ring-1 focus:ring-rose-500 focus:border-rose-500 transition-all"
+                        />
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            onClick={() => { setShowRejectBox(false); setRejectNote(""); }}
+                            className="px-3 py-1.5 text-xs font-mono font-bold border border-border bg-secondary hover:bg-secondary/80 text-secondary-foreground rounded-md transition-all select-none cursor-pointer"
+                          >
+                            Hủy
+                          </button>
+                          <button
+                            onClick={handleRejectPlan}
+                            disabled={isRejecting || !rejectNote.trim()}
+                            className="px-3 py-1.5 text-xs font-mono font-bold bg-rose-600 hover:bg-rose-600/90 text-white rounded-md transition-all disabled:opacity-50 select-none cursor-pointer"
+                          >
+                            {isRejecting ? "Đang từ chối..." : "Xác nhận từ chối"}
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ) : activePlan.status === "REJECTED" ? (
+                  <div className="border border-rose-500/30 bg-rose-500/5 p-3 rounded-md mt-1 flex items-start gap-3 select-none">
+                    <XCircle className="w-5 h-5 text-rose-500 shrink-0 mt-0.5" />
+                    <div className="flex flex-col gap-0.5">
+                      <span className="font-mono text-xs uppercase font-extrabold text-rose-600 leading-none">Kế hoạch đã bị từ chối</span>
+                      {activePlan.reviewNote && (
+                        <p className="text-[11px] text-muted-foreground mt-1 leading-relaxed">
+                          <strong>Lý do:</strong> {activePlan.reviewNote}
+                        </p>
+                      )}
+                      {activePlan.reviewedBy && (
+                        <p className="text-[10px] font-mono text-muted-foreground">Người duyệt: {activePlan.reviewedBy}</p>
+                      )}
                     </div>
                   </div>
                 ) : (

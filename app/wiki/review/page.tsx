@@ -10,11 +10,14 @@ import {
   useApproveDraftMutation,
   useRejectDraftMutation,
   useRequestChangesOnDraftMutation,
-  useGetPendingDraftsQuery
+  useGetPendingDraftsQuery,
+  useUpdateDraftMutation
 } from "@/src/redux/feature/mrpApi";
 import { useGetAdminWikiMetadataQuery } from "@/src/redux/feature/adminApi";
 import { WikiDraftDiff } from "../components/WikiDraftDiff";
 import { WikiAiCheckPanel } from "../components/WikiAiCheckPanel";
+import { WikiIssuePanel } from "../components/WikiIssuePanel";
+import { WikiFixerChat } from "../components/WikiFixerChat";
 import {
   ArrowLeft,
   CheckCircle,
@@ -26,7 +29,12 @@ import {
   Command,
   HelpCircle,
   Split,
-  Maximize2
+  Maximize2,
+  Pencil,
+  Save,
+  X,
+  Wrench,
+  FileText
 } from "lucide-react";
 import { useHasRole } from "@/src/lib/rbac/usePermission";
 import { useSelector } from "react-redux";
@@ -121,10 +129,20 @@ export default function WikiReviewConsole({ isEmbedded = false }: { isEmbedded?:
     return drafts.slice(page * size, (page + 1) * size);
   }, [drafts, page, size]);
 
+  // Edit mode state
+  const [isEditMode, setIsEditMode] = React.useState(false);
+  const [editContent, setEditContent] = React.useState("");
+  const [editNote, setEditNote] = React.useState("");
+
+  // Admin tab: "review" | "fixer"
+  const [adminTab, setAdminTab] = React.useState<"review" | "fixer">("review");
+  const [fixerIssueId, setFixerIssueId] = React.useState<number | undefined>(undefined);
+
   // Mutations
   const [approveDraft, { isLoading: isApproving }] = useApproveDraftMutation();
   const [rejectDraft, { isLoading: isRejecting }] = useRejectDraftMutation();
   const [requestChanges, { isLoading: isRequesting }] = useRequestChangesOnDraftMutation();
+  const [updateDraft, { isLoading: isSavingEdit }] = useUpdateDraftMutation();
 
   // Dynamically load the base wiki page content only when activeDraft changes and a wikiPageId exists
   const { data: activeBasePage } = useGetWikiPageByIdQuery(
@@ -136,7 +154,18 @@ export default function WikiReviewConsole({ isEmbedded = false }: { isEmbedded?:
   const baseWikiPage = activeBasePage || null;
 
   const oldText = baseWikiPage?.content || "";
-  const newText = activeDraft?.content || "";
+  const newText = isEditMode ? editContent : (activeDraft?.content || "");
+
+  // Sync edit content when switching draft
+  React.useEffect(() => {
+    if (activeDraft) {
+      setEditContent(activeDraft.content || "");
+      setEditNote("");
+    }
+    setIsEditMode(false);
+    setAdminTab("review");
+    setFixerIssueId(undefined);
+  }, [activeDraft?.id]);
 
   // Review Actions
   const handleApprove = async () => {
@@ -194,6 +223,40 @@ export default function WikiReviewConsole({ isEmbedded = false }: { isEmbedded?:
     }
   };
 
+  const handleSaveEdit = async () => {
+    if (!activeDraft || !editContent.trim()) return;
+    setMessage(null);
+    try {
+      await updateDraft({
+        draftId: activeDraft.id,
+        content: editContent,
+        ...(editNote.trim() ? { note: editNote } : {}),
+      }).unwrap();
+      setMessage({ text: `Đã lưu chỉnh sửa trực tiếp cho bản thảo "${activeDraft.title}". Bạn có thể phê duyệt ngay.`, type: "success" });
+      setIsEditMode(false);
+      refetchDrafts();
+    } catch (err) {
+      const error = err as { data?: { message?: string } } | undefined;
+      setMessage({ text: error?.data?.message || "Lỗi khi lưu chỉnh sửa.", type: "error" });
+    }
+  };
+
+  const handleSaveAndApprove = async () => {
+    if (!activeDraft || !editContent.trim()) return;
+    setMessage(null);
+    try {
+      await updateDraft({ draftId: activeDraft.id, content: editContent, ...(editNote.trim() ? { note: editNote } : {}) }).unwrap();
+      await approveDraft(activeDraft.id).unwrap();
+      setMessage({ text: `Đã lưu chỉnh sửa và phê duyệt bản thảo "${activeDraft.title}".`, type: "success" });
+      setIsEditMode(false);
+      setSelectedDraftId(null);
+      refetchDrafts();
+    } catch (err) {
+      const error = err as { data?: { message?: string } } | undefined;
+      setMessage({ text: error?.data?.message || "Lỗi khi lưu & duyệt.", type: "error" });
+    }
+  };
+
   // Keyboard shortcuts listeners
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -212,20 +275,36 @@ export default function WikiReviewConsole({ isEmbedded = false }: { isEmbedded?:
 
       switch (e.key.toLowerCase()) {
         case "a": // Approve
+          if (isEditMode || adminTab === "fixer") break;
           e.preventDefault();
           handleApprove();
           break;
         case "r": // Reject
+          if (isEditMode || adminTab === "fixer") break;
           e.preventDefault();
           handleReject();
           break;
         case "c": // Request changes
+          if (isEditMode || adminTab === "fixer") break;
           e.preventDefault();
           handleRequestChanges();
           break;
-        case "escape": // Cancel selection
+        case "e": // Toggle edit mode (Admin)
+          if (isEditMode) break;
+          if (isSuperAdmin || isAdmin) {
+            e.preventDefault();
+            setEditContent(activeDraft.content || "");
+            setIsEditMode(true);
+          }
+          break;
+        case "escape": // Cancel selection / exit edit
           e.preventDefault();
-          setSelectedDraftId(null);
+          if (isEditMode) {
+            setIsEditMode(false);
+            setEditContent(activeDraft.content || "");
+          } else {
+            setSelectedDraftId(null);
+          }
           break;
       }
     };
@@ -276,11 +355,14 @@ export default function WikiReviewConsole({ isEmbedded = false }: { isEmbedded?:
           </div>
 
           {/* Global info */}
-          <div className="flex items-center gap-1.5 font-mono text-[10px] text-muted-foreground bg-muted p-1 border border-border rounded-md">
+          <div className="flex items-center gap-1.5 font-mono text-[10px] text-muted-foreground bg-muted p-1 border border-border rounded-md flex-wrap">
             <span>Phím tắt:</span>
             <span className="bg-background px-1.5 py-0.5 rounded border border-border text-foreground font-semibold">[A] Duyệt</span>
             <span className="bg-background px-1.5 py-0.5 rounded border border-border text-foreground font-semibold">[C] Yêu cầu</span>
             <span className="bg-background px-1.5 py-0.5 rounded border border-border text-foreground font-semibold">[R] Từ chối</span>
+            {(isSuperAdmin || isAdmin) && (
+              <span className="bg-amber-500/10 border-amber-500 px-1.5 py-0.5 rounded border text-amber-700 dark:text-amber-400 font-semibold">[E] Sửa trực tiếp</span>
+            )}
             <span className="bg-background px-1.5 py-0.5 rounded border border-border text-foreground font-semibold">[Esc] Hủy</span>
           </div>
         </div>
@@ -388,41 +470,110 @@ export default function WikiReviewConsole({ isEmbedded = false }: { isEmbedded?:
           {activeDraft ? (
             <div className="grid grid-cols-1 xl:grid-cols-12 gap-3 items-start">
               
-              {/* Diff Viewer Workspace (8 cols) */}
+              {/* Diff / Edit Viewer Workspace (8 cols) */}
               <div className="xl:col-span-8 flex flex-col gap-3 border border-border bg-card p-4 rounded-lg shadow-md">
                 <div className="flex items-center justify-between border-b border-border pb-1.5 select-none">
                   <div>
-                    <span className="font-mono text-[8px] uppercase font-bold text-muted-foreground">Khung so sánh phiên bản (Diff View)</span>
+                    <span className="font-mono text-[8px] uppercase font-bold text-muted-foreground">
+                      {isEditMode ? "CHẾ ĐỘ CHỈNH SỬA TRỰC TIẾP (ADMIN EDIT)" : "Khung so sánh phiên bản (Diff View)"}
+                    </span>
                     <h2 className="text-xs font-bold text-foreground mt-0.5 line-clamp-1">
                       {activeDraft.title}
                     </h2>
                   </div>
 
-                  <div className="flex items-center border border-border bg-muted p-0.5 rounded-md font-mono text-[9px] font-semibold">
-                    <button
-                      onClick={() => setDiffMode("unified")}
-                      className={`px-2 py-0.75 rounded-md transition-all flex items-center gap-1 ${
-                        diffMode === "unified" ? "bg-primary text-primary-foreground shadow-sm" : "hover:bg-muted-foreground/10 text-foreground"
-                      }`}
-                    >
-                      <Maximize2 className="w-2.5 h-2.5" />
-                      Unified
-                    </button>
-                    <button
-                      onClick={() => setDiffMode("split")}
-                      className={`px-2 py-0.75 rounded-md transition-all flex items-center gap-1 ${
-                        diffMode === "split" ? "bg-primary text-primary-foreground shadow-sm" : "hover:bg-muted-foreground/10 text-foreground"
-                      }`}
-                    >
-                      <Split className="w-2.5 h-2.5" />
-                      Split Side
-                    </button>
+                  <div className="flex items-center gap-1.5">
+                    {!isEditMode && (
+                      <div className="flex items-center border border-border bg-muted p-0.5 rounded-md font-mono text-[9px] font-semibold">
+                        <button
+                          onClick={() => setDiffMode("unified")}
+                          className={`px-2 py-0.75 rounded-md transition-all flex items-center gap-1 ${
+                            diffMode === "unified" ? "bg-primary text-primary-foreground shadow-sm" : "hover:bg-muted-foreground/10 text-foreground"
+                          }`}
+                        >
+                          <Maximize2 className="w-2.5 h-2.5" />
+                          Unified
+                        </button>
+                        <button
+                          onClick={() => setDiffMode("split")}
+                          className={`px-2 py-0.75 rounded-md transition-all flex items-center gap-1 ${
+                            diffMode === "split" ? "bg-primary text-primary-foreground shadow-sm" : "hover:bg-muted-foreground/10 text-foreground"
+                          }`}
+                        >
+                          <Split className="w-2.5 h-2.5" />
+                          Split Side
+                        </button>
+                      </div>
+                    )}
+
+                    {(isSuperAdmin || isAdmin) && (
+                      <button
+                        onClick={() => {
+                          if (isEditMode) {
+                            setIsEditMode(false);
+                            setEditContent(activeDraft.content || "");
+                          } else {
+                            setEditContent(activeDraft.content || "");
+                            setIsEditMode(true);
+                          }
+                        }}
+                        className={`flex items-center gap-1 px-2 py-1 rounded-md border text-[9px] font-mono font-bold transition-all cursor-pointer ${
+                          isEditMode
+                            ? "bg-amber-500/10 border-amber-500 text-amber-700 dark:text-amber-400"
+                            : "bg-muted border-border text-foreground hover:bg-primary/5 hover:border-primary/30"
+                        }`}
+                        title={isEditMode ? "Quay về xem Diff" : "Chỉnh sửa trực tiếp nội dung bản thảo"}
+                      >
+                        {isEditMode ? <X className="w-2.5 h-2.5" /> : <Pencil className="w-2.5 h-2.5" />}
+                        {isEditMode ? "Hủy sửa" : "Sửa trực tiếp"}
+                      </button>
+                    )}
                   </div>
                 </div>
 
-                <div className="max-h-[520px] overflow-y-auto p-2 bg-muted/10 border border-border rounded-md">
-                  <WikiDraftDiff oldText={oldText} newText={newText} mode={diffMode} />
-                </div>
+                {isEditMode ? (
+                  <div className="flex flex-col gap-2">
+                    <textarea
+                      value={editContent}
+                      onChange={(e) => setEditContent(e.target.value)}
+                      className="w-full min-h-[420px] border border-border bg-background rounded-md p-3 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-primary resize-y"
+                      placeholder="Nội dung bản thảo (Markdown)..."
+                      spellCheck={false}
+                    />
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        value={editNote}
+                        onChange={(e) => setEditNote(e.target.value)}
+                        placeholder="Ghi chú chỉnh sửa (tuỳ chọn)..."
+                        className="flex-1 border border-border bg-background rounded-md px-2.5 py-1.5 text-xs font-sans focus:outline-none focus:ring-1 focus:ring-primary"
+                      />
+                      <button
+                        onClick={handleSaveEdit}
+                        disabled={isSavingEdit || !editContent.trim()}
+                        className="px-3 py-1.5 text-xs font-mono font-bold bg-amber-500 hover:bg-amber-500/90 text-white rounded-md transition-all disabled:opacity-50 flex items-center gap-1.5 select-none cursor-pointer whitespace-nowrap"
+                      >
+                        <Save className="w-3 h-3" />
+                        {isSavingEdit ? "Đang lưu..." : "Lưu chỉnh sửa"}
+                      </button>
+                      <button
+                        onClick={handleSaveAndApprove}
+                        disabled={isSavingEdit || isApproving || !editContent.trim()}
+                        className="px-3 py-1.5 text-xs font-mono font-bold bg-emerald-600 hover:bg-emerald-600/90 text-white rounded-md transition-all disabled:opacity-50 flex items-center gap-1.5 select-none cursor-pointer whitespace-nowrap"
+                      >
+                        <CheckCircle className="w-3 h-3" />
+                        {isSavingEdit || isApproving ? "Đang xử lý..." : "Lưu & Duyệt"}
+                      </button>
+                    </div>
+                    <p className="text-[10px] font-mono text-amber-600 dark:text-amber-400">
+                      Chỉnh sửa trực tiếp (Admin privilege) — nội dung sẽ được ghi vào bản thảo và có thể duyệt ngay.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="max-h-[520px] overflow-y-auto p-2 bg-muted/10 border border-border rounded-md">
+                    <WikiDraftDiff oldText={oldText} newText={activeDraft.content || ""} mode={diffMode} />
+                  </div>
+                )}
 
                 {activeDraft.note && (
                   <div className="border border-border p-2.5 bg-muted/30 rounded-md text-[10.5px] font-sans text-foreground/90">
@@ -431,67 +582,128 @@ export default function WikiReviewConsole({ isEmbedded = false }: { isEmbedded?:
                 )}
               </div>
 
-              {/* Action Box & AI Checks (4 cols) */}
+              {/* Action Box & AI Checks / Wiki Fixer (4 cols) */}
               <div className="xl:col-span-4 flex flex-col gap-3">
-                
-                {/* AI Auditing */}
-                <WikiAiCheckPanel
-                  content={newText}
-                  title={activeDraft.title}
-                  slug={activeDraft.slug}
-                  wikiPages={wikiPages}
-                />
 
-                {/* Reviewer Note & Buttons */}
-                <div className="border border-border bg-card p-3 rounded-lg shadow-md flex flex-col gap-2.5">
-                  <div className="border-b border-border pb-1.5">
-                    <span className="font-mono text-[9px] uppercase font-extrabold text-foreground">
-                      ĐIỀU PHỐI ĐỀ XUẤT (ACTIONS)
-                    </span>
+                {/* Admin Tab bar (SUPER_ADMIN / ADMIN only) */}
+                {(isSuperAdmin || isAdmin) && (
+                  <div className="flex items-center border border-border bg-muted rounded-lg p-0.5 gap-0.5 font-mono text-[9px] font-bold select-none">
+                    <button
+                      onClick={() => setAdminTab("review")}
+                      className={`flex-1 flex items-center justify-center gap-1 py-1.5 rounded-md transition-all ${
+                        adminTab === "review"
+                          ? "bg-background text-foreground shadow-sm"
+                          : "text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      <FileText className="w-2.5 h-2.5" />
+                      KIỂM DUYỆT
+                    </button>
+                    <button
+                      onClick={() => setAdminTab("fixer")}
+                      className={`flex-1 flex items-center justify-center gap-1 py-1.5 rounded-md transition-all ${
+                        adminTab === "fixer"
+                          ? "bg-blue-600 text-white shadow-sm"
+                          : "text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      <Wrench className="w-2.5 h-2.5" />
+                      WIKI FIXER
+                    </button>
                   </div>
+                )}
 
-                  <div className="flex flex-col gap-1">
-                    <div className="flex justify-between items-center">
-                      <label className="text-[10px] font-mono font-bold uppercase text-foreground">Nhận xét (Reviewer Note)</label>
-                      <span className="text-[8px] font-mono text-rose-500">* Bắt buộc</span>
-                    </div>
-                    <textarea
-                      value={reviewerNote}
-                      onChange={(e) => setReviewerNote(e.target.value)}
-                      placeholder="Nhập ghi chú phản hồi..."
-                      rows={isNoteExpanded ? 3 : 1.5}
-                      onFocus={() => setIsNoteExpanded(true)}
-                      onBlur={() => {
-                        if (!reviewerNote.trim()) setIsNoteExpanded(false);
-                      }}
-                      className="w-full border border-border bg-background rounded-md p-2 text-xs font-sans focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all duration-150"
+                {/* ── KIỂM DUYỆT tab (also default for non-admins) ── */}
+                {(adminTab === "review" || (!isSuperAdmin && !isAdmin)) && (
+                  <>
+                    {/* AI Auditing */}
+                    <WikiAiCheckPanel
+                      content={newText}
+                      title={activeDraft.title}
+                      slug={activeDraft.slug}
+                      wikiPages={wikiPages}
                     />
-                  </div>
 
-                  <div className="flex flex-col gap-1.5 pt-1 font-mono text-[10.5px] font-bold">
-                    <button
-                      onClick={handleApprove}
-                      disabled={isApproving || isRejecting || isRequesting}
-                      className="w-full py-1.5 bg-emerald-600 hover:bg-emerald-600/95 text-white transition-all duration-200 rounded-md shadow-sm hover:shadow-md hover:-translate-y-[0.5px] active:scale-[0.98] disabled:opacity-50 disabled:translate-y-0 disabled:shadow-sm uppercase font-semibold select-none cursor-pointer"
+                    {/* Reviewer Note & Buttons */}
+                    <div className="border border-border bg-card p-3 rounded-lg shadow-md flex flex-col gap-2.5">
+                      <div className="border-b border-border pb-1.5">
+                        <span className="font-mono text-[9px] uppercase font-extrabold text-foreground">
+                          ĐIỀU PHỐI ĐỀ XUẤT (ACTIONS)
+                        </span>
+                      </div>
+
+                      <div className="flex flex-col gap-1">
+                        <div className="flex justify-between items-center">
+                          <label className="text-[10px] font-mono font-bold uppercase text-foreground">Nhận xét (Reviewer Note)</label>
+                          <span className="text-[8px] font-mono text-rose-500">* Bắt buộc</span>
+                        </div>
+                        <textarea
+                          value={reviewerNote}
+                          onChange={(e) => setReviewerNote(e.target.value)}
+                          placeholder="Nhập ghi chú phản hồi..."
+                          rows={isNoteExpanded ? 3 : 1.5}
+                          onFocus={() => setIsNoteExpanded(true)}
+                          onBlur={() => {
+                            if (!reviewerNote.trim()) setIsNoteExpanded(false);
+                          }}
+                          className="w-full border border-border bg-background rounded-md p-2 text-xs font-sans focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all duration-150"
+                        />
+                      </div>
+
+                      <div className="flex flex-col gap-1.5 pt-1 font-mono text-[10.5px] font-bold">
+                        <button
+                          onClick={handleApprove}
+                          disabled={isApproving || isRejecting || isRequesting}
+                          className="w-full py-1.5 bg-emerald-600 hover:bg-emerald-600/95 text-white transition-all duration-200 rounded-md shadow-sm hover:shadow-md hover:-translate-y-[0.5px] active:scale-[0.98] disabled:opacity-50 disabled:translate-y-0 disabled:shadow-sm uppercase font-semibold select-none cursor-pointer"
+                        >
+                          Duyệt & Xuất bản (A)
+                        </button>
+                        <button
+                          onClick={handleRequestChanges}
+                          disabled={isApproving || isRejecting || isRequesting}
+                          className="w-full py-1.5 bg-amber-500 hover:bg-amber-500/95 text-white transition-all duration-200 rounded-md shadow-sm hover:shadow-md hover:-translate-y-[0.5px] active:scale-[0.98] disabled:opacity-50 disabled:translate-y-0 disabled:shadow-sm uppercase font-semibold select-none cursor-pointer"
+                        >
+                          Yêu cầu sửa đổi (C)
+                        </button>
+                        <button
+                          onClick={handleReject}
+                          disabled={isApproving || isRejecting || isRequesting}
+                          className="w-full py-1.5 bg-rose-600 hover:bg-rose-600/95 text-white transition-all duration-200 rounded-md shadow-sm hover:shadow-md hover:-translate-y-[0.5px] active:scale-[0.98] disabled:opacity-50 disabled:translate-y-0 disabled:shadow-sm uppercase font-semibold select-none cursor-pointer"
+                        >
+                          Từ chối bản thảo (R)
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                {/* ── WIKI FIXER tab (admin only) ── */}
+                {adminTab === "fixer" && (isSuperAdmin || isAdmin) && (
+                  <div className="flex flex-col gap-3">
+                    {/* Issue tracker panel for the wiki page being reviewed */}
+                    <WikiIssuePanel
+                      slug={activeDraft.slug || ""}
+                      workspaceId={workspaceId}
+                      onOpenFixer={(issueId: number) => setFixerIssueId(issueId)}
+                    />
+
+                    {/* Inline fixer chat */}
+                    <div
+                      className="border border-blue-200/60 dark:border-blue-800/30 bg-card rounded-lg shadow-md overflow-hidden flex flex-col"
+                      style={{ minHeight: "360px" }}
                     >
-                      Duyệt & Xuất bản (A)
-                    </button>
-                    <button
-                      onClick={handleRequestChanges}
-                      disabled={isApproving || isRejecting || isRequesting}
-                      className="w-full py-1.5 bg-amber-500 hover:bg-amber-500/95 text-white transition-all duration-200 rounded-md shadow-sm hover:shadow-md hover:-translate-y-[0.5px] active:scale-[0.98] disabled:opacity-50 disabled:translate-y-0 disabled:shadow-sm uppercase font-semibold select-none cursor-pointer"
-                    >
-                      Yêu cầu sửa đổi (C)
-                    </button>
-                    <button
-                      onClick={handleReject}
-                      disabled={isApproving || isRejecting || isRequesting}
-                      className="w-full py-1.5 bg-rose-600 hover:bg-rose-600/95 text-white transition-all duration-200 rounded-md shadow-sm hover:shadow-md hover:-translate-y-[0.5px] active:scale-[0.98] disabled:opacity-50 disabled:translate-y-0 disabled:shadow-sm uppercase font-semibold select-none cursor-pointer"
-                    >
-                      Từ chối bản thảo (R)
-                    </button>
+                      <WikiFixerChat
+                        inline
+                        slug={
+                          activeDraft.slug ||
+                          (activeDraft.title ?? "unknown").toLowerCase().replace(/\s+/g, "-")
+                        }
+                        issueId={fixerIssueId}
+                        workspaceId={workspaceId}
+                      />
+                    </div>
                   </div>
-                </div>
+                )}
 
               </div>
 

@@ -1,23 +1,25 @@
 "use client";
 
 import React from "react";
-import { 
-  Bold as BoldIcon, 
-  Italic as ItalicIcon, 
-  Code as CodeIcon, 
-  List as ListIcon, 
-  ListOrdered as ListOrderedIcon, 
-  Quote as QuoteIcon, 
-  Braces as BracesIcon, 
-  Link as LinkIcon, 
-  Network as NetworkIcon, 
+import {
+  Bold as BoldIcon,
+  Italic as ItalicIcon,
+  Code as CodeIcon,
+  List as ListIcon,
+  ListOrdered as ListOrderedIcon,
+  Quote as QuoteIcon,
+  Braces as BracesIcon,
+  Link as LinkIcon,
+  Network as NetworkIcon,
   Minus as MinusIcon,
-  BookOpen
+  BookOpen,
+  ImagePlus,
+  Loader2,
 } from "lucide-react";
 import { WikiContent } from "./WikiContent";
 import { WikilinkAutocomplete } from "./WikilinkAutocomplete";
 import { getTextareaCaretCoords, type CaretCoords } from "../../../src/lib/textarea-caret";
-import { useGetWikiPagesMetadataQuery, WikiPage } from "@/src/redux/feature/mrpApi";
+import { useGetWikiPagesMetadataQuery, useUploadWikiImageMutation, WikiPage } from "@/src/redux/feature/mrpApi";
 import { useSelector } from "react-redux";
 
 function insertWrap(
@@ -133,16 +135,60 @@ export function MarkdownEditor({
 }: MarkdownEditorProps) {
   const [tab, setTab] = React.useState<"edit" | "preview">("edit");
   const taRef = React.useRef<HTMLTextAreaElement>(null);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   // Autocomplete context
   const [link, setLink] = React.useState<LinkContext | null>(null);
   const [coords, setCoords] = React.useState<CaretCoords | null>(null);
-  
+  const [uploadError, setUploadError] = React.useState<string | null>(null);
+
   // RTK query for page pool (lightweight metadata)
   const currentWorkspaceId = useSelector((state: any) => state.workspace.currentWorkspaceId);
   const workspaceId = currentWorkspaceId || "default-workspace";
   const { data: pagesData } = useGetWikiPagesMetadataQuery({ workspaceId });
   const pages: WikiPage[] = React.useMemo(() => pagesData || [], [pagesData]);
+
+  const [uploadWikiImage, { isLoading: isUploading }] = useUploadWikiImageMutation();
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!e.target) return;
+    // Reset input so the same file can be selected again
+    (e.target as HTMLInputElement).value = "";
+    if (!file) return;
+
+    setUploadError(null);
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const result = await uploadWikiImage(formData).unwrap();
+      const safeAlt = file.name.replace(/[[\]]/g, "").replace(/\s+/g, "_");
+      const mdTag = `![${safeAlt}](image://${result.id})`;
+
+      const ta = taRef.current;
+      if (ta) {
+        const cursor = ta.selectionStart ?? value.length;
+        const before = value.slice(0, cursor);
+        const after = value.slice(cursor);
+        const needsNewlineBefore = before.length > 0 && !before.endsWith("\n");
+        const needsNewlineAfter = after.length > 0 && !after.startsWith("\n");
+        const insert = (needsNewlineBefore ? "\n" : "") + mdTag + (needsNewlineAfter ? "\n" : "");
+        const next = before + insert + after;
+        onChange(next);
+        requestAnimationFrame(() => {
+          ta.focus();
+          const pos = cursor + insert.length;
+          ta.setSelectionRange(pos, pos);
+        });
+      } else {
+        onChange(value + "\n" + mdTag + "\n");
+      }
+    } catch {
+      setUploadError("Tải ảnh lên thất bại. Vui lòng thử lại.");
+      setTimeout(() => setUploadError(null), 4000);
+    }
+  };
 
   const updateLinkCtx = React.useCallback(() => {
     const ta = taRef.current;
@@ -194,6 +240,15 @@ export function MarkdownEditor({
 
   return (
     <div className="flex flex-col gap-0 rounded-lg border border-border bg-card text-foreground overflow-hidden font-sans shadow-sm">
+      {/* Hidden file input for image upload */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/png,image/jpeg,image/gif,image/webp,image/svg+xml"
+        className="hidden"
+        onChange={handleImageUpload}
+      />
+
       {/* Header tab controller */}
       <div className="flex items-center justify-between px-3 py-1.5 bg-muted border-b border-border select-none">
         <div className="flex gap-1 border border-border p-0.5 bg-background rounded-md">
@@ -265,7 +320,29 @@ export function MarkdownEditor({
               }}
             />
             <ToolbarButton icon={MinusIcon} label="Đường kẻ ngang" onClick={() => blk("\n\n---\n\n", 6)} />
+
+            <ToolbarSep />
+
+            {/* Image upload */}
+            <button
+              type="button"
+              title={isUploading ? "Đang tải ảnh lên..." : "Chèn hình ảnh (png, jpg, gif, webp, svg)"}
+              disabled={isUploading}
+              onClick={() => fileInputRef.current?.click()}
+              className="flex items-center justify-center w-7 h-7 border border-border bg-card hover:bg-muted hover:border-primary/30 text-foreground rounded-md transition-all shadow-xs disabled:opacity-50 disabled:cursor-not-allowed relative"
+            >
+              {isUploading
+                ? <Loader2 className="w-3.5 h-3.5 animate-spin text-primary" />
+                : <ImagePlus className="w-3.5 h-3.5" />}
+            </button>
           </div>
+
+          {/* Upload error toast */}
+          {uploadError && (
+            <div className="px-3 py-1.5 bg-rose-500/10 border-b border-rose-400/30 text-[10px] font-mono font-semibold text-rose-600 dark:text-rose-400">
+              {uploadError}
+            </div>
+          )}
 
           {/* Editor area */}
           <textarea
