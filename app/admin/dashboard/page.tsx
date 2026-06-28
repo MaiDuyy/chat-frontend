@@ -21,6 +21,7 @@ import { Megaphone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import CompilationPlansPage from "@/app/wiki/plans/page";
 import WikiReviewConsole from "@/app/wiki/review/page";
+import { MrpPipelinePage } from "@/src/features/admin/MrpPipelinePage";
 
 export default function AdminDashboardPage() {
   const searchParams = useSearchParams();
@@ -41,6 +42,8 @@ export default function AdminDashboardPage() {
         return <ChannelManagement />;
       case "departments":
         return <DepartmentManagement />;
+      case "mrp-pipeline":
+        return <MrpPipelinePage />;
       case "documents":
         return <DocumentManagement />;
       case "wiki-plans":

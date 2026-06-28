@@ -38,6 +38,8 @@ import { getPageType } from "@/app/wiki/components/WikilinkAutocomplete";
 import { useHasRole } from "@/src/lib/rbac/usePermission";
 import { WikiPagination } from "@/app/wiki/components/WikiPagination";
 import { DocumentManagement } from "@/src/features/admin/DocumentManagement";
+import WikiReviewConsole from "@/app/wiki/review/page";
+import AdminMrpPage from "@/app/admin/mrp/page";
 import {
   WikiAIChatPanel,
   WikiAIChatButton,
@@ -86,7 +88,7 @@ export function AdminWikiDashboard() {
   const workspaceId = viewAllWiki && isSystemAdmin ? "all" : (currentWorkspaceId || "default-workspace");
 
   const [showAIChat, setShowAIChat] = React.useState(false);
-  const [activeTab, setActiveTab] = React.useState<"knowledge" | "documents" | "activity">(
+  const [activeTab, setActiveTab] = React.useState<"knowledge" | "documents" | "mrp" | "review" | "activity">(
     "knowledge"
   );
   const [page, setPage] = React.useState(0);
@@ -307,11 +309,11 @@ export function AdminWikiDashboard() {
             <span className="text-[10px] font-mono uppercase font-bold text-muted-foreground tracking-widest">
               Bảng điều khiển quản trị
             </span>
-            <h1 className="text-lg font-display font-semibold text-foreground leading-tight flex items-center gap-2 mt-0.5">
+            {/* <h1 className="text-lg font-display font-semibold text-foreground leading-tight flex items-center gap-2 mt-0.5">
               <BookOpen className="w-5 h-5 text-primary shrink-0" />
               Quản lý Wiki
               <WikiCompilationStatus workspaceId={workspaceId} compact />
-            </h1>
+            </h1> */}
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
@@ -390,7 +392,7 @@ export function AdminWikiDashboard() {
         </div>
 
         {/* Wiki Compilation Status (WeKnora-style polling) */}
-        <WikiCompilationStatus workspaceId={workspaceId} />
+        {/* <WikiCompilationStatus workspaceId={workspaceId} /> */}
 
         {/* Tab switcher */}
         <div className="flex border-b border-border select-none gap-1">
@@ -404,7 +406,7 @@ export function AdminWikiDashboard() {
           >
             Cơ sở tri thức
           </button>
-          <button
+          {/* <button
             onClick={() => setActiveTab("documents")}
             className={`px-4 py-2 text-xs font-semibold border-b-2 transition-all cursor-pointer ${
               activeTab === "documents"
@@ -413,8 +415,33 @@ export function AdminWikiDashboard() {
             }`}
           >
             Tài nguyên & Tài liệu gốc
+          </button> */}
+          <button
+            onClick={() => setActiveTab("mrp")}
+            className={`px-4 py-2 text-xs font-semibold border-b-2 transition-all cursor-pointer flex items-center gap-1.5 ${
+              activeTab === "mrp"
+                ? "border-primary text-foreground"
+                : "border-transparent text-muted-foreground hover:text-foreground"
+            }`}
+          >
+          Tài nguyền và Tài liệu gốc
           </button>
           <button
+            onClick={() => setActiveTab("review")}
+            className={`px-4 py-2 text-xs font-semibold border-b-2 transition-all cursor-pointer ${
+              activeTab === "review"
+                ? "border-primary text-foreground"
+                : "border-transparent text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            {/* Duyệt bản thảo
+            {pendingCount > 0 && (
+              <span className="ml-1.5 inline-flex items-center justify-center min-w-[16px] h-[16px] px-1 rounded-full text-[9px] font-bold bg-amber-500 text-white leading-none">
+                {pendingCount}
+              </span>
+            )} */}
+          </button>
+          {/* <button
             onClick={() => setActiveTab("activity")}
             className={`px-4 py-2 text-xs font-semibold border-b-2 transition-all cursor-pointer ${
               activeTab === "activity"
@@ -423,11 +450,19 @@ export function AdminWikiDashboard() {
             }`}
           >
             Nhật ký hoạt động
-          </button>
+          </button> */}
         </div>
 
         {/* Tab content */}
-        {activeTab === "activity" ? (
+        {activeTab === "mrp" ? (
+          <div className="mt-3">
+            <AdminMrpPage />
+          </div>
+        ) : activeTab === "review" ? (
+          <div className="mt-3">
+            <WikiReviewConsole isEmbedded={true} />
+          </div>
+        ) : activeTab === "activity" ? (
           <div className="mt-1 grid grid-cols-1 lg:grid-cols-12 gap-4">
             <div className="lg:col-span-8">
               <WikiActivityLog workspaceId={workspaceId} limit={30} />

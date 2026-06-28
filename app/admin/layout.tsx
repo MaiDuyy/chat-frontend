@@ -17,6 +17,7 @@ const TAB_TITLES: Record<string, string> = {
     channels: "Quản lý Kênh chat",
     departments: "Quản lý Phòng ban",
     documents: "Quản lý Tài liệu thô",
+    "mrp-pipeline": "MRP Pipeline — Biên soạn tri thức",
     "wiki-plans": "Kế hoạch Biên soạn MRP",
     "wiki-drafts": "Duyệt Bản thảo Wiki",
     analytics: "Thống kê hệ thống",

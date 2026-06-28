@@ -345,6 +345,17 @@ export const mrpApi = apiSlice.injectEndpoints({
       invalidatesTags: ['Tasks'],
     }),
 
+    // Gửi lại bản thảo sau khi sửa (tác giả: NEEDS_REVISION → PENDING)
+    submitRevisionDraft: builder.mutation<WikiPageDraft, { draftId: number; content?: string; note?: string }>({
+      query: ({ draftId, ...body }) => ({
+        url: `/mrp/drafts/${draftId}/submit-revision`,
+        method: 'POST',
+        body,
+      }),
+      transformResponse: (response: WikiPageDraft) => normalizeWikiDraft(response),
+      invalidatesTags: ['Tasks'],
+    }),
+
     // Rút lại bản thảo (tác giả)
     withdrawDraft: builder.mutation<WikiPageDraft, number>({
       query: (draftId) => ({
@@ -633,6 +644,7 @@ export const {
   useApproveDraftMutation,
   useRejectDraftMutation,
   useRequestChangesOnDraftMutation,
+  useSubmitRevisionDraftMutation,
   useWithdrawDraftMutation,
   useBulkApproveDraftsMutation,
   useGetWikiPagesQuery,

@@ -94,6 +94,11 @@ const data = {
       icon: BookOpen,
       items: [
         {
+          title: "🚀 MRP Pipeline",
+          id: "mrp",
+          url: "/admin/mrp",
+        },
+        {
           title: "Quản lý Tài liệu",
           id: "documents",
           url: "/admin/dashboard?tab=documents",
