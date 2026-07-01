@@ -20,6 +20,7 @@ import {
   useGetDraftsByStatusQuery,
   PaginatedResponse,
   SourceCompilationPlan,
+  WikiStatsDto,
 } from "@/src/redux/feature/mrpApi";
 import { useHasRole } from "@/src/lib/rbac/usePermission";
 import { DocumentManagement } from "@/src/features/admin/DocumentManagement";
@@ -30,14 +31,7 @@ import CompilationPlansPage from "@/app/wiki/plans/page";
 // Live stats header
 // ---------------------------------------------------------------------------
 
-function LiveStatsBar({ workspaceId }: { workspaceId: string }) {
-  const [poll, setPoll] = React.useState(6000);
-  const { data: stats } = useGetWikiStatsQuery({ workspaceId }, { pollingInterval: poll });
-
-  React.useEffect(() => {
-    if (stats) setPoll((stats.activeCompilations ?? 0) > 0 || stats.isIndexing ? 3000 : 8000);
-  }, [stats]);
-
+function LiveStatsBar({ stats }: { stats?: WikiStatsDto }) {
   const items = [
     {
       icon: <Loader2 className={`w-3.5 h-3.5 ${(stats?.activeCompilations ?? 0) > 0 ? "animate-spin" : ""}`} />,
@@ -133,7 +127,7 @@ function AttentionBanners({
 // ---------------------------------------------------------------------------
 
 function WikiPublishedTab({ workspaceId }: { workspaceId: string }) {
-  const { data: stats } = useGetWikiStatsQuery({ workspaceId }, { pollingInterval: 15000 });
+  const { data: stats } = useGetWikiStatsQuery({ workspaceId }, { pollingInterval: 30000 });
 
   return (
     <div className="flex flex-col items-center justify-center gap-5 py-16">
@@ -189,18 +183,32 @@ export default function AdminMrpPage() {
 
   const [activeTab, setActiveTab] = React.useState("upload");
 
-  // Badge counts
+  // Dynamic stats polling interval: 15s by default, 5s during activity, 30s when idle
+  const [statsPoll, setStatsPoll] = React.useState(15000);
+  const { data: stats } = useGetWikiStatsQuery({ workspaceId }, { pollingInterval: statsPoll });
+
+  React.useEffect(() => {
+    if (stats) {
+      const isIndexingOrCompiling = stats.isIndexing || (stats.activeCompilations ?? 0) > 0 || (stats.finalizingDocs ?? 0) > 0;
+      setStatsPoll(isIndexingOrCompiling ? 5000 : 30000);
+    }
+  }, [stats]);
+
+  const isIndexingOrCompiling = stats?.isIndexing || (stats?.activeCompilations ?? 0) > 0 || (stats?.finalizingDocs ?? 0) > 0;
+  const badgePollInterval = isIndexingOrCompiling ? 5000 : 30000;
+
+  // Badge counts (throttled based on stats to avoid unnecessary server load)
   const { data: plansData, refetch: refetchPlans } = useGetCompilationPlansQuery(
     { workspaceId, page: 0, size: 200 },
-    { pollingInterval: 10000 }
+    { pollingInterval: badgePollInterval }
   );
   const { data: revisionData, refetch: refetchRevision } = useGetDraftsByStatusQuery(
     { status: "NEEDS_REVISION", limit: 200 },
-    { pollingInterval: 10000 }
+    { pollingInterval: badgePollInterval }
   );
   const { data: pendingData, refetch: refetchPending } = useGetDraftsByStatusQuery(
     { status: "PENDING", limit: 200 },
-    { pollingInterval: 10000 }
+    { pollingInterval: badgePollInterval }
   );
 
   const pendingPlansCount = React.useMemo(() => {
@@ -250,7 +258,7 @@ export default function AdminMrpPage() {
             Tải tài liệu → Kế hoạch → Bản thảo → Wiki chính thức
           </p>
         </div>
-        <LiveStatsBar workspaceId={workspaceId} />
+        <LiveStatsBar stats={stats} />
       </div>
 
       {/* ── Attention banners ── */}

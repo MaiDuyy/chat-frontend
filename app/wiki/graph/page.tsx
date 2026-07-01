@@ -499,7 +499,7 @@ export default function WikiGraphPage() {
                 </span>
               )}
               <Link
-                href={`/wiki/${encodeURIComponent(selectedSlug)}${workspaceId && workspaceId !== 'default-workspace' ? `?workspaceId=${encodeURIComponent(workspaceId)}` : ''}`}
+                href={`/wiki/${encodeURIComponent(selectedSlug ?? "")}${workspaceId && workspaceId !== 'default-workspace' ? `?workspaceId=${encodeURIComponent(workspaceId)}` : ''}`}
                 className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent border border-border transition-colors cursor-pointer"
                 title="Mở trang toàn màn hình"
               >

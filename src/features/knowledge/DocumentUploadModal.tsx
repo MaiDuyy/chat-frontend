@@ -95,8 +95,9 @@ export function DocumentUploadModal({ isOpen, onClose, onSuccess, defaultWorkspa
     const [uploadDocument, { isLoading }] = useUploadDocumentMutation();
 
     const currentWorkspaceId = useSelector((state: RootState) => state.workspace.currentWorkspaceId);
+    const user = useSelector((state: RootState) => state.auth.user);
     const { data: workspacesData } = useGetUserWorkspacesQuery(undefined, { skip: !isOpen });
-    const { data: departmentsData } = useGetUserDepartmentsQuery(undefined, { skip: !isOpen });
+    const { data: departmentsData } = useGetUserDepartmentsQuery(user?.id ?? '', { skip: !isOpen || !user?.id });
 
     const workspaces = Array.isArray(workspacesData) ? workspacesData : [];
     const departments = Array.isArray(departmentsData) ? departmentsData : [];

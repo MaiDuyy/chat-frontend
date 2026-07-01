@@ -253,12 +253,9 @@ export default function KnowledgePage() {
                     <MarkdownEditorModal
                         isOpen={!!editorDoc}
                         onClose={() => setEditorDoc(null)}
-                        document={{
-                            id: editorDoc.id,
-                            fileName: editorDoc.fileName,
-                            status: 'PREVIEW',
-                            markdownContent: editorDoc.markdownContent,
-                        } as Document}
+                        initialMarkdown={editorDoc.markdownContent || ""}
+                        documentId={editorDoc.id}
+                        fileName={editorDoc.fileName}
                     />
                 )}
             </div>

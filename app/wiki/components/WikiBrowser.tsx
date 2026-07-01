@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React from "react";
 import Link from "next/link";
@@ -22,6 +22,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import { WikiIssuePanel } from "./WikiIssuePanel";
 import { WikiFixerChat } from "./WikiFixerChat";
+import { useHasAnyRole } from "@/src/lib/rbac/usePermission";
 
 // ── Tree types ────────────────────────────────────────────────────────
 interface TreeNode {
@@ -330,6 +331,12 @@ function WikiReader({ workspaceId, selectedSlug, systemView, navHistory, onNavig
   const [fixerOpen, setFixerOpen] = React.useState(false);
   const [fixerIssueId, setFixerIssueId] = React.useState<number | undefined>(undefined);
 
+  const canManageWiki = useHasAnyRole([
+    "SUPER_ADMIN",
+    "ADMIN",
+    "WORKSPACE_MANAGER",
+  ]);
+
   const { data: indexData, isLoading: indexLoading } = useGetWikiIndexQuery(
     { workspaceId, limit: 200 },
     { skip: systemView !== "index" }
@@ -341,7 +348,7 @@ function WikiReader({ workspaceId, selectedSlug, systemView, navHistory, onNavig
   const { data: allPagesData } = useGetWikiPagesMetadataQuery({ workspaceId });
   const { data: issueCount } = useGetWikiIssueCountQuery(
     { slug: selectedSlug ?? "" },
-    { skip: !selectedSlug || systemView === "index" }
+    { skip: !selectedSlug || systemView === "index" || !canManageWiki }
   );
   const openIssueCount = typeof issueCount === "number" ? issueCount : 0;
 
@@ -536,23 +543,25 @@ function WikiReader({ workspaceId, selectedSlug, systemView, navHistory, onNavig
                   >
                     <Network className="w-3.5 h-3.5" />
                   </Link>
-                  <button
-                    onClick={() => setShowIssues((v) => !v)}
-                    className={cn(
-                      "relative p-1.5 rounded-md border transition-colors",
-                      showIssues
-                        ? "bg-amber-500/10 border-amber-400/30 text-amber-600 dark:text-amber-400"
-                        : "text-muted-foreground hover:text-foreground hover:bg-accent border-border"
-                    )}
-                    title="Vấn đề chất lượng trang"
-                  >
-                    <AlertTriangle className="w-3.5 h-3.5" />
-                    {openIssueCount > 0 && (
-                      <span className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-red-500 text-[8px] font-bold text-white flex items-center justify-center">
-                        {openIssueCount > 9 ? "9+" : openIssueCount}
-                      </span>
-                    )}
-                  </button>
+                  {canManageWiki && (
+                    <button
+                      onClick={() => setShowIssues((v) => !v)}
+                      className={cn(
+                        "relative p-1.5 rounded-md border transition-colors",
+                        showIssues
+                          ? "bg-amber-500/10 border-amber-400/30 text-amber-600 dark:text-amber-400"
+                          : "text-muted-foreground hover:text-foreground hover:bg-accent border-border"
+                      )}
+                      title="Vấn đề chất lượng trang"
+                    >
+                      <AlertTriangle className="w-3.5 h-3.5" />
+                      {openIssueCount > 0 && (
+                        <span className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-red-500 text-[8px] font-bold text-white flex items-center justify-center">
+                          {openIssueCount > 9 ? "9+" : openIssueCount}
+                        </span>
+                      )}
+                    </button>
+                  )}
                 </div>
               </div>
               {pageData.summary && (
@@ -563,7 +572,7 @@ function WikiReader({ workspaceId, selectedSlug, systemView, navHistory, onNavig
             </div>
 
             {/* Wiki Issue Panel */}
-            {showIssues && selectedSlug && (
+            {canManageWiki && showIssues && selectedSlug && (
               <WikiIssuePanel
                 slug={selectedSlug}
                 workspaceId={workspaceId}
@@ -631,7 +640,7 @@ function WikiReader({ workspaceId, selectedSlug, systemView, navHistory, onNavig
         )}
       </div>
       {/* Wiki Fixer Chat Sheet */}
-      {selectedSlug && (
+      {canManageWiki && selectedSlug && (
         <WikiFixerChat
           open={fixerOpen}
           onClose={() => { setFixerOpen(false); setFixerIssueId(undefined); }}

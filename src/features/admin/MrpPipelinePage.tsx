@@ -26,6 +26,7 @@ import {
   useGetWikiStatsQuery,
   useGetCompilationPlansQuery,
   useGetDraftsByStatusQuery,
+  WikiStatsDto,
 } from "@/src/redux/feature/mrpApi";
 import { useHasRole } from "@/src/lib/rbac/usePermission";
 import { DocumentManagement } from "@/src/features/admin/DocumentManagement";
@@ -51,16 +52,7 @@ interface StepMeta {
 // Status bar — live metric chips
 // ---------------------------------------------------------------------------
 
-function StatusBar({ workspaceId }: { workspaceId: string }) {
-  const [pollingMs, setPollingMs] = React.useState(5000);
-  const { data: stats, isFetching } = useGetWikiStatsQuery({ workspaceId }, { pollingInterval: pollingMs });
-
-  React.useEffect(() => {
-    if (stats) {
-      setPollingMs((stats.activeCompilations ?? 0) > 0 || stats.isIndexing ? 3000 : 8000);
-    }
-  }, [stats]);
-
+function StatusBar({ stats, isFetching }: { stats?: WikiStatsDto; isFetching?: boolean }) {
   const chips = [
     {
       label: "Đang biên soạn",
@@ -88,7 +80,7 @@ function StatusBar({ workspaceId }: { workspaceId: string }) {
 
   return (
     <div className="flex items-center gap-2 flex-wrap">
-      {isFetching && !stats && (
+      {isFetching && (
         <RefreshCw className="w-3.5 h-3.5 animate-spin text-muted-foreground" />
       )}
       {chips.map((c) => (
@@ -184,20 +176,31 @@ export function MrpPipelinePage() {
 
   const [activeStep, setActiveStep] = React.useState<PipelineStep>("upload");
 
-  // Live counts for badges
-  const { data: stats } = useGetWikiStatsQuery(
+  // Dynamic stats polling interval: 15s by default, 5s during activity, 30s when idle
+  const [statsPollMs, setStatsPollMs] = React.useState(15000);
+  const { data: stats, isFetching: isStatsFetching } = useGetWikiStatsQuery(
     { workspaceId },
-    { pollingInterval: 8000 }
+    { pollingInterval: statsPollMs }
   );
+
+  React.useEffect(() => {
+    if (stats) {
+      const isIndexingOrCompiling = stats.isIndexing || (stats.activeCompilations ?? 0) > 0 || (stats.finalizingDocs ?? 0) > 0;
+      setStatsPollMs(isIndexingOrCompiling ? 5000 : 30000);
+    }
+  }, [stats]);
+
+  const isIndexingOrCompiling = stats?.isIndexing || (stats?.activeCompilations ?? 0) > 0 || (stats?.finalizingDocs ?? 0) > 0;
+  const badgePollInterval = isIndexingOrCompiling ? 5000 : 30000;
 
   const { data: plansData } = useGetCompilationPlansQuery(
     { workspaceId, page: 0, size: 200 },
-    { pollingInterval: 10000 }
+    { pollingInterval: badgePollInterval }
   );
 
   const { data: revisionData } = useGetDraftsByStatusQuery(
     { status: "NEEDS_REVISION", limit: 200 },
-    { pollingInterval: 10000 }
+    { pollingInterval: badgePollInterval }
   );
 
   // Count pending plans (PENDING_REVIEW)
@@ -276,7 +279,7 @@ export function MrpPipelinePage() {
             Quy trình từ tài liệu gốc đến trang Wiki chính thức
           </p>
         </div>
-        <StatusBar workspaceId={workspaceId} />
+        <StatusBar stats={stats} isFetching={isStatsFetching} />
       </div>
 
       {/* ── Pipeline step navigator ── */}

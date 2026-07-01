@@ -294,6 +294,7 @@ export const mrpApi = apiSlice.injectEndpoints({
         return response.map(normalizeWikiDraft);
       },
       providesTags: ['Tasks'],
+      keepUnusedDataFor: 120,
     }),
 
     // Lấy chi tiết một bản thảo theo ID
@@ -414,6 +415,7 @@ export const mrpApi = apiSlice.injectEndpoints({
         return response.map(normalizeWikiPage);
       },
       providesTags: ['Documents'],
+      keepUnusedDataFor: 120,
     }),
 
     // Lấy đồ thị liên kết tri thức (Wiki Graph) của Workspace
@@ -452,6 +454,7 @@ export const mrpApi = apiSlice.injectEndpoints({
         return queryParts.length ? `${url}?${queryParts.join('&')}` : url;
       },
       providesTags: ['Tasks'],
+      keepUnusedDataFor: 120,
     }),
 
     // Lấy chi tiết một kế hoạch biên soạn
@@ -547,6 +550,7 @@ fetchWikiImageRaw: builder.query<string, string>({
     getWikiStats: builder.query<WikiStatsDto, { workspaceId: string }>({
       query: ({ workspaceId }) => `/mrp/wiki/stats?workspaceId=${workspaceId}`,
       providesTags: ['Documents', 'Tasks'],
+      keepUnusedDataFor: 120,
     }),
 
     // --- Wiki Activity Log ---
